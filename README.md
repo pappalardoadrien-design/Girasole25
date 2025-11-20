@@ -1,6 +1,6 @@
 # 🌞 GIRASOLE 2025 - Interface Web Professionnelle
 
-Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audit de 52 centrales photovoltaïques (39 SOL + 13 TOITURE).
+Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audit de 52 centrales photovoltaïques (toutes classées SOL car audits toiture incluent systématiquement installations au sol).
 
 ## 🎯 Objectifs du Projet
 
@@ -29,16 +29,16 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 ## 📊 Fonctionnalités Principales
 
 ### 1. **Dashboard Mission** 📈
-- Vue d'ensemble 52 centrales (SOL + TOITURE)
+- Vue d'ensemble 52 centrales (toutes type SOL)
 - Statistiques temps réel : Total / Auditées / Validées / Photos
-- Graphiques interactifs (Chart.js) : Répartition par statut et type
+- Graphiques interactifs (Chart.js) : Répartition par statut
 - Monitoring volumétrie (JSON, Photos, Heures terrain)
 
 ### 2. **Gestion Centrales** 📋
 - Liste complète des 52 centrales avec filtres
 - Changement de statut : À Auditer → En Cours → Terminé → Validé
 - Détails par centrale : Retours JSON, photos, timeline
-- Recherche par type (SOL/TOITURE) et statut
+- Recherche par nom, localisation et statut
 
 ### 3. **Upload Retours JSON V4** 📥
 - Formulaire d'enregistrement métadonnées retours techniciens
@@ -63,8 +63,7 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 ### **Schema Principal**
 ```sql
 centrales (52 rows)
-├── SOL (39 centrales)
-└── TOITURE (13 centrales)
+└── SOL (52 centrales - audits toiture incluent installations sol)
 
 Statuts possibles:
 - A_AUDITER (initial)
@@ -111,7 +110,7 @@ webapp/
 │       ├── app.js             # Frontend JavaScript (dashboard, API calls)
 │       └── styles.css         # Custom CSS styles
 ├── migrations/
-│   └── 0001_init_schema.sql   # Schema D1 initial (52 centrales)
+│   └── 0001_init_centrales_reelles.sql   # Migration D1 avec 52 centrales réelles
 ├── dist/                      # Build output (généré par Vite)
 ├── .wrangler/                 # Wrangler state (D1 local, cache)
 ├── ecosystem.config.cjs       # Configuration PM2
@@ -236,8 +235,7 @@ curl -X PUT http://localhost:3000/api/centrales/1/statut \
 ## 📅 Timeline Mission
 
 ### **Par Centrale**
-- **SOL** (39) : 6h30 terrain + traitement
-- **TOITURE** (13) : 8h10 terrain + traitement
+- **SOL** (52) : 6h30-8h10 terrain + traitement selon configuration (toiture+sol ou sol uniquement)
 
 ### **Mission Complète**
 - **360 heures** terrain avec 2-3 techniciens
@@ -314,13 +312,13 @@ npm run deploy:prod
 ## ✅ Tests et Validation
 
 ### **Tests Effectués**
-- ✅ API `/api/stats` : 52 centrales, 39 SOL, 13 TOITURE
-- ✅ API `/api/centrales` : Liste complète avec filtres
+- ✅ API `/api/stats` : 52 centrales SOL (audits toiture + sol inclus)
+- ✅ API `/api/centrales` : Liste complète avec données réelles (ANNEXE 1)
 - ✅ Dashboard frontend : Charts + statistiques
 - ✅ Upload form : Enregistrement retours JSON
-- ✅ Database D1 locale : Migrations appliquées
+- ✅ Database D1 locale : Migrations appliquées avec 52 centrales réelles
 - ✅ PM2 process : Serveur stable et accessible
-- ✅ GitHub sync : Code pushé avec succès
+- ✅ GitHub sync : Code pushé avec corrections type
 
 ### **Statut Final**
 - **Sandbox** : ✅ 100% Opérationnel
