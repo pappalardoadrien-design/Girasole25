@@ -1786,6 +1786,82 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
           </div>
         </div>
 
+        <!-- Synthèse Exécutive & Recommandations -->
+        <div class="info-section" style="background: #fffbeb; border-left: 5px solid #f59e0b;">
+          <h2 style="color: #92400e; margin-top: 0;">📋 Synthèse Exécutive & Recommandations DiagPV</h2>
+          
+          ${statsConformite.anomalie_majeure > 0 || statsConformite.non_conforme > 0 ? `
+            <div style="padding: 15px; background: #fee2e2; border-left: 4px solid #dc2626; border-radius: 8px; margin-bottom: 20px;">
+              <h3 style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 16px;">🚨 Actions Prioritaires</h3>
+              <p style="margin: 0; color: #991b1b; font-size: 14px; line-height: 1.6;">
+                <strong>${statsConformite.anomalie_majeure + statsConformite.non_conforme} non-conformités majeures</strong> détectées nécessitant une intervention immédiate pour garantir la sécurité et les performances de l'installation.
+              </p>
+            </div>
+          ` : ''}
+          
+          <div style="padding: 20px; background: white; border-radius: 10px; border: 2px solid #e5e7eb; margin-bottom: 20px;">
+            <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">🎯 Préconisations Hiérarchisées</h3>
+            
+            ${statsConformite.anomalie_majeure > 0 || statsConformite.non_conforme > 0 ? `
+              <div style="padding: 15px; background: #fef2f2; border-left: 5px solid #dc2626; border-radius: 8px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <span style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">PRIORITÉ HAUTE</span>
+                  <strong style="color: #7f1d1d; font-size: 15px;">Résolution Non-Conformités Majeures</strong>
+                </div>
+                <p style="margin: 0 0 10px 0; color: #991b1b; font-size: 14px; line-height: 1.6;">
+                  Traitement immédiat des ${statsConformite.anomalie_majeure + statsConformite.non_conforme} points critiques identifiés. Risque : sécurité électrique, garanties constructeur, pertes production.
+                </p>
+                <div style="display: flex; gap: 15px; font-size: 13px; font-weight: 600; color: #7f1d1d;">
+                  <span>💰 Impact : ${((statsConformite.anomalie_majeure + statsConformite.non_conforme) * mission.puissance_kwc * 0.15 * 150).toFixed(0)} €/an</span>
+                  <span>⚡ Perte prod. : ${((statsConformite.anomalie_majeure + statsConformite.non_conforme) * mission.puissance_kwc * 0.15 * 1000).toFixed(0)} kWh/an</span>
+                  <span>⏱️ Délai : < 30 jours</span>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${statsConformite.anomalie_mineure > 0 ? `
+              <div style="padding: 15px; background: #fffbeb; border-left: 5px solid #f59e0b; border-radius: 8px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <span style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">PRIORITÉ MOYENNE</span>
+                  <strong style="color: #78350f; font-size: 15px;">Optimisations Performance</strong>
+                </div>
+                <p style="margin: 0 0 10px 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+                  Correction de ${statsConformite.anomalie_mineure} anomalies mineures pour optimiser le rendement. Nettoyage modules, resserrage connexions, équilibrage strings.
+                </p>
+                <div style="display: flex; gap: 15px; font-size: 13px; font-weight: 600; color: #78350f;">
+                  <span>💰 Gain potentiel : ${(statsConformite.anomalie_mineure * mission.puissance_kwc * 0.05 * 150).toFixed(0)} €/an</span>
+                  <span>⚡ Gain prod. : ${(statsConformite.anomalie_mineure * mission.puissance_kwc * 0.05 * 1000).toFixed(0)} kWh/an</span>
+                  <span>⏱️ Délai : 2-3 mois</span>
+                </div>
+              </div>
+            ` : ''}
+            
+            <div style="padding: 15px; background: #f0fdf4; border-left: 5px solid #10b981; border-radius: 8px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">RECOMMANDÉ</span>
+                <strong style="color: #065f46; font-size: 15px;">Maintenance Préventive Continue</strong>
+              </div>
+              <p style="margin: 0 0 10px 0; color: #047857; font-size: 14px; line-height: 1.6;">
+                Mise en place contrat O&M avec audits semestriels, nettoyage annuel, monitoring temps réel, vérifications thermographiques.
+              </p>
+              <div style="display: flex; gap: 15px; font-size: 13px; font-weight: 600; color: #065f46;">
+                <span>💰 ROI maintenance : +3-5% production/an</span>
+                <span>📊 Monitoring : Détection précoce pannes</span>
+                <span>🛡️ Protection : Garanties prolongées</span>
+              </div>
+            </div>
+          </div>
+          
+          <div style="padding: 15px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 6px;">
+            <strong style="color: #1e40af;">📌 Note DiagPV:</strong> 
+            <span style="color: #1e3a8a; font-size: 14px;">
+              Audit conforme normes IEC 62446-1, IEC 61215/61730, NF C 15-100. 
+              Rapport complet avec photos HD, mesures électriques, recommandations chiffrées. 
+              Validité 12 mois. Contact : adrien@diagpv.fr | +33 6 XX XX XX XX
+            </span>
+          </div>
+        </div>
+
         <!-- Checklist Détaillée -->
         <div class="info-section">
           <h2 style="color: #1e40af; margin-top: 0;">✅ Checklist Audit V4 (54 Points CDC)</h2>

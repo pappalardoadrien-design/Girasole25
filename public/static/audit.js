@@ -1,28 +1,82 @@
-// audit.js - Interface Audit Terrain Mobile avec Auto-Save
+// audit.js - Interface Audit Terrain Mobile avec Auto-Save + Mode Offline
 
 const missionId = parseInt(window.location.pathname.split('/')[2]);
 let checklistItems = [];
 let autoSaveTimer = null;
+let isOnline = navigator.onLine;
+let pendingSyncQueue = [];
+
+// LocalStorage keys
+const STORAGE_KEY = `audit_mission_${missionId}`;
+const SYNC_QUEUE_KEY = `sync_queue_${missionId}`;
+
+// Détecter changements connexion
+window.addEventListener('online', () => {
+  isOnline = true;
+  console.log('✅ Connexion rétablie - Sync en cours...');
+  document.getElementById('offlineIndicator')?.remove();
+  syncPendingChanges();
+});
+
+window.addEventListener('offline', () => {
+  isOnline = false;
+  console.log('⚠️ Mode offline activé');
+  showOfflineIndicator();
+});
+
+// Indicateur mode offline
+function showOfflineIndicator() {
+  if (document.getElementById('offlineIndicator')) return;
+  
+  const indicator = document.createElement('div');
+  indicator.id = 'offlineIndicator';
+  indicator.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#f59e0b;color:white;padding:10px 20px;border-radius:20px;z-index:100;box-shadow:0 4px 6px rgba(0,0,0,0.1);';
+  indicator.innerHTML = '<i class="fas fa-wifi-slash mr-2"></i>Mode Offline - Données sauvegardées localement';
+  document.body.appendChild(indicator);
+}
 
 // Charger checklist au démarrage
 async function loadChecklist() {
   try {
-    const response = await axios.get(`/api/checklist/${missionId}`);
+    // Essayer de charger depuis localStorage d'abord (mode offline)
+    const localData = localStorage.getItem(STORAGE_KEY);
     
-    if (!response.data.success || response.data.data.length === 0) {
-      // Initialiser checklist si vide
-      await axios.post(`/api/checklist/${missionId}/init`);
-      const retry = await axios.get(`/api/checklist/${missionId}`);
-      checklistItems = retry.data.data;
+    if (isOnline) {
+      // Mode online : charger depuis serveur
+      const response = await axios.get(`/api/checklist/${missionId}`);
+      
+      if (!response.data.success || response.data.data.length === 0) {
+        // Initialiser checklist si vide
+        await axios.post(`/api/checklist/${missionId}/init`);
+        const retry = await axios.get(`/api/checklist/${missionId}`);
+        checklistItems = retry.data.data;
+      } else {
+        checklistItems = response.data.data;
+      }
+      
+      // Sauvegarder en local pour backup offline
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(checklistItems));
+      
+    } else if (localData) {
+      // Mode offline : charger depuis localStorage
+      checklistItems = JSON.parse(localData);
+      showOfflineIndicator();
+      console.log('📦 Checklist chargée depuis localStorage (mode offline)');
     } else {
-      checklistItems = response.data.data;
+      throw new Error('Aucune donnée locale disponible et pas de connexion');
     }
     
     renderChecklist();
     updateProgress();
+    
+    // Sync changements en attente si connexion rétablie
+    if (isOnline) {
+      syncPendingChanges();
+    }
+    
   } catch (error) {
     console.error('Erreur chargement:', error);
-    alert('Erreur chargement checklist');
+    alert('⚠️ Erreur chargement checklist. Vérifiez votre connexion.');
   }
 }
 
@@ -135,20 +189,75 @@ async function updateStatus(itemId, statut, conformite) {
   updateProgress();
 }
 
+// Compresser image avant upload (réduit ~80% taille)
+async function compressImage(file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Redimensionner si nécessaire
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = width * ratio;
+          height = height * ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir en JPEG avec compression
+        canvas.toBlob(
+          (blob) => {
+            const compressedReader = new FileReader();
+            compressedReader.onload = (e2) => {
+              const base64 = e2.target.result.split(',')[1];
+              const compressionRatio = ((1 - blob.size / file.size) * 100).toFixed(0);
+              console.log(`📷 Photo compressée: ${(file.size/1024).toFixed(0)}KB → ${(blob.size/1024).toFixed(0)}KB (-${compressionRatio}%)`);
+              resolve(base64);
+            };
+            compressedReader.readAsDataURL(blob);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // Gérer upload photo
-function handlePhotoUpload(itemId, event) {
+async function handlePhotoUpload(itemId, event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  // Vérifier taille (max 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    alert('⚠️ Photo trop volumineuse (max 5MB)');
+  // Vérifier taille originale (max 20MB)
+  if (file.size > 20 * 1024 * 1024) {
+    alert('⚠️ Photo trop volumineuse (max 20MB)');
     return;
   }
   
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64 = e.target.result.split(',')[1]; // Retirer préfixe data:image
+  try {
+    // Afficher loader
+    const itemEl = document.getElementById(`item-${itemId}`);
+    if (itemEl) {
+      itemEl.style.opacity = '0.6';
+    }
+    
+    // Compresser image
+    const base64 = await compressImage(file, 1920, 1080, 0.8);
+    
     const item = checklistItems.find(i => i.id === itemId);
     if (item) {
       item.photo_base64 = base64;
@@ -156,8 +265,16 @@ function handlePhotoUpload(itemId, event) {
       await saveItem(itemId);
       renderChecklist(); // Re-render pour afficher photo
     }
-  };
-  reader.readAsDataURL(file);
+    
+    // Retirer loader
+    if (itemEl) {
+      itemEl.style.opacity = '1';
+    }
+    
+  } catch (error) {
+    console.error('Erreur compression photo:', error);
+    alert('⚠️ Erreur traitement photo');
+  }
 }
 
 // Planifier auto-save (3 secondes après dernière modification)
@@ -166,40 +283,102 @@ function scheduleAutoSave(itemId) {
   autoSaveTimer = setTimeout(() => saveItem(itemId), 3000);
 }
 
-// Sauvegarder item
+// Sauvegarder item (avec mode offline)
 async function saveItem(itemId) {
   const item = checklistItems.find(i => i.id === itemId);
   if (!item) return;
   
   const commentEl = document.getElementById(`comment-${itemId}`);
   const commentaire = commentEl ? commentEl.value : '';
+  const technicienNom = document.querySelector('[data-technicien-nom]')?.dataset.technicienNom || 'Technicien';
   
-  try {
-    // Récupérer technicien depuis meta page
-    const technicienNom = document.querySelector('[data-technicien-nom]')?.dataset.technicienNom || 'Technicien';
+  const updateData = {
+    statut: item.statut,
+    conformite: item.conformite,
+    commentaire: commentaire,
+    photo_base64: item.photo_base64 || null,
+    photo_filename: item.photo_filename || null,
+    technicien_nom: technicienNom
+  };
+  
+  // Sauvegarder TOUJOURS en localStorage (backup offline)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(checklistItems));
+  
+  if (isOnline) {
+    // Mode online : envoyer au serveur
+    try {
+      await axios.put(`/api/checklist/${itemId}`, updateData);
+      showSaveIndicator('✅ Sauvegardé');
+    } catch (error) {
+      console.error('Erreur sauvegarde online:', error);
+      // Ajouter à la queue de sync
+      addToSyncQueue(itemId, updateData);
+      showSaveIndicator('💾 Sauvegardé localement', '#f59e0b');
+    }
+  } else {
+    // Mode offline : ajouter à la queue
+    addToSyncQueue(itemId, updateData);
+    showSaveIndicator('💾 Sauvegardé localement', '#f59e0b');
+  }
+}
+
+// Ajouter changement à la queue de sync
+function addToSyncQueue(itemId, data) {
+  const queue = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || '[]');
+  
+  // Remplacer si item déjà dans queue
+  const existingIndex = queue.findIndex(q => q.itemId === itemId);
+  if (existingIndex >= 0) {
+    queue[existingIndex] = { itemId, data, timestamp: Date.now() };
+  } else {
+    queue.push({ itemId, data, timestamp: Date.now() });
+  }
+  
+  localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+  console.log(`📦 Item ${itemId} ajouté à la queue de sync (${queue.length} en attente)`);
+}
+
+// Synchroniser changements en attente
+async function syncPendingChanges() {
+  const queue = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || '[]');
+  
+  if (queue.length === 0) {
+    console.log('✅ Aucun changement en attente');
+    return;
+  }
+  
+  console.log(`🔄 Sync ${queue.length} changements en attente...`);
+  let successCount = 0;
+  
+  for (const change of queue) {
+    try {
+      await axios.put(`/api/checklist/${change.itemId}`, change.data);
+      successCount++;
+    } catch (error) {
+      console.error(`❌ Erreur sync item ${change.itemId}:`, error);
+      // Garder dans la queue si échec
+      break;
+    }
+  }
+  
+  // Retirer items synchronisés de la queue
+  if (successCount > 0) {
+    const remainingQueue = queue.slice(successCount);
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(remainingQueue));
+    console.log(`✅ ${successCount}/${queue.length} changements synchronisés`);
     
-    await axios.put(`/api/checklist/${itemId}`, {
-      statut: item.statut,
-      conformite: item.conformite,
-      commentaire: commentaire,
-      photo_base64: item.photo_base64 || null,
-      photo_filename: item.photo_filename || null,
-      technicien_nom: technicienNom
-    });
-    
-    // Afficher indicateur sauvegarde
-    showSaveIndicator();
-    
-  } catch (error) {
-    console.error('Erreur sauvegarde:', error);
-    alert('⚠️ Erreur sauvegarde. Vérifiez votre connexion.');
+    if (remainingQueue.length === 0) {
+      alert(`✅ Tous vos changements ont été synchronisés avec succès !`);
+    }
   }
 }
 
 // Afficher indicateur sauvegarde
-function showSaveIndicator() {
+function showSaveIndicator(text = '✅ Sauvegardé', color = '#10b981') {
   const indicator = document.getElementById('saveIndicator');
   if (indicator) {
+    indicator.textContent = text;
+    indicator.style.background = color;
     indicator.style.display = 'block';
     setTimeout(() => {
       indicator.style.display = 'none';
