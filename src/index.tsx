@@ -963,6 +963,1061 @@ app.get('/api/stats/planning', async (c) => {
   }
 })
 
+// ========================================
+// API ROUTES - CHECKLIST TEMPS RÉEL
+// ========================================
+
+// POST /api/admin/init-all-tables - Initialiser TOUTES les tables (migrations 0001, 0002, 0003)
+app.post('/api/admin/init-all-tables', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Migration 0001: Centrales (lecture du fichier de migration)
+    const migration0001Statements = `
+      CREATE TABLE IF NOT EXISTS centrales (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom TEXT UNIQUE NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('SOL', 'TOITURE')),
+        puissance_kwc REAL,
+        localisation TEXT,
+        statut TEXT DEFAULT 'A_AUDITER' CHECK(statut IN ('A_AUDITER', 'EN_COURS', 'TERMINE', 'VALIDE')),
+        date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date_audit DATETIME,
+        date_validation DATETIME
+      );
+      
+      CREATE TABLE IF NOT EXISTS retours_json_old (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        centrale_id INTEGER NOT NULL,
+        date_upload DATETIME DEFAULT CURRENT_TIMESTAMP,
+        json_data TEXT NOT NULL,
+        taille_bytes INTEGER,
+        nombre_photos INTEGER,
+        commentaire TEXT,
+        FOREIGN KEY (centrale_id) REFERENCES centrales(id) ON DELETE CASCADE
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_centrales_statut ON centrales(statut);
+      CREATE INDEX IF NOT EXISTS idx_centrales_type ON centrales(type);
+      CREATE INDEX IF NOT EXISTS idx_retours_centrale ON retours_json_old(centrale_id);
+    `.split(';').filter(s => s.trim());
+    
+    for (const stmt of migration0001Statements) {
+      if (stmt.trim()) {
+        await DB.prepare(stmt).run();
+      }
+    }
+    
+    // Migration 0002: Planning
+    const migration0002Statements = `
+      CREATE TABLE IF NOT EXISTS sous_traitants (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom_entreprise TEXT UNIQUE NOT NULL,
+        email_contact TEXT,
+        telephone TEXT,
+        adresse TEXT,
+        siret TEXT,
+        contact_principal TEXT,
+        statut TEXT DEFAULT 'ACTIF' CHECK(statut IN ('ACTIF', 'INACTIF', 'SUSPENDU')),
+        date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date_modification DATETIME DEFAULT CURRENT_TIMESTAMP,
+        notes TEXT
+      );
+      
+      CREATE TABLE IF NOT EXISTS techniciens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sous_traitant_id INTEGER NOT NULL,
+        prenom TEXT NOT NULL,
+        nom TEXT NOT NULL,
+        email TEXT UNIQUE,
+        telephone TEXT,
+        statut TEXT DEFAULT 'DISPONIBLE' CHECK(statut IN ('DISPONIBLE', 'OCCUPE', 'INDISPONIBLE', 'CONGE')),
+        date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date_modification DATETIME DEFAULT CURRENT_TIMESTAMP,
+        notes TEXT,
+        FOREIGN KEY (sous_traitant_id) REFERENCES sous_traitants(id) ON DELETE CASCADE
+      );
+      
+      CREATE TABLE IF NOT EXISTS ordres_mission (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        centrale_id INTEGER NOT NULL,
+        technicien_id INTEGER NOT NULL,
+        sous_traitant_id INTEGER NOT NULL,
+        date_mission DATE NOT NULL,
+        heure_debut TIME,
+        heure_fin TIME,
+        duree_estimee_heures REAL DEFAULT 7.0,
+        statut TEXT DEFAULT 'PLANIFIE' CHECK(statut IN ('PLANIFIE', 'CONFIRME', 'EN_COURS', 'TERMINE', 'VALIDE', 'ANNULE', 'REPORTE')),
+        checklist_generee BOOLEAN DEFAULT 0,
+        ordre_mission_pdf TEXT,
+        date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date_validation DATETIME,
+        date_annulation DATETIME,
+        commentaires TEXT,
+        raison_annulation TEXT,
+        FOREIGN KEY (centrale_id) REFERENCES centrales(id) ON DELETE CASCADE,
+        FOREIGN KEY (technicien_id) REFERENCES techniciens(id) ON DELETE CASCADE,
+        FOREIGN KEY (sous_traitant_id) REFERENCES sous_traitants(id) ON DELETE CASCADE,
+        UNIQUE(centrale_id)
+      );
+      
+      CREATE TABLE IF NOT EXISTS planning_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ordre_mission_id INTEGER NOT NULL,
+        centrale_id INTEGER NOT NULL,
+        technicien_id INTEGER NOT NULL,
+        sous_traitant_id INTEGER NOT NULL,
+        date_debut DATETIME NOT NULL,
+        date_fin DATETIME NOT NULL,
+        titre TEXT NOT NULL,
+        description TEXT,
+        couleur TEXT DEFAULT '#3b82f6',
+        statut TEXT DEFAULT 'PLANIFIE',
+        FOREIGN KEY (ordre_mission_id) REFERENCES ordres_mission(id) ON DELETE CASCADE,
+        FOREIGN KEY (centrale_id) REFERENCES centrales(id) ON DELETE CASCADE,
+        FOREIGN KEY (technicien_id) REFERENCES techniciens(id) ON DELETE CASCADE,
+        FOREIGN KEY (sous_traitant_id) REFERENCES sous_traitants(id) ON DELETE CASCADE
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_techniciens_sous_traitant ON techniciens(sous_traitant_id);
+      CREATE INDEX IF NOT EXISTS idx_techniciens_statut ON techniciens(statut);
+      CREATE INDEX IF NOT EXISTS idx_ordres_centrale ON ordres_mission(centrale_id);
+      CREATE INDEX IF NOT EXISTS idx_ordres_technicien ON ordres_mission(technicien_id);
+      CREATE INDEX IF NOT EXISTS idx_ordres_sous_traitant ON ordres_mission(sous_traitant_id);
+      CREATE INDEX IF NOT EXISTS idx_ordres_date ON ordres_mission(date_mission);
+      CREATE INDEX IF NOT EXISTS idx_ordres_statut ON ordres_mission(statut);
+      CREATE INDEX IF NOT EXISTS idx_planning_date ON planning_events(date_debut, date_fin);
+      CREATE INDEX IF NOT EXISTS idx_planning_technicien ON planning_events(technicien_id);
+    `.split(';').filter(s => s.trim());
+    
+    for (const stmt of migration0002Statements) {
+      if (stmt.trim()) {
+        await DB.prepare(stmt).run();
+      }
+    }
+    
+    // Migration 0003: Checklist temps réel
+    const migration0003Statements = `
+      CREATE TABLE IF NOT EXISTS checklist_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ordre_mission_id INTEGER NOT NULL,
+        categorie TEXT NOT NULL CHECK(categorie IN ('DOC', 'ELEC', 'TABLEAUX', 'CABLAGE', 'MODULES', 'STRUCTURES', 'TOITURE')),
+        item_numero INTEGER NOT NULL,
+        item_texte TEXT NOT NULL,
+        statut TEXT DEFAULT 'NON_VERIFIE' CHECK(statut IN ('NON_VERIFIE', 'CONFORME', 'NON_CONFORME', 'NA', 'ANOMALIE_MINEURE', 'ANOMALIE_MAJEURE')),
+        conformite BOOLEAN,
+        commentaire TEXT,
+        photo_base64 TEXT,
+        photo_filename TEXT,
+        mesure_valeur TEXT,
+        mesure_unite TEXT,
+        date_verification DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date_modification DATETIME DEFAULT CURRENT_TIMESTAMP,
+        technicien_nom TEXT,
+        FOREIGN KEY (ordre_mission_id) REFERENCES ordres_mission(id) ON DELETE CASCADE,
+        UNIQUE(ordre_mission_id, categorie, item_numero)
+      );
+      
+      CREATE TABLE IF NOT EXISTS retours_json (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ordre_mission_id INTEGER NOT NULL,
+        centrale_id INTEGER NOT NULL,
+        technicien_id INTEGER NOT NULL,
+        json_data TEXT NOT NULL,
+        taille_mo REAL,
+        nb_photos INTEGER,
+        date_upload DATETIME DEFAULT CURRENT_TIMESTAMP,
+        statut TEXT DEFAULT 'RECU' CHECK(statut IN ('RECU', 'EN_ANALYSE', 'VALIDE', 'REJETE')),
+        rapport_final_genere BOOLEAN DEFAULT 0,
+        date_rapport_final DATETIME,
+        FOREIGN KEY (ordre_mission_id) REFERENCES ordres_mission(id) ON DELETE CASCADE,
+        FOREIGN KEY (centrale_id) REFERENCES centrales(id) ON DELETE CASCADE,
+        FOREIGN KEY (technicien_id) REFERENCES techniciens(id) ON DELETE CASCADE
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_checklist_mission ON checklist_items(ordre_mission_id);
+      CREATE INDEX IF NOT EXISTS idx_checklist_categorie ON checklist_items(categorie);
+      CREATE INDEX IF NOT EXISTS idx_checklist_statut ON checklist_items(statut);
+      CREATE INDEX IF NOT EXISTS idx_retours_mission ON retours_json(ordre_mission_id);
+      CREATE INDEX IF NOT EXISTS idx_retours_centrale ON retours_json(centrale_id);
+      CREATE INDEX IF NOT EXISTS idx_retours_date ON retours_json(date_upload);
+    `.split(';').filter(s => s.trim());
+    
+    for (const stmt of migration0003Statements) {
+      if (stmt.trim()) {
+        await DB.prepare(stmt).run();
+      }
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: 'Toutes les tables créées avec succès (migrations 0001, 0002, 0003)' 
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/admin/init-migration - Initialiser table checklist (admin)
+app.post('/api/admin/init-migration', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Créer table checklist_items
+    await DB.prepare(`
+      CREATE TABLE IF NOT EXISTS checklist_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ordre_mission_id INTEGER NOT NULL,
+        categorie TEXT NOT NULL CHECK(categorie IN ('DOC', 'ELEC', 'TABLEAUX', 'CABLAGE', 'MODULES', 'STRUCTURES', 'TOITURE')),
+        item_numero INTEGER NOT NULL,
+        item_texte TEXT NOT NULL,
+        statut TEXT DEFAULT 'NON_VERIFIE' CHECK(statut IN ('NON_VERIFIE', 'CONFORME', 'NON_CONFORME', 'NA', 'ANOMALIE_MINEURE', 'ANOMALIE_MAJEURE')),
+        conformite BOOLEAN,
+        commentaire TEXT,
+        photo_base64 TEXT,
+        photo_filename TEXT,
+        mesure_valeur TEXT,
+        mesure_unite TEXT,
+        date_verification DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date_modification DATETIME DEFAULT CURRENT_TIMESTAMP,
+        technicien_nom TEXT,
+        FOREIGN KEY (ordre_mission_id) REFERENCES ordres_mission(id) ON DELETE CASCADE,
+        UNIQUE(ordre_mission_id, categorie, item_numero)
+      )
+    `).run()
+    
+    // Créer table retours_json
+    await DB.prepare(`
+      CREATE TABLE IF NOT EXISTS retours_json (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ordre_mission_id INTEGER NOT NULL,
+        centrale_id INTEGER NOT NULL,
+        technicien_id INTEGER NOT NULL,
+        json_data TEXT NOT NULL,
+        taille_mo REAL,
+        nb_photos INTEGER,
+        date_upload DATETIME DEFAULT CURRENT_TIMESTAMP,
+        statut TEXT DEFAULT 'RECU' CHECK(statut IN ('RECU', 'EN_ANALYSE', 'VALIDE', 'REJETE')),
+        rapport_final_genere BOOLEAN DEFAULT 0,
+        date_rapport_final DATETIME,
+        FOREIGN KEY (ordre_mission_id) REFERENCES ordres_mission(id) ON DELETE CASCADE,
+        FOREIGN KEY (centrale_id) REFERENCES centrales(id) ON DELETE CASCADE,
+        FOREIGN KEY (technicien_id) REFERENCES techniciens(id) ON DELETE CASCADE
+      )
+    `).run()
+    
+    // Créer indexes
+    await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_checklist_mission ON checklist_items(ordre_mission_id)`).run()
+    await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_checklist_categorie ON checklist_items(categorie)`).run()
+    await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_retours_mission ON retours_json(ordre_mission_id)`).run()
+    
+    return c.json({ success: true, message: 'Tables checklist_items et retours_json créées avec succès' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/checklist/:mission_id - Récupérer checklist mission
+app.get('/api/checklist/:mission_id', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT * FROM checklist_items 
+      WHERE ordre_mission_id = ?
+      ORDER BY categorie, item_numero
+    `).bind(missionId).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/checklist/:mission_id/init - Initialiser checklist vide pour mission
+app.post('/api/checklist/:mission_id/init', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  
+  try {
+    // Structure checklist V4 (54 points)
+    const checklistStructure = [
+      // DOC (8 points)
+      { cat: 'DOC', items: [
+        'Plaques signalétiques modules',
+        'Plan installation (as-built)',
+        'Schémas électriques (DC/AC)',
+        'Attestation Consuel',
+        'Certificats conformité onduleurs',
+        'Rapport mise en service',
+        'Contrat maintenance O&M',
+        'Notice technique modules'
+      ]},
+      // ELEC (12 points)
+      { cat: 'ELEC', items: [
+        'Mesure tension Voc strings (à vide)',
+        'Mesure courant Isc strings (court-circuit)',
+        'Test isolement DC (> 1 MΩ)',
+        'Mesure continuité terres',
+        'Polarité strings (+ et -)',
+        'Protection différentielle 30mA',
+        'Disjoncteurs calibrage correct',
+        'Parafoudres DC/AC état',
+        'Test fonctionnel onduleurs',
+        'Monitoring production réel vs théorique',
+        'Équilibrage phases AC',
+        'Cos φ (facteur puissance)'
+      ]},
+      // TABLEAUX (8 points)
+      { cat: 'TABLEAUX', items: [
+        'État général coffrets DC',
+        'Étanchéité IP65 boîtiers',
+        'Serrage bornes électriques',
+        'Signalétique circuits',
+        'Ventilation coffrets',
+        'Absence corrosion/oxydation',
+        'Échauffement anormal (thermographie)',
+        'Accessibilité maintenance'
+      ]},
+      // CABLAGE (7 points)
+      { cat: 'CABLAGE', items: [
+        'Connecteurs MC4 serrés/étanches',
+        'Gaines ICTA/IRL état',
+        'Chemins câbles fixations',
+        'Protection UV câbles DC',
+        'Rayon courbure respecté',
+        'Absence points chauds (thermographie)',
+        'Marquage câbles positif/négatif'
+      ]},
+      // MODULES (10 points)
+      { cat: 'MODULES', items: [
+        'État visuel face avant (fissures/casse)',
+        'État cadres (corrosion/déformation)',
+        'Boîtiers jonction étanches',
+        'Diodes by-pass fonctionnelles',
+        'Hotspots thermographie (ΔT > 10°C)',
+        'Délamination/bulles',
+        'Snail trails (traces escargot)',
+        'Salissures importantes',
+        'Ombres portées permanentes',
+        'PID (Potential Induced Degradation)'
+      ]},
+      // STRUCTURES (5 points)
+      { cat: 'STRUCTURES', items: [
+        'Fixations modules (boulons/clips)',
+        'État rails (corrosion/déformation)',
+        'Fondations/lestage stable',
+        'Mise à la terre structures',
+        'Espacement inter-rangées ventilation'
+      ]},
+      // TOITURE (4 points)
+      { cat: 'TOITURE', items: [
+        'Étanchéité traversées toiture',
+        'État couverture (tuiles/bac acier)',
+        'Écrans sous-toiture intacts',
+        'Zinguerie/gouttières fonctionnelles'
+      ]}
+    ]
+    
+    // Insérer tous les items
+    for (const category of checklistStructure) {
+      for (let i = 0; i < category.items.length; i++) {
+        await DB.prepare(`
+          INSERT OR IGNORE INTO checklist_items (ordre_mission_id, categorie, item_numero, item_texte)
+          VALUES (?, ?, ?, ?)
+        `).bind(missionId, category.cat, i + 1, category.items[i]).run()
+      }
+    }
+    
+    return c.json({ success: true, message: 'Checklist initialisée (54 points)' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/checklist/:id - Mettre à jour item checklist (auto-save)
+app.put('/api/checklist/:id', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    const body = await c.req.json()
+    const { statut, conformite, commentaire, photo_base64, photo_filename, mesure_valeur, mesure_unite, technicien_nom } = body
+    
+    await DB.prepare(`
+      UPDATE checklist_items 
+      SET statut = ?, conformite = ?, commentaire = ?, photo_base64 = ?, photo_filename = ?,
+          mesure_valeur = ?, mesure_unite = ?, technicien_nom = ?, date_modification = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(
+      statut || 'NON_VERIFIE',
+      conformite !== undefined ? conformite : null,
+      commentaire || null,
+      photo_base64 || null,
+      photo_filename || null,
+      mesure_valeur || null,
+      mesure_unite || null,
+      technicien_nom || null,
+      id
+    ).run()
+    
+    return c.json({ success: true, message: 'Item sauvegardé' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/retours-json - Upload JSON V4 complet
+app.post('/api/retours-json', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { ordre_mission_id, centrale_id, technicien_id, json_data, taille_mo, nb_photos } = body
+    
+    if (!ordre_mission_id || !centrale_id || !technicien_id || !json_data) {
+      return c.json({ success: false, error: 'Champs obligatoires manquants' }, 400)
+    }
+    
+    const result = await DB.prepare(`
+      INSERT INTO retours_json (ordre_mission_id, centrale_id, technicien_id, json_data, taille_mo, nb_photos)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(ordre_mission_id, centrale_id, technicien_id, json_data, taille_mo || 0, nb_photos || 0).run()
+    
+    // Mettre à jour statut mission
+    await DB.prepare(`
+      UPDATE ordres_mission SET statut = 'TERMINE' WHERE id = ?
+    `).bind(ordre_mission_id).run()
+    
+    return c.json({ success: true, data: { id: result.meta.last_row_id } })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ========================================
+// API ROUTES - RAPPORT FINAL PDF
+// ========================================
+
+// GET /api/ordres-mission/:id/rapport-final - Générer rapport final avec photos
+app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    // Récupérer mission complète
+    const mission = await DB.prepare(`
+      SELECT om.*, c.nom as centrale_nom, c.type as centrale_type, c.puissance_kwc, c.localisation,
+             t.prenom as technicien_prenom, t.nom as technicien_nom, st.nom_entreprise
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      WHERE om.id = ?
+    `).bind(id).first()
+    
+    if (!mission) {
+      return c.json({ success: false, error: 'Mission non trouvée' }, 404)
+    }
+    
+    // Récupérer checklist remplie
+    const checklist = await DB.prepare(`
+      SELECT * FROM checklist_items 
+      WHERE ordre_mission_id = ?
+      ORDER BY categorie, item_numero
+    `).bind(id).all()
+    
+    // Récupérer JSON V4 si uploadé
+    const retourJson = await DB.prepare(`
+      SELECT * FROM retours_json 
+      WHERE ordre_mission_id = ?
+      ORDER BY date_upload DESC
+      LIMIT 1
+    `).bind(id).first()
+    
+    // Grouper checklist par catégorie
+    const categories = ['DOC', 'ELEC', 'TABLEAUX', 'CABLAGE', 'MODULES', 'STRUCTURES', 'TOITURE']
+    const checklistGrouped: any = {}
+    
+    categories.forEach(cat => {
+      checklistGrouped[cat] = checklist.results.filter((item: any) => item.categorie === cat)
+    })
+    
+    // Extraire photos du JSON V4 si disponible
+    let photosJson: any[] = []
+    if (retourJson && retourJson.json_data) {
+      try {
+        const jsonParsed = JSON.parse(retourJson.json_data)
+        if (jsonParsed.photos && Array.isArray(jsonParsed.photos)) {
+          photosJson = jsonParsed.photos
+        }
+      } catch (e) {
+        console.error('Erreur parsing JSON V4:', e)
+      }
+    }
+    
+    const dateAudit = mission.date_mission ? new Date(mission.date_mission).toLocaleDateString('fr-FR', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    }) : 'Non définie'
+    
+    const statsConformite = {
+      conforme: checklist.results.filter((i: any) => i.statut === 'CONFORME').length,
+      non_conforme: checklist.results.filter((i: any) => i.statut === 'NON_CONFORME').length,
+      anomalie_mineure: checklist.results.filter((i: any) => i.statut === 'ANOMALIE_MINEURE').length,
+      anomalie_majeure: checklist.results.filter((i: any) => i.statut === 'ANOMALIE_MAJEURE').length,
+      na: checklist.results.filter((i: any) => i.statut === 'NA').length,
+      total: checklist.results.length
+    }
+    
+    const tauxConformite = statsConformite.total > 0 
+      ? ((statsConformite.conforme / statsConformite.total) * 100).toFixed(1)
+      : '0'
+    
+    // Fonction pour générer HTML item checklist
+    const renderChecklistItem = (item: any) => {
+      const statusIcons: any = {
+        'CONFORME': '✅',
+        'NON_CONFORME': '❌',
+        'ANOMALIE_MINEURE': '⚠️',
+        'ANOMALIE_MAJEURE': '🚨',
+        'NA': '➖',
+        'NON_VERIFIE': '⏸️'
+      }
+      
+      const statusColors: any = {
+        'CONFORME': '#10b981',
+        'NON_CONFORME': '#ef4444',
+        'ANOMALIE_MINEURE': '#f59e0b',
+        'ANOMALIE_MAJEURE': '#dc2626',
+        'NA': '#6b7280',
+        'NON_VERIFIE': '#9ca3af'
+      }
+      
+      const icon = statusIcons[item.statut] || '❓'
+      const color = statusColors[item.statut] || '#6b7280'
+      
+      let photoHtml = ''
+      if (item.photo_base64) {
+        photoHtml = `
+          <div style="margin-top: 10px;">
+            <img src="data:image/jpeg;base64,${item.photo_base64}" 
+                 style="max-width: 300px; border: 2px solid #e5e7eb; border-radius: 8px;" 
+                 alt="${item.photo_filename || 'Photo'}">
+          </div>
+        `
+      }
+      
+      let commentaireHtml = ''
+      if (item.commentaire) {
+        commentaireHtml = `<div style="margin-top: 8px; padding: 8px; background: #fef3c7; border-left: 3px solid #f59e0b; font-size: 13px; color: #78350f;"><strong>💬 Commentaire:</strong> ${item.commentaire}</div>`
+      }
+      
+      let mesureHtml = ''
+      if (item.mesure_valeur) {
+        mesureHtml = `<div style="margin-top: 6px; font-size: 13px; color: #1e40af;"><strong>📊 Mesure:</strong> ${item.mesure_valeur} ${item.mesure_unite || ''}</div>`
+      }
+      
+      return `
+        <div style="padding: 12px; margin-bottom: 10px; background: white; border-left: 4px solid ${color}; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 18px;">${icon}</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: #1f2937;">${item.item_texte}</div>
+              <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Statut: <strong style="color: ${color};">${item.statut}</strong></div>
+              ${mesureHtml}
+            </div>
+          </div>
+          ${commentaireHtml}
+          ${photoHtml}
+        </div>
+      `
+    }
+    
+    // Générer sections checklist par catégorie
+    const checklistHtml = categories.map(cat => {
+      const items = checklistGrouped[cat] || []
+      if (items.length === 0) return ''
+      
+      const categoryIcons: any = {
+        'DOC': '📄',
+        'ELEC': '⚡',
+        'TABLEAUX': '🔌',
+        'CABLAGE': '🔌',
+        'MODULES': '☀️',
+        'STRUCTURES': '🏗️',
+        'TOITURE': '🏠'
+      }
+      
+      return `
+        <div style="page-break-inside: avoid; margin-bottom: 30px;">
+          <h3 style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 12px 20px; border-radius: 8px; margin: 20px 0 15px 0; font-size: 18px;">
+            ${categoryIcons[cat]} ${cat} (${items.length} points)
+          </h3>
+          ${items.map(renderChecklistItem).join('')}
+        </div>
+      `
+    }).join('')
+    
+    // Section photos JSON V4
+    let photosHtml = ''
+    if (photosJson.length > 0) {
+      photosHtml = `
+        <div style="page-break-before: always; padding: 20px 0;">
+          <h2 style="color: #1e40af; border-bottom: 3px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px;">
+            📸 Galerie Photos Audit (${photosJson.length} photos)
+          </h2>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            ${photosJson.slice(0, 20).map((photo: any, idx: number) => `
+              <div style="border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <img src="data:image/jpeg;base64,${photo.base64}" style="width: 100%; height: auto;" alt="Photo ${idx + 1}">
+                <div style="padding: 8px; background: #f3f4f6; font-size: 12px; color: #4b5563;">
+                  <strong>${photo.categorie || 'Photo'}</strong> - ${photo.filename || `photo_${idx + 1}.jpg`}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          ${photosJson.length > 20 ? `<p style="text-align: center; color: #6b7280; margin-top: 20px;"><em>+ ${photosJson.length - 20} photos supplémentaires disponibles dans le JSON V4</em></p>` : ''}
+        </div>
+      `
+    }
+    
+    // HTML Complet
+    return c.html(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <title>Rapport Final Audit - ${mission.centrale_nom}</title>
+        <style>
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none !important; }
+            @page { margin: 1.5cm; size: A4; }
+          }
+          
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9fafb;
+          }
+          
+          .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+          }
+          
+          .btn-print:hover {
+            background: #1d4ed8;
+          }
+          
+          .header {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+          }
+          
+          .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+          }
+          
+          .header .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+          }
+          
+          .info-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 5px solid #3b82f6;
+          }
+          
+          .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+          }
+          
+          .info-item {
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+          }
+          
+          .info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+          }
+          
+          .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+          }
+          
+          .stats-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+          }
+          
+          .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          }
+          
+          .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+          }
+          
+          .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            text-transform: uppercase;
+          }
+        </style>
+      </head>
+      <body>
+        <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimer / Sauvegarder PDF</button>
+        
+        <div class="header">
+          <h1>📋 RAPPORT FINAL AUDIT</h1>
+          <div class="subtitle">Mission GIRASOLE 2025 - Diagnostic Photovoltaïque Premium</div>
+          <div style="margin-top: 15px; font-size: 14px; opacity: 0.85;">
+            Rapport généré le ${new Date().toLocaleString('fr-FR')} | Diagnostic Photovoltaïque - Adrien Pappalardo
+          </div>
+        </div>
+
+        <!-- Informations Centrale -->
+        <div class="info-section">
+          <h2 style="color: #1e40af; margin-top: 0;">🏭 Centrale Photovoltaïque</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Nom Installation</div>
+              <div class="info-value">${mission.centrale_nom}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Type</div>
+              <div class="info-value">${mission.centrale_type === 'SOL' ? '☀️ Au Sol' : '🏠 Toiture'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Puissance Installée</div>
+              <div class="info-value">${mission.puissance_kwc} kWc</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Localisation</div>
+              <div class="info-value">${mission.localisation || 'Non renseignée'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations Mission -->
+        <div class="info-section">
+          <h2 style="color: #1e40af; margin-top: 0;">📅 Détails Mission</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Date Audit</div>
+              <div class="info-value">${dateAudit}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Technicien</div>
+              <div class="info-value">${mission.technicien_prenom} ${mission.technicien_nom}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Sous-Traitant</div>
+              <div class="info-value">${mission.nom_entreprise}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Durée Audit</div>
+              <div class="info-value">${mission.duree_estimee_heures || 7}h</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques Conformité -->
+        <div class="info-section">
+          <h2 style="color: #1e40af; margin-top: 0;">📊 Synthèse Conformité</h2>
+          <div class="stats-box">
+            <div class="stat-card" style="border-left: 5px solid #10b981;">
+              <div class="stat-value" style="color: #10b981;">${statsConformite.conforme}</div>
+              <div class="stat-label">✅ Conforme</div>
+            </div>
+            <div class="stat-card" style="border-left: 5px solid #ef4444;">
+              <div class="stat-value" style="color: #ef4444;">${statsConformite.non_conforme + statsConformite.anomalie_majeure}</div>
+              <div class="stat-label">❌ Non Conforme</div>
+            </div>
+            <div class="stat-card" style="border-left: 5px solid #3b82f6;">
+              <div class="stat-value" style="color: #3b82f6;">${tauxConformite}%</div>
+              <div class="stat-label">Taux Conformité</div>
+            </div>
+          </div>
+          <div style="padding: 15px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 6px; margin-top: 15px;">
+            <strong>📌 Détails:</strong> ${statsConformite.anomalie_mineure} anomalies mineures • ${statsConformite.na} points N/A • Total ${statsConformite.total} vérifications
+          </div>
+        </div>
+
+        <!-- Checklist Détaillée -->
+        <div class="info-section">
+          <h2 style="color: #1e40af; margin-top: 0;">✅ Checklist Audit V4 (54 Points CDC)</h2>
+          ${checklistHtml}
+        </div>
+
+        <!-- Photos Audit -->
+        ${photosHtml}
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding: 20px; background: #1f2937; color: white; border-radius: 10px; text-align: center;">
+          <p style="margin: 0; font-size: 14px;">© 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+          <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7;">
+            Mission GIRASOLE 2025 - Audit Conforme IEC 62446-1, IEC 61215/61730, NF C 15-100
+          </p>
+        </div>
+      </body>
+      </html>
+    `)
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ========================================
+// PAGE AUDIT TERRAIN MOBILE
+// ========================================
+
+app.get('/audit/:mission_id', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  
+  try {
+    // Récupérer mission
+    const mission = await DB.prepare(`
+      SELECT om.*, c.nom as centrale_nom, c.type as centrale_type, c.puissance_kwc, c.localisation,
+             t.prenom as technicien_prenom, t.nom as technicien_nom, st.nom_entreprise
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      WHERE om.id = ?
+    `).bind(missionId).first()
+    
+    if (!mission) {
+      return c.html('<h1 style="text-align:center;margin-top:50px;">❌ Mission non trouvée</h1>')
+    }
+    
+    return c.html(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Audit ${mission.centrale_nom}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+          body {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-y;
+            overscroll-behavior-y: contain;
+          }
+          
+          .checklist-item {
+            transition: all 0.2s ease;
+          }
+          
+          .checklist-item.saved {
+            background: #d1fae5 !important;
+            border-left-color: #10b981 !important;
+          }
+          
+          .status-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+          
+          .status-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          
+          .status-btn.conforme.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+          }
+          
+          .status-btn.non-conforme.active {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+          }
+          
+          .status-btn.na.active {
+            background: #6b7280;
+            color: white;
+            border-color: #6b7280;
+          }
+          
+          .category-header {
+            position: sticky;
+            top: 60px;
+            z-index: 10;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 15px;
+            margin: 0 -15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          }
+          
+          .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e5e7eb;
+            z-index: 50;
+          }
+          
+          .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            transition: width 0.3s ease;
+          }
+          
+          .floating-save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            animation: fadeIn 0.3s;
+            z-index: 40;
+          }
+          
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          
+          .photo-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #e5e7eb;
+          }
+          
+          input[type="file"] {
+            display: none;
+          }
+          
+          .photo-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+          }
+          
+          .photo-btn:active {
+            background: #2563eb;
+          }
+        </style>
+      </head>
+      <body class="bg-gray-50">
+        <div class="progress-bar">
+          <div id="progressBar" class="progress-bar-fill" style="width: 0%"></div>
+        </div>
+        
+        <div class="floating-save-indicator" id="saveIndicator">
+          <i class="fas fa-check-circle mr-2"></i>Sauvegardé
+        </div>
+        
+        <!-- Header fixe -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg" style="position: sticky; top: 0; z-index: 20;">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <i class="fas fa-clipboard-check text-2xl"></i>
+              <div>
+                <h1 class="text-lg font-bold">${mission.centrale_nom}</h1>
+                <p class="text-xs text-blue-200">${mission.centrale_type === 'SOL' ? '☀️ Sol' : '🏠 Toiture'} • ${mission.puissance_kwc} kWc</p>
+              </div>
+            </div>
+            <button onclick="finishAudit()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-semibold text-sm">
+              <i class="fas fa-check mr-1"></i>Terminer
+            </button>
+          </div>
+          <div class="mt-3 flex items-center text-sm" data-technicien-nom="${mission.technicien_prenom} ${mission.technicien_nom}">
+            <i class="fas fa-user-hard-hat mr-2"></i>
+            <span>${mission.technicien_prenom} ${mission.technicien_nom}</span>
+            <span class="mx-2">•</span>
+            <span id="progressText">0/54 vérifications</span>
+          </div>
+        </header>
+
+        <!-- Contenu -->
+        <main class="p-4 pb-20" id="checklistContainer">
+          <div class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Chargement checklist...</p>
+          </div>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="/static/audit.js"></script>
+      </body>
+      </html>
+    `)
+  } catch (error) {
+    return c.html('<h1 style="text-align:center;margin-top:50px;">❌ Erreur: ' + String(error) + '</h1>')
+  }
+})
+
 // ======================
 // PAGE PRINCIPALE
 // ======================

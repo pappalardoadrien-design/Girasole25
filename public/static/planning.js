@@ -326,9 +326,16 @@ function displayMissions(data) {
                       <button onclick="viewMission(${m.id})" class="text-blue-600 hover:text-blue-800 p-2" title="📄 Ordre de Mission PDF">
                         <i class="fas fa-file-pdf"></i>
                       </button>
-                      <button onclick="generateChecklist(${m.id})" class="text-purple-600 hover:text-purple-800 p-2" title="✅ Checklist V4">
-                        <i class="fas fa-clipboard-check"></i>
-                      </button>
+                      ${(m.statut === 'EN_COURS' || m.statut === 'TERMINE' || m.statut === 'VALIDE') ? `
+                        <button onclick="startAudit(${m.id})" class="text-orange-600 hover:text-orange-800 p-2" title="📱 Audit Terrain">
+                          <i class="fas fa-mobile-alt"></i>
+                        </button>
+                      ` : ''}
+                      ${(m.statut === 'TERMINE' || m.statut === 'VALIDE') ? `
+                        <button onclick="viewRapportFinal(${m.id})" class="text-purple-600 hover:text-purple-800 p-2" title="📋 Rapport Final">
+                          <i class="fas fa-file-invoice"></i>
+                        </button>
+                      ` : ''}
                       <button onclick="editMission(${m.id})" class="text-green-600 hover:text-green-800 p-2" title="Modifier">
                         <i class="fas fa-edit"></i>
                       </button>
@@ -785,6 +792,34 @@ window.showModalTechnicien = showModalTechnicien;
 window.showModalOrdreMission = showModalOrdreMission;
 window.closeModal = closeModal;
 window.filterTechniciensBySousTraitant = filterTechniciensBySousTraitant;
+// Démarrer audit terrain (ouvre interface mobile)
+function startAudit(missionId) {
+  window.open(`/audit/${missionId}`, '_blank');
+}
+
+// Voir rapport final PDF avec photos
+function viewRapportFinal(missionId) {
+  window.open(`/api/ordres-mission/${missionId}/rapport-final`, '_blank');
+}
+
+// Initialiser DB tables (bouton admin caché)
+async function initDatabase() {
+  if (!confirm('⚠️ Initialiser les tables checklist_items et retours_json ?\n\nCette action est nécessaire uniquement au premier démarrage.')) {
+    return;
+  }
+  
+  try {
+    const response = await axios.post('/api/admin/init-migration');
+    if (response.data.success) {
+      alert('✅ Tables créées avec succès !');
+    } else {
+      alert('❌ Erreur: ' + response.data.error);
+    }
+  } catch (error) {
+    alert('❌ Erreur initialisation: ' + error.message);
+  }
+}
+
 window.viewMission = viewMission;
 window.editMission = editMission;
 window.cancelMission = cancelMission;
@@ -792,3 +827,6 @@ window.assignMission = assignMission;
 window.editSousTraitant = editSousTraitant;
 window.editTechnicien = editTechnicien;
 window.generateChecklist = generateChecklist;
+window.startAudit = startAudit;
+window.viewRapportFinal = viewRapportFinal;
+window.initDatabase = initDatabase;
