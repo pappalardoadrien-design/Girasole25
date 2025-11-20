@@ -1,0 +1,128 @@
+/* GIRASOLE 2025 - Custom Styles */
+
+:root {
+  --primary-blue: #2563eb;
+  --secondary-green: #10b981;
+  --accent-purple: #a78bfa;
+  --warning-orange: #f59e0b;
+  --gray-50: #f9fafb;
+  --gray-800: #1f2937;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.tab-btn {
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  font-weight: 600;
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cards hover effect */
+.bg-white.rounded-lg.shadow {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bg-white.rounded-lg.shadow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Table row hover */
+tr.hover\:bg-gray-50:hover {
+  background-color: var(--gray-50);
+  transition: background-color 0.2s ease;
+}
+
+/* Form inputs focus */
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Loading spinner */
+.spinner {
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid var(--primary-blue);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Charts container */
+canvas {
+  max-height: 300px;
+}
+
+/* Status badges */
+.px-2.py-1.text-xs.rounded {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  table {
+    font-size: 0.875rem;
+  }
+  
+  .tab-btn {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  header, nav, footer, button {
+    display: none;
+  }
+  
+  .bg-white {
+    box-shadow: none;
+  }
+}
