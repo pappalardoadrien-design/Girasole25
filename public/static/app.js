@@ -38,6 +38,8 @@ function showTab(tabName) {
     loadCentrales();
   } else if (tabName === 'upload') {
     loadUploadForm();
+  } else if (tabName === 'analytics') {
+    loadAnalytics();
   }
 }
 
@@ -180,19 +182,39 @@ async function loadCentrales() {
     
     centralesData = response.data.data;
     
-    // Appliquer filtres
+    // Appliquer filtres et recherche
     const filterType = document.getElementById('filter-type').value;
     const filterStatut = document.getElementById('filter-statut').value;
+    const searchQuery = document.getElementById('search-centrales')?.value.toLowerCase() || '';
     
     let filtered = centralesData;
     
+    // Filtre par type
     if (filterType) {
       filtered = filtered.filter(c => c.type === filterType);
     }
     
+    // Filtre par statut
     if (filterStatut) {
       filtered = filtered.filter(c => c.statut === filterStatut);
     }
+    
+    // Recherche par nom ou localisation
+    if (searchQuery) {
+      filtered = filtered.filter(c => 
+        c.nom.toLowerCase().includes(searchQuery) || 
+        (c.localisation && c.localisation.toLowerCase().includes(searchQuery))
+      );
+    }
+    
+    // Tri (par défaut par nom)
+    const sortBy = document.getElementById('sort-by')?.value || 'nom';
+    filtered.sort((a, b) => {
+      if (sortBy === 'nom') return a.nom.localeCompare(b.nom);
+      if (sortBy === 'date_audit') return (b.date_audit || '') > (a.date_audit || '') ? 1 : -1;
+      if (sortBy === 'nb_retours') return (b.nb_retours || 0) - (a.nb_retours || 0);
+      return 0;
+    })
     
     // Afficher liste
     const container = document.getElementById('centrales-list');
@@ -202,43 +224,67 @@ async function loadCentrales() {
       return;
     }
     
+    // Mettre à jour le compteur
+    document.getElementById('centrales-count').textContent = 
+      `${filtered.length} centrale${filtered.length > 1 ? 's' : ''} affichée${filtered.length > 1 ? 's' : ''}`;
+    
     const html = `
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Puissance (kWc)</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Retours</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Photos</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localisation</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Retours</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Photos</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             ${filtered.map(c => `
-              <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap font-medium">${c.nom}</td>
+              <tr class="hover:bg-gray-50 transition-colors duration-150">
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs rounded ${c.type === 'SOL' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-                    ${c.type}
+                  <div class="flex items-center">
+                    <i class="fas fa-solar-panel text-yellow-500 mr-2"></i>
+                    <span class="font-medium text-gray-900">${c.nom}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${c.type === 'SOL' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
+                    ${c.type === 'SOL' ? '☀️' : '🏠'} ${c.type}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs rounded ${getStatutColor(c.statut)}">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatutColor(c.statut)}">
                     ${getStatutLabel(c.statut)}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">${c.puissance_kwc || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${c.nb_retours || 0}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${c.total_photos || 0}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <button onclick="changeCentraleStatut(${c.id}, '${c.statut}')" class="text-blue-600 hover:text-blue-800 mr-3">
-                    <i class="fas fa-edit"></i>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  ${c.localisation || '-'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="inline-flex items-center justify-center w-8 h-8 rounded-full ${(c.nb_retours || 0) > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}">
+                    ${c.nb_retours || 0}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="inline-flex items-center text-sm ${(c.total_photos || 0) > 0 ? 'text-blue-600 font-medium' : 'text-gray-400'}">
+                    <i class="fas fa-camera mr-1"></i>
+                    ${c.total_photos || 0}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <button onclick="changeCentraleStatut(${c.id}, '${c.statut}')" 
+                          class="text-blue-600 hover:text-blue-800 mr-3 transition-colors" 
+                          title="Modifier statut">
+                    <i class="fas fa-edit text-lg"></i>
                   </button>
-                  <button onclick="viewCentraleDetail(${c.id})" class="text-green-600 hover:text-green-800">
-                    <i class="fas fa-eye"></i>
+                  <button onclick="viewCentraleDetail(${c.id})" 
+                          class="text-green-600 hover:text-green-800 transition-colors" 
+                          title="Voir détails">
+                    <i class="fas fa-eye text-lg"></i>
                   </button>
                 </td>
               </tr>
@@ -246,6 +292,14 @@ async function loadCentrales() {
           </tbody>
         </table>
       </div>
+      
+      ${filtered.length === 0 ? `
+        <div class="text-center py-12">
+          <i class="fas fa-search text-gray-300 text-6xl mb-4"></i>
+          <p class="text-gray-500 text-lg">Aucune centrale trouvée</p>
+          <p class="text-gray-400 text-sm mt-2">Essayez de modifier vos filtres ou votre recherche</p>
+        </div>
+      ` : ''}
     `;
     
     container.innerHTML = html;
@@ -364,6 +418,185 @@ async function loadUploadForm() {
   } catch (error) {
     console.error('Erreur chargement form upload:', error);
   }
+}
+
+// ======================
+// ANALYTICS
+// ======================
+let chartCompletion = null;
+
+async function loadAnalytics() {
+  try {
+    const response = await axios.get('/api/stats');
+    if (!response.data.success) {
+      throw new Error(response.data.error);
+    }
+    
+    const data = response.data.data;
+    const centralesResponse = await axios.get('/api/centrales');
+    const centrales = centralesResponse.data.data;
+    
+    // Progression mission
+    const auditees = data.global.auditees || 0;
+    const total = data.global.total_centrales || 52;
+    const progressPercent = ((auditees / total) * 100).toFixed(1);
+    
+    document.getElementById('analytics-progress-percent').textContent = `${progressPercent}%`;
+    document.getElementById('analytics-progress-bar').style.width = `${progressPercent}%`;
+    document.getElementById('analytics-remaining').textContent = total - auditees;
+    
+    // Temps restant estimé (6h30 SOL, 8h10 TOITURE)
+    const remaining = centrales.filter(c => c.statut === 'A_AUDITER');
+    const solRemaining = remaining.filter(c => c.type === 'SOL').length;
+    const toitRemaining = remaining.filter(c => c.type === 'TOITURE').length;
+    const heuresRestantes = (solRemaining * 6.5 + toitRemaining * 8.17).toFixed(0);
+    document.getElementById('analytics-time-remaining').textContent = `${heuresRestantes}h`;
+    
+    // KPI
+    const totalPhotos = data.volumetrie.total_photos || 0;
+    const avgPhotos = auditees > 0 ? Math.round(totalPhotos / auditees) : 0;
+    document.getElementById('analytics-avg-photos').textContent = avgPhotos;
+    
+    const volumeJSON = (data.volumetrie.total_json_mb || 0) / 1024;
+    const volumePhotos = totalPhotos * 3.5 / 1024; // Estimation 3.5 MB/photo
+    const volumeTotal = (volumeJSON + volumePhotos).toFixed(1);
+    document.getElementById('analytics-volume-total').textContent = `${volumeTotal} GB`;
+    
+    const validationRate = total > 0 ? ((data.global.validees / total) * 100).toFixed(1) : 0;
+    document.getElementById('analytics-validation-rate').textContent = `${validationRate}%`;
+    
+    // Détails par type et statut
+    const solCentrales = centrales.filter(c => c.type === 'SOL');
+    const toitureCentrales = centrales.filter(c => c.type === 'TOITURE');
+    
+    document.getElementById('sol-a-auditer').textContent = solCentrales.filter(c => c.statut === 'A_AUDITER').length;
+    document.getElementById('sol-en-cours').textContent = solCentrales.filter(c => c.statut === 'EN_COURS').length;
+    document.getElementById('sol-termine').textContent = solCentrales.filter(c => c.statut === 'TERMINE').length;
+    document.getElementById('sol-valide').textContent = solCentrales.filter(c => c.statut === 'VALIDE').length;
+    
+    document.getElementById('toiture-a-auditer').textContent = toitureCentrales.filter(c => c.statut === 'A_AUDITER').length;
+    document.getElementById('toiture-en-cours').textContent = toitureCentrales.filter(c => c.statut === 'EN_COURS').length;
+    document.getElementById('toiture-termine').textContent = toitureCentrales.filter(c => c.statut === 'TERMINE').length;
+    document.getElementById('toiture-valide').textContent = toitureCentrales.filter(c => c.statut === 'VALIDE').length;
+    
+    // Chart completion
+    createChartCompletion(data, centrales);
+    
+  } catch (error) {
+    console.error('Erreur chargement analytics:', error);
+  }
+}
+
+function createChartCompletion(statsData, centrales) {
+  const ctx = document.getElementById('chartCompletion');
+  
+  if (chartCompletion) {
+    chartCompletion.destroy();
+  }
+  
+  const total = centrales.length;
+  const aAuditer = centrales.filter(c => c.statut === 'A_AUDITER').length;
+  const enCours = centrales.filter(c => c.statut === 'EN_COURS').length;
+  const termine = centrales.filter(c => c.statut === 'TERMINE').length;
+  const valide = centrales.filter(c => c.statut === 'VALIDE').length;
+  
+  chartCompletion = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['À Auditer', 'En Cours', 'Terminé', 'Validé'],
+      datasets: [{
+        data: [aAuditer, enCours, termine, valide],
+        backgroundColor: ['#94a3b8', '#fbbf24', '#34d399', '#a78bfa'],
+        borderWidth: 3,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const percent = ((value / total) * 100).toFixed(1);
+              return `${label}: ${value} (${percent}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ======================
+// EXPORT FUNCTIONS
+// ======================
+async function exportToCSV() {
+  try {
+    const response = await axios.get('/api/centrales');
+    if (!response.data.success) throw new Error(response.data.error);
+    
+    const centrales = response.data.data;
+    
+    // Créer CSV
+    let csv = 'Nom,Type,Statut,Localisation,Puissance (kWc),Nb Retours,Total Photos\n';
+    centrales.forEach(c => {
+      csv += `${c.nom},${c.type},${c.statut},${c.localisation || '-'},${c.puissance_kwc || 0},${c.nb_retours || 0},${c.total_photos || 0}\n`;
+    });
+    
+    // Télécharger
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `girasole_centrales_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    alert('✅ Export CSV réussi !');
+  } catch (error) {
+    console.error('Erreur export CSV:', error);
+    alert('❌ Erreur lors de l\'export CSV');
+  }
+}
+
+async function exportToJSON() {
+  try {
+    const response = await axios.get('/api/centrales');
+    if (!response.data.success) throw new Error(response.data.error);
+    
+    const statsResponse = await axios.get('/api/stats');
+    
+    const exportData = {
+      date_export: new Date().toISOString(),
+      mission: 'GIRASOLE 2025',
+      centrales: response.data.data,
+      statistiques: statsResponse.data.data
+    };
+    
+    const json = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `girasole_export_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    alert('✅ Export JSON réussi !');
+  } catch (error) {
+    console.error('Erreur export JSON:', error);
+    alert('❌ Erreur lors de l\'export JSON');
+  }
+}
+
+function printReport() {
+  window.print();
 }
 
 // Upload form submit

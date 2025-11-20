@@ -291,6 +291,9 @@ app.get('/', (c) => {
                     <button onclick="showTab('upload')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-upload mr-2"></i>Upload JSON
                     </button>
+                    <button onclick="showTab('analytics')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-chart-pie mr-2"></i>Analytics
+                    </button>
                     <button onclick="showTab('docs')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-book mr-2"></i>Documentation
                     </button>
@@ -377,20 +380,37 @@ app.get('/', (c) => {
             <!-- Centrales Tab -->
             <div id="tab-centrales" class="tab-content hidden">
                 <div class="bg-white rounded-lg shadow">
-                    <div class="p-6 border-b flex items-center justify-between">
-                        <h3 class="text-lg font-bold">Liste des 52 Centrales</h3>
-                        <div class="flex space-x-4">
-                            <select id="filter-type" onchange="loadCentrales()" class="px-4 py-2 border rounded">
-                                <option value="">Tous types</option>
-                                <option value="SOL">SOL (39)</option>
-                                <option value="TOITURE">TOITURE (13)</option>
+                    <div class="p-6 border-b">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold">Liste des 52 Centrales</h3>
+                            <div class="flex items-center space-x-2">
+                                <span id="centrales-count" class="text-sm text-gray-600 font-medium">52 centrales</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <input 
+                                type="text" 
+                                id="search-centrales" 
+                                placeholder="🔍 Rechercher par nom ou localisation..." 
+                                onkeyup="loadCentrales()"
+                                class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                            <select id="filter-type" onchange="loadCentrales()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                                <option value="">📂 Tous types</option>
+                                <option value="SOL">☀️ SOL (39)</option>
+                                <option value="TOITURE">🏠 TOITURE (13)</option>
                             </select>
-                            <select id="filter-statut" onchange="loadCentrales()" class="px-4 py-2 border rounded">
-                                <option value="">Tous statuts</option>
-                                <option value="A_AUDITER">À auditer</option>
-                                <option value="EN_COURS">En cours</option>
-                                <option value="TERMINE">Terminé</option>
-                                <option value="VALIDE">Validé</option>
+                            <select id="filter-statut" onchange="loadCentrales()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                                <option value="">📊 Tous statuts</option>
+                                <option value="A_AUDITER">⏳ À auditer</option>
+                                <option value="EN_COURS">🔄 En cours</option>
+                                <option value="TERMINE">✅ Terminé</option>
+                                <option value="VALIDE">⭐ Validé</option>
+                            </select>
+                            <select id="sort-by" onchange="loadCentrales()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                                <option value="nom">📝 Trier par nom</option>
+                                <option value="date_audit">📅 Trier par date</option>
+                                <option value="nb_retours">📊 Trier par retours</option>
                             </select>
                         </div>
                     </div>
@@ -440,6 +460,154 @@ app.get('/', (c) => {
                     </form>
                     
                     <div id="upload-result" class="mt-6 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="tab-analytics" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Progression Mission -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center">
+                            <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                            Progression Mission
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Centrales Auditées</span>
+                                    <span id="analytics-progress-percent" class="font-bold text-blue-600">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-4">
+                                    <div id="analytics-progress-bar" class="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600">Restant à auditer</p>
+                                    <p id="analytics-remaining" class="text-2xl font-bold text-gray-800">52</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600">Temps estimé restant</p>
+                                    <p id="analytics-time-remaining" class="text-2xl font-bold text-gray-800">360h</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Taux de Complétion -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center">
+                            <i class="fas fa-tasks text-green-600 mr-2"></i>
+                            Taux de Complétion
+                        </h3>
+                        <canvas id="chartCompletion"></canvas>
+                    </div>
+                </div>
+                
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm font-medium">Moyenne Photos/Centrale</p>
+                                <p id="analytics-avg-photos" class="text-3xl font-bold mt-2">0</p>
+                            </div>
+                            <i class="fas fa-camera text-5xl text-blue-300 opacity-50"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium">Volumétrie Totale</p>
+                                <p id="analytics-volume-total" class="text-3xl font-bold mt-2">0 GB</p>
+                            </div>
+                            <i class="fas fa-database text-5xl text-green-300 opacity-50"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100 text-sm font-medium">Taux Validation</p>
+                                <p id="analytics-validation-rate" class="text-3xl font-bold mt-2">0%</p>
+                            </div>
+                            <i class="fas fa-check-circle text-5xl text-purple-300 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Détails par Type -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center">
+                            <i class="fas fa-sun text-yellow-600 mr-2"></i>
+                            Centrales SOL (39)
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                                <span class="text-gray-600">À Auditer</span>
+                                <span id="sol-a-auditer" class="font-bold text-gray-800">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-yellow-50 rounded">
+                                <span class="text-gray-600">En Cours</span>
+                                <span id="sol-en-cours" class="font-bold text-yellow-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-green-50 rounded">
+                                <span class="text-gray-600">Terminé</span>
+                                <span id="sol-termine" class="font-bold text-green-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-purple-50 rounded">
+                                <span class="text-gray-600">Validé</span>
+                                <span id="sol-valide" class="font-bold text-purple-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center">
+                            <i class="fas fa-building text-green-600 mr-2"></i>
+                            Centrales TOITURE (13)
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                                <span class="text-gray-600">À Auditer</span>
+                                <span id="toiture-a-auditer" class="font-bold text-gray-800">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-yellow-50 rounded">
+                                <span class="text-gray-600">En Cours</span>
+                                <span id="toiture-en-cours" class="font-bold text-yellow-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-green-50 rounded">
+                                <span class="text-gray-600">Terminé</span>
+                                <span id="toiture-termine" class="font-bold text-green-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-purple-50 rounded">
+                                <span class="text-gray-600">Validé</span>
+                                <span id="toiture-valide" class="font-bold text-purple-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export Data -->
+                <div class="mt-6 bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-download text-blue-600 mr-2"></i>
+                        Export Données
+                    </h3>
+                    <div class="flex space-x-4">
+                        <button onclick="exportToCSV()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded transition">
+                            <i class="fas fa-file-csv mr-2"></i>Exporter CSV
+                        </button>
+                        <button onclick="exportToJSON()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition">
+                            <i class="fas fa-file-code mr-2"></i>Exporter JSON
+                        </button>
+                        <button onclick="printReport()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition">
+                            <i class="fas fa-print mr-2"></i>Imprimer Rapport
+                        </button>
+                    </div>
                 </div>
             </div>
 
