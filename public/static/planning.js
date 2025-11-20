@@ -323,8 +323,11 @@ function displayMissions(data) {
                       </div>
                     </div>
                     <div class="flex items-center space-x-2 ml-4">
-                      <button onclick="viewMission(${m.id})" class="text-blue-600 hover:text-blue-800 p-2" title="Voir détails">
-                        <i class="fas fa-eye"></i>
+                      <button onclick="viewMission(${m.id})" class="text-blue-600 hover:text-blue-800 p-2" title="📄 Ordre de Mission PDF">
+                        <i class="fas fa-file-pdf"></i>
+                      </button>
+                      <button onclick="generateChecklist(${m.id})" class="text-purple-600 hover:text-purple-800 p-2" title="✅ Checklist V4">
+                        <i class="fas fa-clipboard-check"></i>
                       </button>
                       <button onclick="editMission(${m.id})" class="text-green-600 hover:text-green-800 p-2" title="Modifier">
                         <i class="fas fa-edit"></i>
@@ -728,7 +731,8 @@ function viewMission(id) {
   const mission = missionsData.find(m => m.id === id);
   if (!mission) return;
   
-  alert(`Détails mission:\n\nCentrale: ${mission.centrale_nom}\nTechnicien: ${mission.technicien_prenom} ${mission.technicien_nom}\nDate: ${formatDate(mission.date_mission)}\nStatut: ${formatStatut(mission.statut)}`);
+  // Ouvrir ordre de mission dans nouvelle fenêtre
+  window.open(`/api/ordres-mission/${id}/document`, '_blank');
 }
 
 function editMission(id) {
@@ -763,6 +767,13 @@ function editTechnicien(id) {
   showNotification('Fonction en développement', 'info');
 }
 
+function generateChecklist(missionId) {
+  // Pour l'instant, même comportement que viewMission
+  // Plus tard: générer une checklist HTML vierge personnalisée
+  viewMission(missionId);
+  showNotification('Ordre de mission généré ! Utilisez Ctrl+P pour imprimer en PDF', 'success');
+}
+
 // ====================================
 // EXPORT
 // ====================================
@@ -780,3 +791,4 @@ window.cancelMission = cancelMission;
 window.assignMission = assignMission;
 window.editSousTraitant = editSousTraitant;
 window.editTechnicien = editTechnicien;
+window.generateChecklist = generateChecklist;

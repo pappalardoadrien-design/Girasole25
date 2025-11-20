@@ -540,6 +540,374 @@ app.get('/api/planning', async (c) => {
   }
 })
 
+// GET /api/ordres-mission/:id/document - Générer ordre de mission PDF/HTML
+app.get('/api/ordres-mission/:id/document', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    // Récupérer ordre de mission complet
+    const mission = await DB.prepare(`
+      SELECT 
+        om.*,
+        c.nom as centrale_nom,
+        c.type as centrale_type,
+        c.puissance_kwc,
+        c.localisation,
+        t.prenom as technicien_prenom,
+        t.nom as technicien_nom,
+        t.email as technicien_email,
+        t.telephone as technicien_telephone,
+        st.nom_entreprise,
+        st.email_contact as entreprise_email,
+        st.telephone as entreprise_telephone,
+        st.adresse as entreprise_adresse
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      WHERE om.id = ?
+    `).bind(id).first()
+    
+    if (!mission) {
+      return c.json({ success: false, error: 'Ordre de mission non trouvé' }, 404)
+    }
+    
+    const dateFormatee = new Date(mission.date_mission).toLocaleDateString('fr-FR', { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    })
+    
+    const qrCodeData = JSON.stringify({
+      mission_id: mission.id,
+      centrale_id: mission.centrale_id,
+      technicien_id: mission.technicien_id,
+      date: mission.date_mission
+    })
+    
+    // Générer QR Code URL (utilise un service public)
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodeData)}`
+    
+    return c.html(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ordre de Mission #${mission.id} - ${mission.centrale_nom}</title>
+        <style>
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+            @page { margin: 1cm; }
+          }
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+          }
+          .header {
+            border-bottom: 4px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+          .header h1 {
+            color: #2563eb;
+            margin: 0 0 5px 0;
+            font-size: 28px;
+          }
+          .header .subtitle {
+            color: #666;
+            font-size: 14px;
+          }
+          .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+          }
+          .section h2 {
+            color: #2563eb;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            text-transform: uppercase;
+          }
+          .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+          }
+          .info-item {
+            margin-bottom: 10px;
+          }
+          .info-label {
+            font-weight: bold;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          .info-value {
+            color: #1e293b;
+            font-size: 16px;
+            margin-top: 3px;
+          }
+          .checklist {
+            background: white;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+          }
+          .checklist-category {
+            margin-bottom: 20px;
+          }
+          .checklist-category h3 {
+            background: #2563eb;
+            color: white;
+            padding: 8px 15px;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+          }
+          .checklist-item {
+            padding: 8px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+          }
+          .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            margin-right: 15px;
+            flex-shrink: 0;
+          }
+          .qr-section {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+          }
+          .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+          }
+          .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          .btn-print:hover {
+            background: #1d4ed8;
+          }
+        </style>
+      </head>
+      <body>
+        <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimer / Sauvegarder PDF</button>
+        
+        <div class="header">
+          <h1>📋 ORDRE DE MISSION</h1>
+          <div class="subtitle">Mission GIRASOLE 2025 - Diagnostic Photovoltaïque</div>
+          <div class="subtitle">Ordre n°${String(mission.id).padStart(4, '0')} - Créé le ${new Date(mission.date_creation).toLocaleDateString('fr-FR')}</div>
+        </div>
+
+        <!-- Informations Centrale -->
+        <div class="section">
+          <h2>🏭 Centrale Photovoltaïque</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Nom Installation</div>
+              <div class="info-value">${mission.centrale_nom}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Type</div>
+              <div class="info-value">${mission.centrale_type}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Puissance Installée</div>
+              <div class="info-value">${mission.puissance_kwc} kWc</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Localisation</div>
+              <div class="info-value">${mission.localisation || 'Non renseignée'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations Technicien -->
+        <div class="section">
+          <h2>👤 Technicien Assigné</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Nom Complet</div>
+              <div class="info-value">${mission.technicien_prenom} ${mission.technicien_nom}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Entreprise</div>
+              <div class="info-value">${mission.nom_entreprise}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Email</div>
+              <div class="info-value">${mission.technicien_email || 'N/A'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Téléphone</div>
+              <div class="info-value">${mission.technicien_telephone || 'N/A'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations Mission -->
+        <div class="section">
+          <h2>📅 Planification</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Date Mission</div>
+              <div class="info-value">${dateFormatee}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Heure Début</div>
+              <div class="info-value">${mission.heure_debut || '08:00'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Durée Estimée</div>
+              <div class="info-value">${mission.duree_estimee_heures}h</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Statut</div>
+              <div class="info-value">${mission.statut}</div>
+            </div>
+          </div>
+          ${mission.commentaires ? `
+            <div class="info-item" style="margin-top: 15px">
+              <div class="info-label">Commentaires</div>
+              <div class="info-value">${mission.commentaires}</div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Checklist V4 -->
+        <div class="section">
+          <h2>✅ Checklist Audit V4 (54 Points CDC)</h2>
+          <div class="checklist">
+            <div class="checklist-category">
+              <h3>📄 1. DOCUMENTATION (8 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> Plaques signalétiques modules</div>
+              <div class="checklist-item"><div class="checkbox"></div> Plaque onduleur(s)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Schéma électrique unifilaire</div>
+              <div class="checklist-item"><div class="checkbox"></div> Plan implantation modules</div>
+              <div class="checklist-item"><div class="checkbox"></div> Attestation Consuel</div>
+              <div class="checklist-item"><div class="checkbox"></div> Contrat de raccordement</div>
+              <div class="checklist-item"><div class="checkbox"></div> Garanties constructeurs</div>
+              <div class="checklist-item"><div class="checkbox"></div> Rapports maintenance existants</div>
+            </div>
+
+            <div class="checklist-category">
+              <h3>⚡ 2. CONTRÔLES ÉLECTRIQUES (12 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> Tension Voc à vide (strings)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Courant Isc court-circuit</div>
+              <div class="checklist-item"><div class="checkbox"></div> Courbes I-V production</div>
+              <div class="checklist-item"><div class="checkbox"></div> Courbes I-V sombres</div>
+              <div class="checklist-item"><div class="checkbox"></div> Test isolement (≥1 MΩ)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Continuité terre/masses</div>
+              <div class="checklist-item"><div class="checkbox"></div> Polarité connexions DC</div>
+              <div class="checklist-item"><div class="checkbox"></div> Serrage bornes (couple)</div>
+              <div class="checklist-item"><div class="checkbox"></div> État connecteurs MC4</div>
+              <div class="checklist-item"><div class="checkbox"></div> Protection surtensions</div>
+              <div class="checklist-item"><div class="checkbox"></div> Fonctionnement onduleur(s)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Production instantanée</div>
+            </div>
+
+            <div class="checklist-category">
+              <h3>🔌 3. TABLEAUX & PROTECTIONS (8 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> État tableau AC</div>
+              <div class="checklist-item"><div class="checkbox"></div> État tableau DC (boîtes jonction)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Calibrage disjoncteurs</div>
+              <div class="checklist-item"><div class="checkbox"></div> Parafoudres opérationnels</div>
+              <div class="checklist-item"><div class="checkbox"></div> Étiquetage circuits</div>
+              <div class="checklist-item"><div class="checkbox"></div> Ventilation locaux techniques</div>
+              <div class="checklist-item"><div class="checkbox"></div> Signalétique sécurité</div>
+              <div class="checklist-item"><div class="checkbox"></div> Accès/consignation</div>
+            </div>
+
+            <div class="checklist-category">
+              <h3>🔧 4. CÂBLAGE & CHEMINEMENTS (7 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> État câbles DC (UV, rongeurs)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Fixations chemins câbles</div>
+              <div class="checklist-item"><div class="checkbox"></div> Passages traversées étanches</div>
+              <div class="checklist-item"><div class="checkbox"></div> Rayon courbure respecté</div>
+              <div class="checklist-item"><div class="checkbox"></div> Protection mécanique adéquate</div>
+              <div class="checklist-item"><div class="checkbox"></div> Tranchées/enterrés conformes</div>
+              <div class="checklist-item"><div class="checkbox"></div> Distance sécurité respectée</div>
+            </div>
+
+            <div class="checklist-category">
+              <h3>☀️ 5. MODULES PHOTOVOLTAÏQUES (10 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> Inspection visuelle (fissures, délamination)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Encrassement/salissures</div>
+              <div class="checklist-item"><div class="checkbox"></div> Points chauds (si thermographie)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Diodes bypass fonctionnelles</div>
+              <div class="checklist-item"><div class="checkbox"></div> Boîtiers jonction modules</div>
+              <div class="checklist-item"><div class="checkbox"></div> État cadres/joints</div>
+              <div class="checklist-item"><div class="checkbox"></div> Fixations/clips</div>
+              <div class="checklist-item"><div class="checkbox"></div> Mise à la terre modules</div>
+              <div class="checklist-item"><div class="checkbox"></div> Ombrage(s) identifié(s)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Homogénéité installation</div>
+            </div>
+
+            <div class="checklist-category">
+              <h3>🏗️ 6. STRUCTURES & ANCRAGE (5 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> Corrosion structures</div>
+              <div class="checklist-item"><div class="checkbox"></div> Boulonnerie/serrage</div>
+              <div class="checklist-item"><div class="checkbox"></div> Niveau/alignement</div>
+              <div class="checklist-item"><div class="checkbox"></div> Ancrage toiture/sol</div>
+              <div class="checklist-item"><div class="checkbox"></div> Drainage eaux pluviales</div>
+            </div>
+
+            <div class="checklist-category">
+              <h3>🏠 7. SUPPORT TOITURE (si applicable - 4 points)</h3>
+              <div class="checklist-item"><div class="checkbox"></div> État couverture (tuiles, bac acier)</div>
+              <div class="checklist-item"><div class="checkbox"></div> Étanchéité traversées</div>
+              <div class="checklist-item"><div class="checkbox"></div> Charpente/structure porteuse</div>
+              <div class="checklist-item"><div class="checkbox"></div> Infiltrations eau</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-section">
+          <h3 style="margin-top: 0">📱 QR Code Mission</h3>
+          <p style="color: #64748b; font-size: 14px">Scanner pour accès rapide aux données mission</p>
+          <img src="${qrCodeUrl}" alt="QR Code Mission" style="margin: 15px 0">
+          <p style="color: #94a3b8; font-size: 12px">Mission ID: #${String(mission.id).padStart(4, '0')}</p>
+        </div>
+
+        <div class="footer">
+          <p><strong>Diagnostic Photovoltaïque - Adrien Pappalardo</strong></p>
+          <p>Mission GIRASOLE 2025 - Audit 52 Centrales Photovoltaïques</p>
+          <p>Document généré le ${new Date().toLocaleString('fr-FR')}</p>
+        </div>
+      </body>
+      </html>
+    `)
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 // GET /api/stats/planning - Stats planning
 app.get('/api/stats/planning', async (c) => {
   const { DB } = c.env
