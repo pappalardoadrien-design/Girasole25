@@ -18,6 +18,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, List
 import io
+import subprocess
+import platform
 
 try:
     from docx import Document
@@ -793,6 +795,55 @@ def generer_rapport_pdf_v4(centrale_id: str, json_v4_path: Path,
     return output_docx
 
 
+def convertir_docx_vers_pdf(docx_path: Path) -> Path:
+    """
+    Convertit un fichier DOCX en PDF avec LibreOffice
+    
+    Args:
+        docx_path: Chemin du fichier DOCX
+    
+    Returns:
+        Path du fichier PDF généré ou None si erreur
+    """
+    try:
+        output_dir = docx_path.parent
+        
+        # Commande LibreOffice headless
+        cmd = [
+            'libreoffice',
+            '--headless',
+            '--convert-to', 'pdf',
+            '--outdir', str(output_dir),
+            str(docx_path)
+        ]
+        
+        print(f"   🔄 Conversion PDF en cours...")
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        
+        if result.returncode == 0:
+            # Construire chemin PDF
+            pdf_path = docx_path.with_suffix('.pdf')
+            if pdf_path.exists():
+                print(f"   ✅ PDF généré : {pdf_path.name}")
+                return pdf_path
+            else:
+                print(f"   ⚠️  PDF non trouvé après conversion")
+                return None
+        else:
+            print(f"   ⚠️  Erreur conversion PDF : {result.stderr[:200]}")
+            return None
+    
+    except subprocess.TimeoutExpired:
+        print(f"   ⚠️  Timeout conversion PDF (>120s)")
+        return None
+    except FileNotFoundError:
+        print(f"   ⚠️  LibreOffice non installé (conversion PDF désactivée)")
+        return None
+    except Exception as e:
+        print(f"   ⚠️  Erreur conversion PDF : {e}")
+        return None
+
+
 # ====================================================================================================
 # 🎯 MAIN - BATCH PROCESSING
 # ====================================================================================================
@@ -845,6 +896,9 @@ def main():
             )
             
             if output_path:
+                # Tentative conversion PDF
+                pdf_path = convertir_docx_vers_pdf(output_path)
+                
                 print(f"[{i}/{len(json_files)}] ✅ {centrale_id} - {json_path.name}")
                 nb_ok += 1
             else:
@@ -859,13 +913,15 @@ def main():
     print("="*100)
     print("📊 STATISTIQUES GÉNÉRATION V4")
     print("="*100)
-    print(f"✅ Rapports V4 générés : {nb_ok}/{len(json_files)}")
+    print(f"✅ Rapports Word générés : {nb_ok}/{len(json_files)}")
+    print(f"✅ Rapports PDF générés : Conversion automatique (si LibreOffice disponible)")
     print(f"⚠️  JSON V3 skippés : {nb_skip}")
     print(f"❌ Erreurs : {nb_erreurs}")
     print(f"📁 Dossier sortie : {output_dir}")
     print("="*100)
     print()
-    print("💡 NOTE : Pour conversion PDF, exécuter :")
+    print("💡 NOTE : Conversion PDF automatique intégrée !")
+    print(f"   Si LibreOffice non disponible, exécuter manuellement :")
     print(f"   libreoffice --headless --convert-to pdf --outdir {output_dir} {output_dir}/*.docx")
     print()
 
