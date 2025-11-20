@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Terrain Complète - Diagnostic Photovoltaïque</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        
+        .info-section {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .info-item label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .info-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .section {
+            padding: 25px 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2ecc71;
+        }
+        
+        .section-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+        
+        .section-title {
+            flex: 1;
+        }
+        
+        .section-title h2 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .section-title p {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        
+        .section-progress {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2ecc71;
+        }
+        
+        .checklist-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #95a5a6;
+            transition: all 0.3s ease;
+        }
+        
+        .checklist-item.checked {
+            background: #d4edda;
+            border-left-color: #2ecc71;
+        }
+        
+        .checklist-item.critical {
+            border-left-color: #e74c3c;
+        }
+        
+        .checklist-item.critical.checked {
+            border-left-color: #2ecc71;
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .item-checkbox {
+            width: 22px;
+            height: 22px;
+            margin-right: 12px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+        
+        .item-description {
+            color: #7f8c8d;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .item-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge-critical {
+            background: #fee;
+            color: #e74c3c;
+        }
+        
+        .badge-important {
+            background: #fff3cd;
+            color: #f39c12;
+        }
+        
+        .item-notes {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .global-progress {
+            position: sticky;
+            top: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 12px;
+            background: #34495e;
+            border-radius: 6px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .actions {
+            padding: 30px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .footer {
+            padding: 20px 30px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .global-progress,
+            .actions {
+                display: none;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress Bar Global -->
+        <div class="global-progress">
+            <div style="font-weight: 600;">Progression globale</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="globalProgress"></div>
+            </div>
+            <div id="globalProgressText" style="font-weight: 600;">0/68 (0%)</div>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>✅ CHECKLIST TERRAIN COMPLÈTE</h1>
+            <p>Intervention Centrale Photovoltaïque - Diagnostic Photovoltaïque</p>
+            <p style="margin-top: 10px; font-size: 12px;">Version 2.0 | Mission GIRASOLE 2025</p>
+        </div>
+        
+        <!-- Informations Intervention -->
+        <div class="info-section">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">📋 INFORMATIONS INTERVENTION</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Centrale</label>
+                    <input type="text" id="centrale" placeholder="Nom centrale">
+                </div>
+                <div class="info-item">
+                    <label>Date</label>
+                    <input type="date" id="date">
+                </div>
+                <div class="info-item">
+                    <label>Technicien 1</label>
+                    <input type="text" id="technicien1" placeholder="Nom prénom">
+                </div>
+                <div class="info-item">
+                    <label>Technicien 2</label>
+                    <input type="text" id="technicien2" placeholder="Nom prénom (binôme)">
+                </div>
+                <div class="info-item">
+                    <label>Type intervention</label>
+                    <input type="text" id="typeIntervention" placeholder="Commissioning / Audit / Maintenance">
+                </div>
+                <div class="info-item">
+                    <label>Météo</label>
+                    <input type="text" id="meteo" placeholder="Ensoleillé / Nuageux / Pluie">
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 1: PRÉ-INTERVENTION -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🔍</div>
+                <div class="section-title">
+                    <h2>1. PRÉ-INTERVENTION (15 min)</h2>
+                    <p>Vérifications obligatoires avant démarrage intervention</p>
+                </div>
+                <div class="section-progress" data-section="1">0/15</div>
+            </div>
+            
+            <!-- 1.1 Sécurité & Habilitations -->
+            <h4 style="margin: 20px 0 15px 0; color: #34495e; font-size: 16px;">🛡️ 1.1 Sécurité & Habilitations</h4>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Habilitations électriques à jour <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">H0B0 valide < 3 ans pour interventions proximité électrique</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Binôme constitué (minimum 2 personnes) <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Jamais seul en hauteur ou proximité électrique</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">EPI complets vérifiés <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Casque, gants isolants, chaussures sécurité, lunettes, gilet haute visibilité</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">PTI activé et testé <span class="item-badge badge-important">IMPORTANT</span></div>
+                        <div class="item-description">Protection Travailleur Isolé opérationnel (si applicable toiture)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Conditions météo validées <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Vent < 40 km/h, pas de pluie/orage/givre, irradiation > 300 W/m² (si mesures électriques)</div>
+                        <textarea class="item-notes" placeholder="Conditions exactes (température, irradiation estimée, vent)..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 1.2 Matériel & Équipements -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">🔧 1.2 Matériel & Équipements</h4>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Drone thermographie opérationnel</div>
+                        <div class="item-description">Mavic 3T : batteries chargées (min 3), carte SD formatée, calibration caméra thermique OK</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Équipement électroluminescence (si applicable)</div>
+                        <div class="item-description">Drone Maverick 4T + caméras Nikon modifiées + objectifs PvControl, batteries chargées</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Testeurs électriques calibrés</div>
+                        <div class="item-description">PVServ (courbes I-V), mégohmmètre (isolement), multimètre, pince ampèremétrique</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tablette/smartphone opérationnel</div>
+                        <div class="item-description">Checklist HTML accessible, applications photos/notes, batterie chargée, connexion 4G</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 1.3 Documentation & Accès -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">📄 1.3 Documentation & Accès</h4>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">DOE centrale récupéré</div>
+                        <div class="item-description">Plans calepinage, schémas électriques unifilaires, fiche technique modules/onduleurs</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Accès site confirmé</div>
+                        <div class="item-description">Contact exploitant/propriétaire prévenu, clés/codes accès récupérés</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Ordre de mission validé</div>
+                        <div class="item-description">Ordre mission GIRASOLE imprimé/accessible, périmètre intervention clair</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Briefing sécurité binôme effectué</div>
+                        <div class="item-description">Répartition rôles, communication établie, procédure urgence connue</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Reconnaissance visuelle site</div>
+                        <div class="item-description">Identification accès modules, locaux techniques, points sécurité, zones dangereuses</div>
+                        <textarea class="item-notes" placeholder="Observations terrain (accès difficile, zones attention particulière...)"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 2: INSPECTION VISUELLE -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">👁️</div>
+                <div class="section-title">
+                    <h2>2. INSPECTION VISUELLE (20 min)</h2>
+                    <p>Contrôles visuels détaillés modules, structures, câblages</p>
+                </div>
+                <div class="section-progress" data-section="2">0/18</div>
+            </div>
+            
+            <!-- 2.1 Modules Photovoltaïques -->
+            <h4 style="margin: 20px 0 15px 0; color: #34495e; font-size: 16px;">☀️ 2.1 Modules Photovoltaïques</h4>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">État général modules</div>
+                        <div class="item-description">Vérification visuelle propreté, fissures apparentes, délamination, décoloration</div>
+                        <textarea class="item-notes" placeholder="Anomalies visuelles détectées (nb modules affectés, localisation)..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Encrassement / salissures</div>
+                        <div class="item-description">Évaluation niveau saleté (fientes oiseaux, poussière, pollution, végétation)</div>
+                        <textarea class="item-notes" placeholder="Niveau encrassement estimé (faible/moyen/fort), zones concernées..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Ombrage partiel détecté</div>
+                        <div class="item-description">Identification ombrages (arbres, bâtiments, équipements), impact estimé</div>
+                        <textarea class="item-notes" placeholder="Sources ombrage identifiées, strings affectés..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Boîtes jonction modules</div>
+                        <div class="item-description">Étanchéité, fixation, absence traces brûlures/échauffement, câbles bien serrés</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Étiquettes identification modules lisibles</div>
+                        <div class="item-description">Plaques signalétiques présentes, références modules identifiables</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2.2 Structures & Fixations -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">🏗️ 2.2 Structures & Fixations</h4>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">État structures porteuses</div>
+                        <div class="item-description">Corrosion, déformation, fixations desserrées, stabilité générale</div>
+                        <textarea class="item-notes" placeholder="Anomalies structures (corrosion, déformations, zones affectées)..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Fixations modules serrées</div>
+                        <div class="item-description">Vérification échantillon clips/boulons fixation modules sur structures</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Système tracking opérationnel (si applicable)</div>
+                        <div class="item-description">Vérins fonctionnels, capteurs solaires propres, absence blocages mécaniques</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2.3 Câblages & Connectiques -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">🔌 2.3 Câblages & Connectiques</h4>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">État câbles DC strings</div>
+                        <div class="item-description">Absence coupures, dégradations isolant, brûlures, rongeurs, UV</div>
+                        <textarea class="item-notes" placeholder="Câbles endommagés détectés (localisation, gravité)..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Connecteurs MC4 bien enclenchés</div>
+                        <div class="item-description">Vérification échantillon connecteurs inter-modules, absence déconnexions</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Chemins câbles fixés correctement</div>
+                        <div class="item-description">Gaines, colliers, passages toiture étanches, câbles non pendants</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Boîtes jonction strings (si présentes)</div>
+                        <div class="item-description">Étanchéité IP, absence infiltration eau, connexions serrées, fusibles intacts</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2.4 Onduleurs & Locaux Techniques -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">⚡ 2.4 Onduleurs & Locaux Techniques</h4>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">État général onduleurs</div>
+                        <div class="item-description">Propreté, absence traces échauffement/brûlures, voyants LED normaux</div>
+                        <textarea class="item-notes" placeholder="Anomalies onduleurs (erreurs affichées, bruits anormaux...)"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Ventilation onduleurs/locaux</div>
+                        <div class="item-description">Ventilateurs opérationnels, grilles aération propres, température ambiante correcte</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Connexions DC/AC onduleurs serrées</div>
+                        <div class="item-description">Bornes DC entrée, AC sortie correctement serrées, absence traces surchauffe</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Protections électriques en place</div>
+                        <div class="item-description">Disjoncteurs, sectionneurs, parafoudres présents et fonctionnels</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Mise à terre installée et continue</div>
+                        <div class="item-description">Conducteurs terre verts/jaunes présents, continuité visuelle, barrette mesure accessible</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Signalétique sécurité présente</div>
+                        <div class="item-description">Panneaux danger électrique, consignes urgence, schémas unifilaires affichés</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 3: MESURES ÉLECTRIQUES -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <div class="section-title">
+                    <h2>3. MESURES ÉLECTRIQUES (25 min)</h2>
+                    <p>Tests et mesures électriques obligatoires</p>
+                </div>
+                <div class="section-progress" data-section="3">0/12</div>
+            </div>
+            
+            <!-- 3.1 Mesures Strings DC -->
+            <h4 style="margin: 20px 0 15px 0; color: #34495e; font-size: 16px;">🔋 3.1 Mesures Strings DC</h4>
+            
+            <div class="checklist-item critical" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tensions à vide strings (Voc) <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Mesure Voc par string (multimètre), vérification cohérence vs théorique ±10%</div>
+                        <textarea class="item-notes" placeholder="Voc mesurées par string (String 1: XXX V, String 2: XXX V...), anomalies détectées..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Courants court-circuit strings (Isc)</div>
+                        <div class="item-description">Mesure Isc par string (pince ampèremétrique), homogénéité entre strings vérifiée</div>
+                        <textarea class="item-notes" placeholder="Isc mesurés par string, écarts significatifs détectés..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Courbes I-V échantillon (si PVServ disponible)</div>
+                        <div class="item-description">Tracé courbes I-V 2-3 strings représentatifs, analyse forme courbe (FF, Pmax)</div>
+                        <textarea class="item-notes" placeholder="Strings testés, Pmax mesurée vs théorique, anomalies courbes..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Polarité strings respectée</div>
+                        <div class="item-description">Vérification + vers + onduleur, - vers - onduleur (multimètre mode DC)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3.2 Isolement & Continuité -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">🔒 3.2 Isolement & Continuité</h4>
+            
+            <div class="checklist-item critical" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Résistance isolement DC (mégohmmètre) <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Test 500V DC, résistance > 1 MΩ exigée (norme IEC 62446-1)</div>
+                        <textarea class="item-notes" placeholder="Résistance isolement mesurée (+ vers terre, - vers terre), conformité..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Continuité terre structures/masses <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Mesure résistance terre < 100 Ω, continuité liaisons équipotentielles < 0,5 Ω</div>
+                        <textarea class="item-notes" placeholder="Résistance terre mesurée, continuité masses métalliques..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Test différentiel 30 mA (si circuit AC protégé)</div>
+                        <div class="item-description">Vérification déclenchement différentiel côté AC onduleur</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3.3 Onduleurs & Production -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">📊 3.3 Onduleurs & Production</h4>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tensions DC entrée onduleurs</div>
+                        <div class="item-description">Vérification tensions MPPT dans plage onduleur, équilibrage entre MPPT</div>
+                        <textarea class="item-notes" placeholder="Tensions MPPT mesurées par onduleur (MPPT1: XXX V, MPPT2: XXX V...)"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tensions AC sortie onduleurs</div>
+                        <div class="item-description">Mesure tensions triphasées (si applicable), équilibrage phases < 5%</div>
+                        <textarea class="item-notes" placeholder="Tensions AC mesurées (L1: XXX V, L2: XXX V, L3: XXX V)"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Puissance instantanée relevée</div>
+                        <div class="item-description">Lecture afficheur onduleur ou monitoring, cohérence vs irradiation/température</div>
+                        <textarea class="item-notes" placeholder="Puissance instantanée (kW), irradiation estimée (W/m²), température modules (°C)..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Historique production consulté</div>
+                        <div class="item-description">Relevé production journalière/mensuelle/annuelle, détection baisses anormales</div>
+                        <textarea class="item-notes" placeholder="Production consultée (kWh/j, kWh/mois), anomalies historique..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Codes erreurs onduleurs relevés</div>
+                        <div class="item-description">Consultation historique alarmes, erreurs actives, gravité évaluée</div>
+                        <textarea class="item-notes" placeholder="Codes erreurs détectés, signification, fréquence..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 4: ACQUISITION IMAGES -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📸</div>
+                <div class="section-title">
+                    <h2>4. ACQUISITION IMAGES (20 min)</h2>
+                    <p>Thermographie, électroluminescence, photos nomenclature</p>
+                </div>
+                <div class="section-progress" data-section="4">0/10</div>
+            </div>
+            
+            <!-- 4.1 Thermographie Infrarouge -->
+            <h4 style="margin: 20px 0 15px 0; color: #34495e; font-size: 16px;">🌡️ 4.1 Thermographie Infrarouge</h4>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Conditions thermographie validées</div>
+                        <div class="item-description">Irradiation > 500 W/m², vent < 20 km/h, modules en production depuis > 30 min</div>
+                        <textarea class="item-notes" placeholder="Conditions acquisition (irradiation, température ambiante, vent)..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Vol drone thermographie effectué <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Couverture complète champ PV, altitude adaptée (résolution 2-3 cm/px), recouvrement > 60%</div>
+                        <textarea class="item-notes" placeholder="Nb images thermiques acquises, altitude vol, zones non couvertes..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Anomalies thermiques détectées terrain</div>
+                        <div class="item-description">Identification visuelle hotspots, écarts température > 10°C, défauts diodes bypass</div>
+                        <textarea class="item-notes" placeholder="Nb anomalies thermiques détectées, localisation approximative, gravité estimée..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4.2 Électroluminescence (si applicable) -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">🌙 4.2 Électroluminescence (si applicable)</h4>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Conditions EL validées</div>
+                        <div class="item-description">Nuit complète, vent < 15 km/h, onduleurs consignés, alimentation externe strings OK</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Acquisition images EL complète</div>
+                        <div class="item-description">Vol drone Maverick 4T + caméras Nikon, couverture 100% modules, temps exposition adapté</div>
+                        <textarea class="item-notes" placeholder="Nb images EL acquises, strings alimentés, temps exposition utilisé..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Défauts EL détectés terrain</div>
+                        <div class="item-description">Microfissures, cellules inactives, PID, délamination visibles sur images brutes</div>
+                        <textarea class="item-notes" placeholder="Types défauts EL détectés, nb modules affectés estimé..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4.3 Photos Nomenclature Obligatoire -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">📷 4.3 Photos Nomenclature Obligatoire</h4>
+            
+            <div class="checklist-item critical" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Photos générales site (min 5) <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Vue ensemble, accès, environnement, orientation modules, identification site</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Photos détails modules (min 10) <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">État général, salissures, fissures, délamination, boîtes jonction, étiquettes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Photos onduleurs & locaux (min 5) <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Onduleurs (façade, connexions), tableau électrique, schémas, signalétique</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Photos anomalies détectées (toutes)</div>
+                        <div class="item-description">Documentation visuelle CHAQUE anomalie identifiée (close-up + vue contexte)</div>
+                        <textarea class="item-notes" placeholder="Nb photos anomalies, types défauts photographiés..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 5: POST-INTERVENTION -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">✅</div>
+                <div class="section-title">
+                    <h2>5. POST-INTERVENTION (15 min)</h2>
+                    <p>Vérifications finales, exports, remise en état</p>
+                </div>
+                <div class="section-progress" data-section="5">0/13</div>
+            </div>
+            
+            <!-- 5.1 Contrôle Complétude Data -->
+            <h4 style="margin: 20px 0 15px 0; color: #34495e; font-size: 16px;">📊 5.1 Contrôle Complétude Data</h4>
+            
+            <div class="checklist-item critical" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Toutes photos prises conformes nomenclature <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Vérification nb photos minimum atteint, nommage correct, qualité suffisante</div>
+                        <textarea class="item-notes" placeholder="Nb total photos, vérification nomenclature OK..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Images thermographie/EL transférées <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Copie images drones depuis cartes SD vers tablette/laptop, vérification intégrité</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Mesures électriques enregistrées</div>
+                        <div class="item-description">Toutes tensions/courants/isolement notés dans checklist ou fichier dédié</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Observations terrain complétées</div>
+                        <div class="item-description">Tous champs notes checklist remplis, anomalies documentées précisément</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5.2 Exports & Upload -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">☁️ 5.2 Exports & Upload</h4>
+            
+            <div class="checklist-item critical" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Export JSON généré et validé <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Checklist exportée JSON, structure conforme, aucune erreur syntaxe</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Upload cloud sécurisé effectué <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Toutes data uploadées (photos, JSON, images thermo/EL) vers serveur DiagPV/GIRASOLE</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Backup local sécurisé</div>
+                        <div class="item-description">Copie data sur disque dur externe ou seconde carte SD (sécurité perte)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5.3 Remise en État & Sécurité -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">🔒 5.3 Remise en État & Sécurité</h4>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Installation remise état initial</div>
+                        <div class="item-description">Onduleurs redémarrés si consignés, protections réarmées, accès refermés</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Site nettoyé et sécurisé</div>
+                        <div class="item-description">Aucun matériel oublié, déchets évacués, accès verrouillés</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Matériel DiagPV rangé et vérifié</div>
+                        <div class="item-description">Drones, caméras, testeurs, EPI rangés véhicule, rien oublié sur site</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5.4 Administratif -->
+            <h4 style="margin: 30px 0 15px 0; color: #34495e; font-size: 16px;">📝 5.4 Administratif</h4>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Contact exploitant confirmé départ</div>
+                        <div class="item-description">Prévenir exploitant/propriétaire fin intervention, remise clés/codes si nécessaire</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Signature client obtenue (si applicable)</div>
+                        <div class="item-description">Bon intervention signé attestant réalisation prestation</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Debriefing binôme effectué</div>
+                        <div class="item-description">Points positifs, difficultés rencontrées, améliorations futures, incidents éventuels</div>
+                        <textarea class="item-notes" placeholder="Retour expérience intervention (difficultés, points d'attention, suggestions)..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions Finales -->
+        <div class="actions">
+            <button class="btn btn-primary" onclick="exportJSON()">📥 Exporter JSON</button>
+            <button class="btn btn-primary" onclick="generatePDF()">📄 Générer PDF</button>
+            <button class="btn btn-secondary" onclick="saveLocal()">💾 Sauvegarder Local</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer</button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Diagnostic Photovoltaïque</strong> | 3 rue d'Apollo, 31240 L'Union</p>
+            <p>☎️ 05.81.10.16.59 | 📧 contact@diagpv.fr | 🌐 www.diagnosticphotovoltaique.fr</p>
+            <p style="margin-top: 10px; font-size: 11px;">RCS Toulouse 792 972 309 | Assurance RC Pro MMA</p>
+            <p style="margin-top: 8px; opacity: 0.8;">Checklist Terrain V2.0 | Mission GIRASOLE 2025 | © DiagPV 2025</p>
+        </div>
+    </div>
+    
+    <script>
+        // Fonction mise à jour progression
+        function updateProgress() {
+            const sections = [1, 2, 3, 4, 5];
+            let totalChecked = 0;
+            let totalItems = 0;
+            
+            sections.forEach(section => {
+                const sectionItems = document.querySelectorAll(`.checklist-item[data-section="${section}"]`);
+                const sectionCheckboxes = Array.from(sectionItems).map(item => item.querySelector('.item-checkbox'));
+                const checked = sectionCheckboxes.filter(cb => cb.checked).length;
+                const total = sectionCheckboxes.length;
+                
+                const progressDisplay = document.querySelector(`.section-progress[data-section="${section}"]`);
+                if (progressDisplay) {
+                    progressDisplay.textContent = `${checked}/${total}`;
+                }
+                
+                totalChecked += checked;
+                totalItems += total;
+            });
+            
+            const percentage = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+            document.getElementById('globalProgress').style.width = percentage + '%';
+            document.getElementById('globalProgressText').textContent = `${totalChecked}/${totalItems} (${percentage}%)`;
+        }
+        
+        // Gestion checkboxes
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const item = this.closest('.checklist-item');
+                if (this.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
+                }
+                updateProgress();
+                saveLocal();
+            });
+        });
+        
+        // Gestion inputs texte
+        document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(input => {
+            input.addEventListener('change', saveLocal);
+        });
+        
+        // Export JSON
+        function exportJSON() {
+            const data = {
+                intervention: {
+                    centrale: document.getElementById('centrale').value,
+                    date: document.getElementById('date').value,
+                    technicien1: document.getElementById('technicien1').value,
+                    technicien2: document.getElementById('technicien2').value,
+                    typeIntervention: document.getElementById('typeIntervention').value,
+                    meteo: document.getElementById('meteo').value
+                },
+                checklist: {}
+            };
+            
+            document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                const checkbox = item.querySelector('.item-checkbox');
+                const title = item.querySelector('.item-title').textContent.trim();
+                const notes = item.querySelector('.item-notes');
+                
+                data.checklist[`item_${index}`] = {
+                    title: title,
+                    checked: checkbox.checked,
+                    notes: notes ? notes.value : ''
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `checklist_${data.intervention.centrale}_${data.intervention.date}.json`;
+            a.click();
+            
+            alert('✅ Export JSON réussi !');
+        }
+        
+        // Sauvegarde locale
+        function saveLocal() {
+            const data = {
+                intervention: {
+                    centrale: document.getElementById('centrale').value,
+                    date: document.getElementById('date').value,
+                    technicien1: document.getElementById('technicien1').value,
+                    technicien2: document.getElementById('technicien2').value,
+                    typeIntervention: document.getElementById('typeIntervention').value,
+                    meteo: document.getElementById('meteo').value
+                },
+                checkboxes: [],
+                notes: []
+            };
+            
+            document.querySelectorAll('.item-checkbox').forEach((cb, i) => {
+                data.checkboxes[i] = cb.checked;
+            });
+            
+            document.querySelectorAll('.item-notes').forEach((note, i) => {
+                data.notes[i] = note.value;
+            });
+            
+            localStorage.setItem('checklistTerrain', JSON.stringify(data));
+        }
+        
+        // Chargement sauvegarde
+        function loadLocal() {
+            const saved = localStorage.getItem('checklistTerrain');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                if (data.intervention) {
+                    document.getElementById('centrale').value = data.intervention.centrale || '';
+                    document.getElementById('date').value = data.intervention.date || '';
+                    document.getElementById('technicien1').value = data.intervention.technicien1 || '';
+                    document.getElementById('technicien2').value = data.intervention.technicien2 || '';
+                    document.getElementById('typeIntervention').value = data.intervention.typeIntervention || '';
+                    document.getElementById('meteo').value = data.intervention.meteo || '';
+                }
+                
+                if (data.checkboxes) {
+                    document.querySelectorAll('.item-checkbox').forEach((cb, i) => {
+                        if (data.checkboxes[i]) {
+                            cb.checked = true;
+                            cb.closest('.checklist-item').classList.add('checked');
+                        }
+                    });
+                }
+                
+                if (data.notes) {
+                    document.querySelectorAll('.item-notes').forEach((note, i) => {
+                        note.value = data.notes[i] || '';
+                    });
+                }
+                
+                updateProgress();
+            }
+        }
+        
+        // Génération PDF (simulation)
+        function generatePDF() {
+            alert('📄 Fonction génération PDF : À implémenter avec bibliothèque jsPDF ou export serveur.\n\nPour l\'instant, utilisez : Imprimer > Enregistrer PDF');
+            window.print();
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLocal();
+            updateProgress();
+            
+            // Date du jour par défaut
+            if (!document.getElementById('date').value) {
+                document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            }
+        });
+    </script>
+</body>
+</html>

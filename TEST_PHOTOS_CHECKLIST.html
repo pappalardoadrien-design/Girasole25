@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST - Upload Photos + Export JSON Base64</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2ecc71;
+            border-bottom: 3px solid #2ecc71;
+            padding-bottom: 15px;
+        }
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        .photo-zone {
+            border: 3px dashed #2ecc71;
+            padding: 25px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .photo-preview img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #2ecc71;
+        }
+        .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #2ecc71;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #3498db;
+            color: white;
+        }
+        .stats {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 TEST - Photos + Export JSON Base64</h1>
+        
+        <div class="section">
+            <h2>📝 Informations Audit</h2>
+            <p><strong>Centrale:</strong> <input type="text" id="centrale" value="3085 - Hangar Maxime Bayle" style="width: 300px; padding: 8px; border: 2px solid #ddd; border-radius: 5px;"></p>
+            <p><strong>Auditeur:</strong> <input type="text" id="auditeur" value="Test DiagPV" style="width: 200px; padding: 8px; border: 2px solid #ddd; border-radius: 5px;"></p>
+            <p><strong>Date:</strong> <input type="date" id="date" style="padding: 8px; border: 2px solid #ddd; border-radius: 5px;"></p>
+        </div>
+        
+        <div class="section">
+            <h2>📸 Upload Photos</h2>
+            <div class="photo-zone">
+                <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(this.files)" style="display: none;">
+                <button class="btn btn-primary" onclick="document.getElementById('photoInput').click()">
+                    📷 Choisir Photos
+                </button>
+                <p style="margin-top: 15px; color: #666;">Cliquez pour sélectionner une ou plusieurs photos</p>
+            </div>
+            
+            <div class="stats" id="stats">
+                <strong>📊 Photos chargées:</strong> 0 | <strong>Taille totale:</strong> 0 KB
+            </div>
+            
+            <div class="photo-preview" id="photoPreview"></div>
+        </div>
+        
+        <div class="section">
+            <h2>✅ Points de Contrôle</h2>
+            
+            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                <label style="cursor: pointer;">
+                    <input type="checkbox" id="check1" style="width: 20px; height: 20px; margin-right: 10px;">
+                    <strong>Modules photovoltaïques conformes</strong>
+                </label>
+                <textarea id="notes1" placeholder="Observations..." style="margin-top: 10px;"></textarea>
+            </div>
+            
+            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                <label style="cursor: pointer;">
+                    <input type="checkbox" id="check2" style="width: 20px; height: 20px; margin-right: 10px;">
+                    <strong>Onduleurs opérationnels</strong>
+                </label>
+                <textarea id="notes2" placeholder="Observations..." style="margin-top: 10px;"></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>💾 Export JSON</h2>
+            <button class="btn btn-primary" onclick="exportJSON()">
+                📥 EXPORTER JSON (avec photos Base64)
+            </button>
+            <button class="btn btn-secondary" onclick="showJSON()">
+                👁️ Prévisualiser JSON
+            </button>
+            
+            <div id="jsonPreview" style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 10px; display: none; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap;"></div>
+        </div>
+    </div>
+    
+    <script>
+        let photosBase64 = [];
+        let totalSize = 0;
+        
+        // Date du jour par défaut
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        
+        // Gestion upload photos
+        async function handlePhotos(files) {
+            const preview = document.getElementById('photoPreview');
+            photosBase64 = []; // Reset
+            totalSize = 0;
+            preview.innerHTML = '';
+            
+            for (let file of files) {
+                // Lire fichier en Base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Data = e.target.result;
+                    totalSize += base64Data.length;
+                    
+                    photosBase64.push({
+                        nom: file.name,
+                        taille: file.size,
+                        type: file.type,
+                        data: base64Data,
+                        date: new Date().toISOString()
+                    });
+                    
+                    // Prévisualisation
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    preview.appendChild(img);
+                    
+                    // Mise à jour stats
+                    updateStats();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+            stats.innerHTML = `<strong>📊 Photos chargées:</strong> ${photosBase64.length} | <strong>Taille totale:</strong> ${sizeMB} MB`;
+        }
+        
+        // Export JSON avec photos Base64
+        function exportJSON() {
+            const data = {
+                centrale_id: "3085",
+                centrale_nom: document.getElementById('centrale').value,
+                auditeur: document.getElementById('auditeur').value,
+                date_audit: document.getElementById('date').value,
+                horodatage: new Date().toISOString(),
+                points_controle: [
+                    {
+                        id: "check1",
+                        titre: "Modules photovoltaïques conformes",
+                        checked: document.getElementById('check1').checked,
+                        observations: document.getElementById('notes1').value
+                    },
+                    {
+                        id: "check2",
+                        titre: "Onduleurs opérationnels",
+                        checked: document.getElementById('check2').checked,
+                        observations: document.getElementById('notes2').value
+                    }
+                ],
+                photos: photosBase64,
+                nb_photos: photosBase64.length,
+                taille_totale_bytes: totalSize
+            };
+            
+            // Télécharger JSON
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audit_${data.centrale_id}_${data.date_audit}_${Date.now()}.json`;
+            a.click();
+            
+            alert('✅ Export JSON réussi !\n\n' + 
+                  `Photos embarquées: ${photosBase64.length}\n` +
+                  `Taille: ${(totalSize / (1024 * 1024)).toFixed(2)} MB\n\n` +
+                  'Le fichier JSON contient toutes les photos en Base64.');
+        }
+        
+        // Prévisualiser JSON
+        function showJSON() {
+            const data = {
+                centrale_id: "3085",
+                centrale_nom: document.getElementById('centrale').value,
+                auditeur: document.getElementById('auditeur').value,
+                date_audit: document.getElementById('date').value,
+                horodatage: new Date().toISOString(),
+                points_controle: [
+                    {
+                        id: "check1",
+                        titre: "Modules photovoltaïques conformes",
+                        checked: document.getElementById('check1').checked,
+                        observations: document.getElementById('notes1').value
+                    },
+                    {
+                        id: "check2",
+                        titre: "Onduleurs opérationnels",
+                        checked: document.getElementById('check2').checked,
+                        observations: document.getElementById('notes2').value
+                    }
+                ],
+                photos: photosBase64.map(p => ({...p, data: p.data.substring(0, 100) + '... [Base64 tronqué]'})),
+                nb_photos: photosBase64.length,
+                taille_totale_bytes: totalSize
+            };
+            
+            const preview = document.getElementById('jsonPreview');
+            preview.style.display = 'block';
+            preview.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        // Auto-save LocalStorage
+        setInterval(() => {
+            localStorage.setItem('test_audit_3085', JSON.stringify({
+                centrale: document.getElementById('centrale').value,
+                auditeur: document.getElementById('auditeur').value,
+                date: document.getElementById('date').value,
+                check1: document.getElementById('check1').checked,
+                check2: document.getElementById('check2').checked,
+                notes1: document.getElementById('notes1').value,
+                notes2: document.getElementById('notes2').value,
+                photos_count: photosBase64.length
+            }));
+        }, 10000); // Toutes les 10 secondes
+    </script>
+</body>
+</html>

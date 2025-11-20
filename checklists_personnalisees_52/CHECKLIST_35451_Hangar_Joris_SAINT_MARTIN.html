@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Audit - Hangar Joris SAINT MARTIN</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 26px; margin-bottom: 10px; }
+        .centrale-info {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .centrale-info p { margin: 5px 0; font-size: 14px; }
+        .info-section {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        .info-section input, .info-section select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .section {
+            padding: 25px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .section-header {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2ecc71;
+            font-weight: 700;
+        }
+        .check-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #95a5a6;
+            transition: all 0.3s;
+        }
+        .check-item.checked {
+            background: #d4edda;
+            border-left-color: #2ecc71;
+        }
+        .check-item.critique {
+            border-left-color: #e74c3c;
+            background: #ffe6e6;
+        }
+        .check-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .check-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+        .check-item textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .photo-zone {
+            margin: 20px 0;
+            padding: 25px;
+            background: white;
+            border: 3px dashed #2ecc71;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .photo-zone input[type="file"] { display: none; }
+        .btn-upload {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-upload:hover { background: #27ae60; transform: translateY(-2px); }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .photo-preview img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #2ecc71;
+            cursor: pointer;
+        }
+        .photo-stats {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        .btn-export {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+        .btn-export:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .footer {
+            padding: 25px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            font-size: 13px;
+        }
+        .alert { padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+        .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔆 CHECKLIST AUDIT PV</h1>
+            <h2>Hangar Joris SAINT MARTIN</h2>
+            <div class="centrale-info">
+                <p><strong>ID Centrale:</strong> 35451</p>
+                <p><strong>Puissance:</strong> 218.4 kWc</p>
+                <p><strong>Type:</strong> Bâtiment à construire - C</p>
+                <p><strong>Département:</strong> 32</p>
+                <p><strong>Adresse:</strong> Palancot, 32160 Jû-Belloc, France</p>
+                <p><strong>Audit toiture:</strong> ❌ NON (audit visuel seulement)</p>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">📝 Informations Intervention</h3>
+            <input type="text" id="auditeur" placeholder="Nom auditeur / technicien *" required>
+            <input type="date" id="date" required>
+            <select id="meteo">
+                <option value="">Conditions météo *</option>
+                <option value="Ensoleillé">☀️ Ensoleillé</option>
+                <option value="Nuageux">⛅ Nuageux</option>
+                <option value="Couvert">☁️ Couvert</option>
+                <option value="Pluie">🌧️ Pluie</option>
+            </select>
+            <input type="text" id="temperature" placeholder="Température ambiante (°C)">
+        </div>
+
+        <div class="section">
+            <div class="section-header">🎒 1. PRÉPARATION INTERVENTION</div>
+
+            <div class="check-item " id="item_preparation_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_0')">
+                    <span>Plan prévention GIRASOLE lu et signé</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_1')">
+                    <span>Habilitations électriques valides (B2V, BR, BC)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_2')">
+                    <span>EPI complets (casque, gants isolants, chaussures sécurité)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_3')">
+                    <span>Appareil photo haute résolution (>12 Mpx)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_4')">
+                    <span>Documents GIRASOLE consultés (plans TCQ, PV réception, autocontrôle, CR visite)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_5')">
+                    <span>Contact site GIRASOLE prévenu (accès clés shelters/locaux)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_6">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_6')">
+                    <span>Photo panneau signalétique centrale + 4 vues cardinales installation</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">⚡ 2. CONFORMITÉ NF C 15-100 (Inspection VISUELLE)</div>
+
+            <div class="check-item " id="item_nfc15100_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_0')">
+                    <span>AGCP: Réglages calibres VISUELLEMENT cohérents plans TCQ</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_1')">
+                    <span>AGCP: Courbes déclenchement adaptées (C ou D selon charge)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_2')">
+                    <span>AGCP: Protection différentielle Type B 30 mA DC présente</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_3')">
+                    <span>Sections câbles AC: Marquage sections VISIBLE sur câbles</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_4')">
+                    <span>Sections câbles AC: Adéquation avec protections amont (vérif plans)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_5')">
+                    <span>Liaison terre: Repérage vert/jaune respecté partout</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_6">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_6')">
+                    <span>Liaison terre: Section terre VISIBLE cohérente (mini 16mm² Cu)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_7">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_7')">
+                    <span>Liaison terre: Cosses bimétal Cu/Alu présentes (si jonction)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_8">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_8')">
+                    <span>Indices Protection: Shelters/coffrets IP44 min, boîtes jonction DC IP65 min</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_9">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_9')">
+                    <span>Indices Protection: Absence infiltration eau/condensation constatée</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_10">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_10')">
+                    <span>Repérage circuits: Schémas unifilaires présents et affichés</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_11">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_11')">
+                    <span>Repérage circuits: Identification câbles claire (tags sérigraphiés vs manuscrit)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_12">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_12')">
+                    <span>Distances sécurité: Volumes respectés (pas câbles nus accessibles)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_nfc15100_13">
+                <label>
+                    <input type="checkbox" onchange="updateItem('nfc15100_13')">
+                    <span>Photos: AGCP complet, tableau électrique, câblage, terre (min 10 photos)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🔌 3. CONFORMITÉ UTE C 15-712 (Inspection VISUELLE PV)</div>
+
+            <div class="check-item " id="item_utec15712_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_0')">
+                    <span>Interrupteurs DC: Présence par string ou sectionneur général</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_1')">
+                    <span>Interrupteurs DC: Calibre adapté Isc strings (vérif datasheet)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_2')">
+                    <span>Interrupteurs DC: Repérage clair position ON/OFF</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_3')">
+                    <span>Parafoudres: Présents côté DC et AC (Type 2 minimum)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_4')">
+                    <span>Parafoudres: Voyants état OK (pas de défaut)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_5')">
+                    <span>Parafoudres: Raccordement terre <50 cm (DC) et <1m (AC)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_6">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_6')">
+                    <span>Câbles DC: Tenue UV si exposition (double isolation solaire)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_7">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_7')">
+                    <span>Câbles DC: Couleurs +/- différentes (rouge/noir ou rouge/bleu)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_8">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_8')">
+                    <span>Câbles DC: Pas de raccordements intermédiaires (continuité string)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_9">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_9')">
+                    <span>Boîtes jonction DC: Étanchéité IP65 min (presse-étoupes serrés)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_10">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_10')">
+                    <span>Boîtes jonction DC: Orientation anti-ruissellement eau pluie</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_11">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_11')">
+                    <span>Boîtes jonction DC: Absence infiltration/condensation (ouvrir 1 échantillon)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_12">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_12')">
+                    <span>Terre modules PV: Continuité VISUELLE structures PV</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_13">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_13')">
+                    <span>Terre modules PV: Cosses bimétal systématiques alu/cuivre</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_14">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_14')">
+                    <span>Signalétique DC: Étiquettes "Tension DC dangereuse" présentes</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_15">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_15')">
+                    <span>Signalétique DC: Schémas strings affichés, plaques constructeurs lisibles</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_utec15712_16">
+                <label>
+                    <input type="checkbox" onchange="updateItem('utec15712_16')">
+                    <span>Photos: Interrupteurs DC, parafoudres, boîtes jonction, signalétique (min 10 photos)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🛠️ 4. BONNES/MAUVAISES PRATIQUES (CDC GIRASOLE §2.5)</div>
+
+            <div class="check-item " id="item_pratiques_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_0')">
+                    <span>Chemins câbles: Type fixation (galva chaud/froid/peinture), entraxe <1,5m</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_1')">
+                    <span>Chemins câbles: Qualité assemblage (robuste vs fragile)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_2')">
+                    <span>Cosses connexions: Bimétal Cu/Alu systématique, technique (sertissage/vissage)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_3')">
+                    <span>Repérage filerie: Type (sérigraphié/manuscrit/absent), système tenant-aboutissant</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_4')">
+                    <span>Repérage filerie: Durabilité tags (UV-résistants vs papier)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_5')">
+                    <span>Rayons courbure: AC (R>6×Ø), DC (R>12×Ø), absence contraintes mécaniques</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_6">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_6')">
+                    <span>Fourreaux/TPC: Rebouchage (mousse/mortier/non rebouché), étanchéité</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_7">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_7')">
+                    <span>Brassage câbles DC: Organisation (clair vs "spaghettis"), attaches UV</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_8">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_8')">
+                    <span>Tranchées AC: Respect CDC tranchées GIRASOLE (profondeur, grillage, remblai)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_9">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_9')">
+                    <span>Alignement modules PV: Constat visuel qualité (parfait/décalages)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_10">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_10')">
+                    <span>Plans TCQ: Présents sur place (oui/non)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_pratiques_11">
+                <label>
+                    <input type="checkbox" onchange="updateItem('pratiques_11')">
+                    <span>Photos: Toutes BP/MP détectées (min 12 photos variées)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">📋 5. PRESCRIPTIONS GIRASOLE (CDC §2.4)</div>
+
+            <div class="check-item " id="item_prescriptions_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_0')">
+                    <span>Autocontrôle installateur: Présent sur site ou fourni</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_1')">
+                    <span>Autocontrôle installateur: Grille renseignée exhaustivement (pas cases vides)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_2')">
+                    <span>Autocontrôle installateur: Signature installateur + date, cohérent terrain</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_3')">
+                    <span>PV réception lot PV: Document présent</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_4')">
+                    <span>PV réception lot PV: Signé GIRASOLE ET installateur (2 parties)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_5')">
+                    <span>PV réception lot PV: Date cohérente fin travaux, réserves listées/levées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_6">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_6')">
+                    <span>CR visite chantier: Au moins 1 CR pendant phase travaux lot PV</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_7">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_7')">
+                    <span>CR visite chantier: Écarts travaux documentés, actions correctives tracées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_8">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_8')">
+                    <span>CDC tranchées: Profondeur conforme (0,60m min trottoirs, 0,80m autres)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_9">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_9')">
+                    <span>CDC tranchées: Lit sable 10 cm + grillage avertisseur + remblai correct</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_10">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_10')">
+                    <span>Corrélation: Écarts audit signalés dans CR chantier GIRASOLE ? (OUI/NON/Partiel)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_prescriptions_11">
+                <label>
+                    <input type="checkbox" onchange="updateItem('prescriptions_11')">
+                    <span>Photos: Documents (autocontrôle, PV réception) si accessibles (min 4 photos)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">✅ 6. POST-INTERVENTION</div>
+
+            <div class="check-item " id="item_post_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_0')">
+                    <span>Toutes photos nomenclature prises (GEN/ELEC/MP/BP/DOC)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_1')">
+                    <span>Observations terrain complétées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_2')">
+                    <span>Mesures électriques enregistrées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_3')">
+                    <span>Installation remise en état</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_4')">
+                    <span>Site nettoyé et sécurisé</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">📸 PHOTOS TERRAIN</div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ NOMENCLATURE PHOTOS OBLIGATOIRE :</strong><br>
+                • <strong>GEN</strong> : Vues générales (min 5)<br>
+                • <strong>ELEC</strong> : Onduleurs, câbles, protections (min 5)<br>
+                • <strong>MP</strong> : Modules détails (min 10)<br>
+                • <strong>BP</strong> : Boîtes protection (min 2)<br>
+                
+                • <strong>DOC</strong> : Documents, schémas (min 1)<br>
+                <strong>TOTAL MINIMUM : 25 photos</strong>
+            </div>
+            
+            <div class="photo-zone">
+                <input type="file" id="photoInput" accept="image/*" multiple>
+                <button class="btn-upload" onclick="document.getElementById('photoInput').click()">
+                    📷 AJOUTER PHOTOS
+                </button>
+                <p style="margin-top: 15px; color: #666;">Sélectionner plusieurs photos à la fois</p>
+            </div>
+            
+            <div class="photo-stats" id="photoStats">
+                📊 Photos: <span id="nbPhotos">0</span> | Taille: <span id="taillePhotos">0 MB</span>
+            </div>
+            
+            <div class="photo-preview" id="photoPreview"></div>
+        </div>
+        
+        <div class="section">
+            <div class="alert alert-info">
+                <strong>💾 SAUVEGARDE AUTOMATIQUE :</strong> Les données sont sauvegardées localement toutes les 10 secondes.
+            </div>
+            
+            <button class="btn-export" onclick="exporterJSON()">
+                📥 EXPORTER CHECKLIST + PHOTOS (JSON)
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Diagnostic Photovoltaïque</strong> | 3 rue d'Apollo, 31240 L'Union</p>
+            <p>☎️ 05.81.10.16.59 | 📧 contact@diagpv.fr | 🌐 www.diagnosticphotovoltaique.fr</p>
+            <p style="margin-top: 10px;">RCS Toulouse 792 972 309 | Mission GIRASOLE 2025</p>
+        </div>
+    </div>
+    
+    <script>
+        const CENTRALE_ID = '35451';
+        const CENTRALE_NOM = 'Hangar Joris SAINT MARTIN';
+        let photosBase64 = [];
+        let totalSize = 0;
+        
+        // Date du jour par défaut
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        
+        // Update item état
+        function updateItem(itemId) {
+            const item = document.getElementById('item_' + itemId);
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+            saveLocal();
+        }
+        
+        // Gestion photos
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64Data = event.target.result;
+                    totalSize += base64Data.length;
+                    
+                    photosBase64.push({
+                        nom: file.name,
+                        taille: file.size,
+                        type: file.type,
+                        data: base64Data,
+                        date: new Date().toISOString()
+                    });
+                    
+                    // Prévisualisation
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    img.onclick = function() { window.open(base64Data); };
+                    document.getElementById('photoPreview').appendChild(img);
+                    
+                    updatePhotoStats();
+                    saveLocal();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function updatePhotoStats() {
+            document.getElementById('nbPhotos').textContent = photosBase64.length;
+            document.getElementById('taillePhotos').textContent = (totalSize / (1024 * 1024)).toFixed(2);
+        }
+        
+        // Export JSON
+        function exporterJSON() {
+            const auditeur = document.getElementById('auditeur').value;
+            const date = document.getElementById('date').value;
+            const meteo = document.getElementById('meteo').value;
+            const temperature = document.getElementById('temperature').value;
+            
+            if (!auditeur || !date || !meteo) {
+                alert('⚠️ Veuillez remplir les champs obligatoires: Nom, Date, Météo');
+                return;
+            }
+            
+            const data = {
+                centrale_id: CENTRALE_ID,
+                centrale_nom: CENTRALE_NOM,
+                auditeur: auditeur,
+                date_audit: date,
+                meteo: meteo,
+                temperature: temperature,
+                horodatage: new Date().toISOString(),
+                audit_toiture: false,
+                points_controle: [],
+                photos: photosBase64,
+                nb_photos: photosBase64.length,
+                taille_totale_mb: (totalSize / (1024 * 1024)).toFixed(2)
+            };
+            
+            // Récupération points contrôle
+            document.querySelectorAll('.check-item').forEach((item, index) => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const textarea = item.querySelector('textarea');
+                const label = item.querySelector('label span');
+                
+                data.points_controle.push({
+                    id: index,
+                    titre: label.textContent.trim(),
+                    checked: checkbox.checked,
+                    observations: textarea.value
+                });
+            });
+            
+            // Téléchargement
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audit_${CENTRALE_ID}_${date}_${Date.now()}.json`;
+            a.click();
+            
+            alert(`✅ Export réussi !\n\n` +
+                  `Centrale: ${CENTRALE_ID} - ${CENTRALE_NOM}\n` +
+                  `Photos: ${photosBase64.length}\n` +
+                  `Taille: ${(totalSize / (1024 * 1024)).toFixed(2)} MB\n\n` +
+                  `📧 Envoyer ce fichier JSON à DiagPV`);
+        }
+        
+        // Auto-save LocalStorage
+        function saveLocal() {
+            const data = {
+                centrale_id: CENTRALE_ID,
+                auditeur: document.getElementById('auditeur').value,
+                date: document.getElementById('date').value,
+                meteo: document.getElementById('meteo').value,
+                temperature: document.getElementById('temperature').value,
+                checkboxes: [],
+                textareas: [],
+                photos_count: photosBase64.length,
+                last_save: new Date().toISOString()
+            };
+            
+            document.querySelectorAll('.check-item input[type="checkbox"]').forEach(cb => {
+                data.checkboxes.push(cb.checked);
+            });
+            
+            document.querySelectorAll('.check-item textarea').forEach(ta => {
+                data.textareas.push(ta.value);
+            });
+            
+            localStorage.setItem('checklist_' + CENTRALE_ID, JSON.stringify(data));
+        }
+        
+        // Chargement auto-save
+        function loadLocal() {
+            const saved = localStorage.getItem('checklist_' + CENTRALE_ID);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('auditeur').value = data.auditeur || '';
+                document.getElementById('date').value = data.date || '';
+                document.getElementById('meteo').value = data.meteo || '';
+                document.getElementById('temperature').value = data.temperature || '';
+                
+                const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+                const textareas = document.querySelectorAll('.check-item textarea');
+                
+                data.checkboxes.forEach((checked, i) => {
+                    if (checkboxes[i]) {
+                        checkboxes[i].checked = checked;
+                        if (checked) {
+                            checkboxes[i].closest('.check-item').classList.add('checked');
+                        }
+                    }
+                });
+                
+                data.textareas.forEach((value, i) => {
+                    if (textareas[i]) {
+                        textareas[i].value = value;
+                    }
+                });
+            }
+        }
+        
+        // Auto-save périodique
+        setInterval(saveLocal, 10000);
+        
+        // Init
+        window.addEventListener('DOMContentLoaded', loadLocal);
+    </script>
+</body>
+</html>

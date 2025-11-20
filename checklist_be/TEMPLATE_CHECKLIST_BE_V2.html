@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist BE Contrôle Qualité - Diagnostic Photovoltaïque</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        
+        .info-section {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .info-item label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .info-item input,
+        .info-item select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .section {
+            padding: 25px 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .section-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+        
+        .section-title {
+            flex: 1;
+        }
+        
+        .section-title h2 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .section-title p {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        
+        .section-progress {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .checklist-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #95a5a6;
+            transition: all 0.3s ease;
+        }
+        
+        .checklist-item.checked {
+            background: #d4edda;
+            border-left-color: #27ae60;
+        }
+        
+        .checklist-item.warning {
+            background: #fff3cd;
+            border-left-color: #f39c12;
+        }
+        
+        .checklist-item.error {
+            background: #f8d7da;
+            border-left-color: #e74c3c;
+        }
+        
+        .checklist-item.critical {
+            border-left-color: #e74c3c;
+        }
+        
+        .checklist-item.critical.checked {
+            border-left-color: #27ae60;
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .item-checkbox {
+            width: 22px;
+            height: 22px;
+            margin-right: 12px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .item-status {
+            width: 120px;
+            padding: 6px;
+            margin-left: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+        
+        .item-description {
+            color: #7f8c8d;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .item-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge-critical {
+            background: #fee;
+            color: #e74c3c;
+        }
+        
+        .badge-auto {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+        
+        .item-notes {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .item-input {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        
+        .global-progress {
+            position: sticky;
+            top: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 12px;
+            background: #34495e;
+            border-radius: 6px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .status-summary {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #95a5a6;
+            text-align: center;
+        }
+        
+        .status-card.ok {
+            border-left-color: #27ae60;
+        }
+        
+        .status-card.warning {
+            border-left-color: #f39c12;
+        }
+        
+        .status-card.error {
+            border-left-color: #e74c3c;
+        }
+        
+        .status-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .status-label {
+            font-size: 13px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        
+        .actions {
+            padding: 30px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .footer {
+            padding: 20px 30px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .global-progress,
+            .actions {
+                display: none;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid,
+            .status-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Progress Bar Global -->
+        <div class="global-progress">
+            <div style="font-weight: 600;">Contrôle Qualité BE</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="globalProgress"></div>
+            </div>
+            <div id="globalProgressText" style="font-weight: 600;">0/45 (0%)</div>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 CHECKLIST BE CONTRÔLE QUALITÉ</h1>
+            <p>Validation Retour Terrain - Bureau d'Études Diagnostic Photovoltaïque</p>
+            <p style="margin-top: 10px; font-size: 12px;">Version 2.0 | Mission GIRASOLE 2025</p>
+        </div>
+        
+        <!-- Informations Mission -->
+        <div class="info-section">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">📋 INFORMATIONS MISSION</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Centrale</label>
+                    <input type="text" id="centrale" placeholder="Nom centrale">
+                </div>
+                <div class="info-item">
+                    <label>Date intervention</label>
+                    <input type="date" id="dateIntervention">
+                </div>
+                <div class="info-item">
+                    <label>Techniciens terrain</label>
+                    <input type="text" id="techniciens" placeholder="Nom(s) technicien(s)">
+                </div>
+                <div class="info-item">
+                    <label>Validateur BE</label>
+                    <input type="text" id="validateur" placeholder="Votre nom">
+                </div>
+                <div class="info-item">
+                    <label>Date contrôle BE</label>
+                    <input type="date" id="dateControle">
+                </div>
+                <div class="info-item">
+                    <label>Statut validation</label>
+                    <select id="statutValidation">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="en_cours">En cours contrôle</option>
+                        <option value="conforme">✅ Conforme</option>
+                        <option value="reserve_mineure">⚠️ Réserves mineures</option>
+                        <option value="reserve_majeure">🔴 Réserves majeures</option>
+                        <option value="refuse">❌ Refusé - À refaire</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Résumé Statut -->
+        <div class="status-summary">
+            <div class="status-card ok">
+                <div class="status-value" id="nbConformes">0</div>
+                <div class="status-label">✅ Conformes</div>
+            </div>
+            <div class="status-card warning">
+                <div class="status-value" id="nbAvertissements">0</div>
+                <div class="status-label">⚠️ Réserves mineures</div>
+            </div>
+            <div class="status-card error">
+                <div class="status-value" id="nbErreurs">0</div>
+                <div class="status-label">🔴 Réserves majeures</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="tauxCompletude">0%</div>
+                <div class="status-label">📊 Complétude</div>
+            </div>
+        </div>
+        
+        <!-- SECTION 1: COMPLÉTUDE DONNÉES -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📦</div>
+                <div class="section-title">
+                    <h2>1. COMPLÉTUDE DONNÉES (10 min)</h2>
+                    <p>Vérification réception et exhaustivité fichiers terrain</p>
+                </div>
+                <div class="section-progress" data-section="1">0/10</div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Checklist terrain HTML/JSON reçue <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Fichier JSON intervention présent, structure valide, aucune corruption</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Observations (nom fichier, erreurs détectées...)"></textarea>
+            </div>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Photos nomenclature complètes <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Nb photos minimum atteint (générales ≥5, modules ≥10, onduleurs ≥5), nomenclature respectée</div>
+                        <input type="text" class="item-input" placeholder="Nb photos reçues : Générales=X, Modules=X, Onduleurs=X, Anomalies=X">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Photos manquantes, erreurs nomenclature..."></textarea>
+            </div>
+            
+            <div class="checklist-item critical" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Images thermographie reçues <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Dossier images IR complet, couverture champ PV 100%, formats exploitables (TIFF/JPG)</div>
+                        <input type="text" class="item-input" placeholder="Nb images thermographie reçues, résolution, qualité...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Zones non couvertes, qualité images insuffisante..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Images électroluminescence reçues (si applicable)</div>
+                        <div class="item-description">Dossier images EL complet, acquisition nocturne validée, formats exploitables</div>
+                        <input type="text" class="item-input" placeholder="Nb images EL reçues, qualité acquisition...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                        <option value="na">N/A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Données DOE centrale accessibles</div>
+                        <div class="item-description">Plans calepinage, schémas électriques, fiches techniques modules/onduleurs présents</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Mesures électriques documentées</div>
+                        <div class="item-description">Tensions Voc, courants Isc, isolement, terre notés dans JSON ou fichier dédié</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Conditions intervention renseignées</div>
+                        <div class="item-description">Météo, irradiation, température modules, conditions acquisition documentées</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Observations terrain complétées</div>
+                        <div class="item-description">Champs notes checklist remplis, anomalies décrites précisément, contexte clair</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Bon intervention signé (si applicable)</div>
+                        <div class="item-description">Signature client attestant réalisation prestation, scan/photo reçu</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="na">N/A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="1">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Délai transmission respecté</div>
+                        <div class="item-description">Upload data < 48h post-intervention (sauf EL nocturne possible +24h)</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Réserve</option>
+                        <option value="error">🔴 Erreur</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 2: VALIDATION MESURES ÉLECTRIQUES -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <div class="section-title">
+                    <h2>2. VALIDATION MESURES ÉLECTRIQUES (10 min)</h2>
+                    <p>Cohérence valeurs, conformité normes, détection anomalies</p>
+                </div>
+                <div class="section-progress" data-section="2">0/10</div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tensions Voc cohérentes vs théorique <span class="item-badge badge-critical">CRITIQUE</span> <span class="item-badge badge-auto">AUTO</span></div>
+                        <div class="item-description">Vérification Voc strings dans plage ±10% valeur théorique (Voc_module × nb_modules × coeff_T)</div>
+                        <input type="text" class="item-input" placeholder="Voc théorique attendu (V), Voc min/max mesurés (V), écarts (%)...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Écart 10-20%</option>
+                        <option value="error">🔴 Écart >20%</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Strings hors plage identifiés, hypothèses causes (ombrage, défauts modules, erreur mesure...)"></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Courants Isc homogènes entre strings <span class="item-badge badge-auto">AUTO</span></div>
+                        <div class="item-description">Vérification écarts Isc strings < 10% (hors ombrages identifiés), cohérence vs irradiation</div>
+                        <input type="text" class="item-input" placeholder="Isc moyen (A), Isc min/max (A), écart-type (%)...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Écart 10-15%</option>
+                        <option value="error">🔴 Écart >15%</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Strings valeurs atypiques, causes probables..."></textarea>
+            </div>
+            
+            <div class="checklist-item critical" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Résistance isolement DC conforme <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Isolement > 1 MΩ exigé norme IEC 62446-1 (test 500V DC)</div>
+                        <input type="text" class="item-input" placeholder="Isolement mesuré + vers terre (MΩ), - vers terre (MΩ)">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK (>1 MΩ)</option>
+                        <option value="warning">⚠️ Limite (0.5-1 MΩ)</option>
+                        <option value="error">🔴 Non conforme (<0.5 MΩ)</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Si non conforme : actions correctives nécessaires, urgence intervention..."></textarea>
+            </div>
+            
+            <div class="checklist-item critical" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Résistance terre conforme <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Terre < 100 Ω (NF C 15-100), continuité masses < 0.5 Ω</div>
+                        <input type="text" class="item-input" placeholder="Résistance terre mesurée (Ω), continuité masses (Ω)">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK (<100 Ω)</option>
+                        <option value="warning">⚠️ Limite (100-200 Ω)</option>
+                        <option value="error">🔴 Non conforme (>200 Ω)</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Si non conforme : travaux nécessaires, mise en sécurité..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tensions MPPT onduleurs dans plage</div>
+                        <div class="item-description">Tensions DC entrée onduleurs entre Vmin et Vmax constructeur, équilibrage MPPT OK</div>
+                        <input type="text" class="item-input" placeholder="Tensions MPPT mesurées vs plage onduleur (V)">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Proche limites</option>
+                        <option value="error">🔴 Hors plage</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Tensions AC sortie équilibrées</div>
+                        <div class="item-description">Tensions triphasées déséquilibre < 5%, conformité réseau 230V/400V ±10%</div>
+                        <input type="text" class="item-input" placeholder="Tensions AC mesurées L1/L2/L3 (V), déséquilibre (%)">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Déséquilibre 5-8%</option>
+                        <option value="error">🔴 Déséquilibre >8%</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Puissance instantanée cohérente <span class="item-badge badge-auto">AUTO</span></div>
+                        <div class="item-description">Vérification P_instantanée vs P_crête × (Irradiation/1000) × PR_estimé (0.75-0.85)</div>
+                        <input type="text" class="item-input" placeholder="P instantanée (kW), Irradiation (W/m²), P théorique attendue (kW), écart (%)">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Écart 15-25%</option>
+                        <option value="error">🔴 Écart >25%</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Si écart important : hypothèses (salissures, ombrages, dégradation, défauts)..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Courbes I-V analysées (si disponibles)</div>
+                        <div class="item-description">Forme courbes normale (FF > 0.7), absence marches/décrochages, Pmax cohérente</div>
+                        <input type="text" class="item-input" placeholder="Nb courbes I-V analysées, FF moyen, Pmax vs théorique (%)">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Anomalies mineures</option>
+                        <option value="error">🔴 Anomalies majeures</option>
+                        <option value="na">N/A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Historique production cohérent</div>
+                        <div class="item-description">Production kWh/j dans range attendu, absence baisses anormales récentes, PR > 0.75</div>
+                        <input type="text" class="item-input" placeholder="Production moyenne (kWh/j), PR calculé, tendances...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ PR 0.65-0.75</option>
+                        <option value="error">🔴 PR <0.65</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="2">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Codes erreurs onduleurs analysés</div>
+                        <div class="item-description">Erreurs critiques identifiées, fréquence évaluée, actions correctives définies</div>
+                        <input type="text" class="item-input" placeholder="Codes erreurs détectés, fréquence, gravité...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Aucune erreur</option>
+                        <option value="warning">⚠️ Erreurs mineures</option>
+                        <option value="error">🔴 Erreurs critiques</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 3: VALIDATION IMAGES & PHOTOS -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📸</div>
+                <div class="section-title">
+                    <h2>3. VALIDATION IMAGES & PHOTOS (15 min)</h2>
+                    <p>Qualité images, nomenclature, analyse défauts visuels</p>
+                </div>
+                <div class="section-progress" data-section="3">0/10</div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Nomenclature photos 100% respectée <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Nommage fichiers conforme standard GIRASOLE, aucune erreur nomenclature, traçabilité OK</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK 100%</option>
+                        <option value="warning">⚠️ Erreurs <5%</option>
+                        <option value="error">🔴 Erreurs >5%</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Photos mal nommées identifiées, corrections nécessaires..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Qualité photos suffisante</div>
+                        <div class="item-description">Netteté OK, éclairage adapté, cadrage correct, résolution exploitable (min 1920x1080)</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Qualité moyenne</option>
+                        <option value="error">🔴 Qualité insuffisante</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Photos floues, sous/sur-exposées à refaire..."></textarea>
+            </div>
+            
+            <div class="checklist-item critical" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Images thermographie exploitables <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Résolution suffisante (2-3 cm/px), dynamique thermique correcte, couverture complète champ PV</div>
+                        <input type="text" class="item-input" placeholder="Résolution images (px), couverture (%), qualité thermique...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Qualité limite</option>
+                        <option value="error">🔴 Inexploitable</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Zones mal couvertes, résolution insuffisante, problèmes détectés..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Anomalies thermiques identifiées</div>
+                        <div class="item-description">Hotspots, écarts température >10°C, défauts diodes bypass détectés et localisés</div>
+                        <input type="text" class="item-input" placeholder="Nb anomalies thermiques détectées, types, localisation...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Identifiées</option>
+                        <option value="warning">⚠️ Analyse incomplète</option>
+                        <option value="error">🔴 Non traitées</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Détail anomalies thermiques (string, module, gravité estimée, ΔT)..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Images EL exploitables (si applicable)</div>
+                        <div class="item-description">Exposition correcte, contraste suffisant, définition cellules visible, géoréférencement OK</div>
+                        <input type="text" class="item-input" placeholder="Qualité images EL, temps exposition, nb modules analysables...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Qualité limite</option>
+                        <option value="error">🔴 Inexploitable</option>
+                        <option value="na">N/A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Défauts EL identifiés (si applicable)</div>
+                        <div class="item-description">Microfissures, cellules inactives, PID, délamination détectés et quantifiés</div>
+                        <input type="text" class="item-input" placeholder="Nb modules défauts EL, types défauts, gravité...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Identifiés</option>
+                        <option value="warning">⚠️ Analyse incomplète</option>
+                        <option value="error">🔴 Non traités</option>
+                        <option value="na">N/A</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Défauts visuels modules documentés</div>
+                        <div class="item-description">Fissures, délamination, salissures, ombres photographiés, nb modules affectés estimé</div>
+                        <input type="text" class="item-input" placeholder="Types défauts visuels, nb modules estimé, localisation...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Documentation partielle</option>
+                        <option value="error">🔴 Insuffisant</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Anomalies structures/câblages photographiées</div>
+                        <div class="item-description">Corrosion, câbles endommagés, connecteurs défectueux documentés visuellement</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Documentation partielle</option>
+                        <option value="error">🔴 Insuffisant</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Environnement site documenté</div>
+                        <div class="item-description">Vues ensemble, accès, végétation proche, sources ombrage photographiées</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Documentation partielle</option>
+                        <option value="error">🔴 Insuffisant</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="3">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Plaques signalétiques lisibles</div>
+                        <div class="item-description">Photos étiquettes modules, onduleurs, tableau électrique exploitables (références, puissances)</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ OK</option>
+                        <option value="warning">⚠️ Partiellement lisibles</option>
+                        <option value="error">🔴 Illisibles</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECTION 4: ANALYSE TECHNIQUE -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🔬</div>
+                <div class="section-title">
+                    <h2>4. ANALYSE TECHNIQUE BE (15 min)</h2>
+                    <p>Synthèse défauts, classification gravité, recommandations</p>
+                </div>
+                <div class="section-progress" data-section="4">0/8</div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Défauts critiques identifiés et classés <span class="item-badge badge-auto">AUTO</span></div>
+                        <div class="item-description">Classification : Critique (arrêt prod/danger) / Majeur (perte >10%) / Mineur (perte <10%)</div>
+                        <input type="text" class="item-input" placeholder="Nb défauts critiques, majeures, mineures...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Classés</option>
+                        <option value="warning">⚠️ Classification partielle</option>
+                        <option value="error">🔴 Non classés</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Détail défauts critiques/majeurs (localisation, impact prod estimé, urgence)..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Impact production estimé <span class="item-badge badge-auto">AUTO</span></div>
+                        <div class="item-description">Calcul pertes kWh/an, €/an par défaut (selon PR dégradé, tarif rachat/vente)</div>
+                        <input type="text" class="item-input" placeholder="Pertes estimées (kWh/an), (€/an), PR actuel vs optimal...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Calculé</option>
+                        <option value="warning">⚠️ Estimation grossière</option>
+                        <option value="error">🔴 Non estimé</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Causes racines identifiées</div>
+                        <div class="item-description">Root cause analysis défauts (conception, installation, exploitation, vieillissement)</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Identifiées</option>
+                        <option value="warning">⚠️ Hypothèses</option>
+                        <option value="error">🔴 Non traitées</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Causes racines principales défauts détectés..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Recommandations actions correctives</div>
+                        <div class="item-description">Actions priorisées : Urgentes (critique), Court terme (<3 mois), Moyen terme (3-12 mois)</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Définies</option>
+                        <option value="warning">⚠️ Partielles</option>
+                        <option value="error">🔴 Absentes</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Actions correctives recommandées par priorité..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Conformité normes vérifiée</div>
+                        <div class="item-description">Conformité IEC 62446-1, NF C 15-100, UTE C 15-712-1, DTU 40.35 évaluée</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Conforme</option>
+                        <option value="warning">⚠️ Non-conformités mineures</option>
+                        <option value="error">🔴 Non-conformités majeures</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Non-conformités détectées, articles normes concernés..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Cohérence DOE vs terrain</div>
+                        <div class="item-description">Vérification plans calepinage, schémas électriques, puissances vs réalité terrain</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Cohérent</option>
+                        <option value="warning">⚠️ Écarts mineurs</option>
+                        <option value="error">🔴 Incohérences majeures</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Incohérences DOE/terrain détectées (modifications non documentées...)"></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Benchmarking performance centrale</div>
+                        <div class="item-description">Comparaison PR vs centrales similaires (région, puissance, technologie, âge)</div>
+                        <input type="text" class="item-input" placeholder="PR centrale (%), PR benchmark (%), position relative...">
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Au-dessus moyenne</option>
+                        <option value="warning">⚠️ Moyenne</option>
+                        <option value="error">🔴 Sous moyenne</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="4">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Potentiel optimisation identifié</div>
+                        <div class="item-description">Repowering, nettoyage, remplacement modules défectueux, optimisations exploitation</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Identifié</option>
+                        <option value="warning">⚠️ Potentiel limité</option>
+                        <option value="na">N/A (centrale neuve)</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Potentiel optimisation (gain prod estimé, ROI, priorités)..."></textarea>
+            </div>
+        </div>
+        
+        <!-- SECTION 5: PRÉPARATION LIVRABLES CLIENT -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📄</div>
+                <div class="section-title">
+                    <h2>5. PRÉPARATION LIVRABLES CLIENT (10 min)</h2>
+                    <p>Génération rapport, synthèse exécutive, validation finale</p>
+                </div>
+                <div class="section-progress" data-section="5">0/7</div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Rapport PDF généré branded DiagPV</div>
+                        <div class="item-description">Génération rapport automatique depuis webapp, identité DiagPV appliquée, structure conforme</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Généré</option>
+                        <option value="warning">⚠️ Corrections nécessaires</option>
+                        <option value="error">🔴 Non généré</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Synthèse exécutive rédigée</div>
+                        <div class="item-description">Résumé 1 page : État général, défauts majeurs, recommandations prioritaires, conclusion</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Rédigée</option>
+                        <option value="warning">⚠️ À compléter</option>
+                        <option value="error">🔴 Absente</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Synthèse exécutive brute (copier-coller rapport)..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Cartographie anomalies géolocalisées</div>
+                        <div class="item-description">Plan site avec overlay défauts géolocalisés (thermographie, EL), légende claire</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Créée</option>
+                        <option value="warning">⚠️ Partielle</option>
+                        <option value="error">🔴 Absente</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Annexes techniques complètes</div>
+                        <div class="item-description">Tableaux mesures, graphiques, méthodologie, références normes, photos représentatives</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Complètes</option>
+                        <option value="warning">⚠️ Partielles</option>
+                        <option value="error">🔴 Absentes</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Relecture orthographe/cohérence</div>
+                        <div class="item-description">Correction fautes, vérification cohérence données rapport, terminologie précise</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Relu</option>
+                        <option value="warning">⚠️ Relecture rapide</option>
+                        <option value="error">🔴 Non relu</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="checklist-item critical" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Validation Fabien CORRERA obtenue <span class="item-badge badge-critical">CRITIQUE</span></div>
+                        <div class="item-description">Relecture expert technique DiagPV, signature électronique/physique rapport, autorisation envoi</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Validé</option>
+                        <option value="warning">⚠️ Corrections demandées</option>
+                        <option value="error">🔴 Refusé</option>
+                    </select>
+                </div>
+                <textarea class="item-notes" placeholder="Retours Fabien, corrections apportées..."></textarea>
+            </div>
+            
+            <div class="checklist-item" data-section="5">
+                <div class="item-header">
+                    <input type="checkbox" class="item-checkbox">
+                    <div class="item-content">
+                        <div class="item-title">Email transmission client rédigé</div>
+                        <div class="item-description">Email professionnel, résumé intervention, pièces jointes listées, disponibilité échanges</div>
+                    </div>
+                    <select class="item-status">
+                        <option value="">-- Statut --</option>
+                        <option value="ok">✅ Rédigé</option>
+                        <option value="warning">⚠️ À finaliser</option>
+                        <option value="error">🔴 Non rédigé</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions Finales -->
+        <div class="actions">
+            <button class="btn btn-success" onclick="validateControl()">✅ Valider Contrôle (Conforme)</button>
+            <button class="btn btn-warning" onclick="requestCorrections()">⚠️ Demander Corrections</button>
+            <button class="btn btn-primary" onclick="exportJSON()">📥 Exporter JSON</button>
+            <button class="btn btn-secondary" onclick="generateReport()">📄 Générer Rapport BE</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimer</button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Diagnostic Photovoltaïque - Bureau d'Études</strong></p>
+            <p>3 rue d'Apollo, 31240 L'Union | ☎️ 05.81.10.16.59 | 📧 contact@diagpv.fr</p>
+            <p style="margin-top: 10px; font-size: 11px;">RCS Toulouse 792 972 309 | Assurance RC Pro MMA</p>
+            <p style="margin-top: 8px; opacity: 0.8;">Checklist BE V2.0 | Mission GIRASOLE 2025 | © DiagPV 2025</p>
+        </div>
+    </div>
+    
+    <script>
+        // Fonction mise à jour progression
+        function updateProgress() {
+            const sections = [1, 2, 3, 4, 5];
+            let totalChecked = 0;
+            let totalItems = 0;
+            let nbOK = 0;
+            let nbWarning = 0;
+            let nbError = 0;
+            
+            sections.forEach(section => {
+                const sectionItems = document.querySelectorAll(`.checklist-item[data-section="${section}"]`);
+                const sectionCheckboxes = Array.from(sectionItems).map(item => item.querySelector('.item-checkbox'));
+                const checked = sectionCheckboxes.filter(cb => cb.checked).length;
+                const total = sectionCheckboxes.length;
+                
+                const progressDisplay = document.querySelector(`.section-progress[data-section="${section}"]`);
+                if (progressDisplay) {
+                    progressDisplay.textContent = `${checked}/${total}`;
+                }
+                
+                totalChecked += checked;
+                totalItems += total;
+                
+                // Compter statuts
+                sectionItems.forEach(item => {
+                    const status = item.querySelector('.item-status');
+                    if (status && status.value) {
+                        if (status.value === 'ok') nbOK++;
+                        else if (status.value === 'warning') nbWarning++;
+                        else if (status.value === 'error') nbError++;
+                    }
+                });
+            });
+            
+            const percentage = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+            document.getElementById('globalProgress').style.width = percentage + '%';
+            document.getElementById('globalProgressText').textContent = `${totalChecked}/${totalItems} (${percentage}%)`;
+            
+            // Mise à jour résumé statut
+            document.getElementById('nbConformes').textContent = nbOK;
+            document.getElementById('nbAvertissements').textContent = nbWarning;
+            document.getElementById('nbErreurs').textContent = nbError;
+            document.getElementById('tauxCompletude').textContent = percentage + '%';
+        }
+        
+        // Gestion checkboxes
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const item = this.closest('.checklist-item');
+                if (this.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
+                }
+                updateProgress();
+                saveLocal();
+            });
+        });
+        
+        // Gestion statuts
+        document.querySelectorAll('.item-status').forEach(select => {
+            select.addEventListener('change', function() {
+                const item = this.closest('.checklist-item');
+                item.classList.remove('warning', 'error');
+                
+                if (this.value === 'warning') {
+                    item.classList.add('warning');
+                } else if (this.value === 'error') {
+                    item.classList.add('error');
+                }
+                
+                updateProgress();
+                saveLocal();
+            });
+        });
+        
+        // Gestion inputs
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('change', saveLocal);
+        });
+        
+        // Validation contrôle
+        function validateControl() {
+            const nbErrors = parseInt(document.getElementById('nbErreurs').textContent);
+            
+            if (nbErrors > 0) {
+                if (!confirm(`⚠️ Attention : ${nbErrors} réserve(s) majeure(s) détectée(s).\n\nConfirmer validation CONFORME malgré tout ?`)) {
+                    return;
+                }
+            }
+            
+            document.getElementById('statutValidation').value = 'conforme';
+            alert('✅ Contrôle validé CONFORME !\n\nRapport prêt pour envoi client.');
+            saveLocal();
+        }
+        
+        // Demander corrections
+        function requestCorrections() {
+            const nbWarnings = parseInt(document.getElementById('nbAvertissements').textContent);
+            const nbErrors = parseInt(document.getElementById('nbErreurs').textContent);
+            
+            let message = '⚠️ CORRECTIONS NÉCESSAIRES\n\n';
+            message += `Réserves mineures : ${nbWarnings}\n`;
+            message += `Réserves majeures : ${nbErrors}\n\n`;
+            message += 'Email envoyé techniciens terrain avec détails corrections.';
+            
+            alert(message);
+            
+            if (nbErrors > 0) {
+                document.getElementById('statutValidation').value = 'reserve_majeure';
+            } else {
+                document.getElementById('statutValidation').value = 'reserve_mineure';
+            }
+            
+            saveLocal();
+        }
+        
+        // Export JSON
+        function exportJSON() {
+            const data = {
+                mission: {
+                    centrale: document.getElementById('centrale').value,
+                    dateIntervention: document.getElementById('dateIntervention').value,
+                    techniciens: document.getElementById('techniciens').value,
+                    validateur: document.getElementById('validateur').value,
+                    dateControle: document.getElementById('dateControle').value,
+                    statutValidation: document.getElementById('statutValidation').value
+                },
+                checklist: {},
+                summary: {
+                    conformes: document.getElementById('nbConformes').textContent,
+                    avertissements: document.getElementById('nbAvertissements').textContent,
+                    erreurs: document.getElementById('nbErreurs').textContent,
+                    completude: document.getElementById('tauxCompletude').textContent
+                }
+            };
+            
+            document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                const checkbox = item.querySelector('.item-checkbox');
+                const status = item.querySelector('.item-status');
+                const title = item.querySelector('.item-title').textContent.trim();
+                const notes = item.querySelector('.item-notes');
+                const input = item.querySelector('.item-input');
+                
+                data.checklist[`item_${index}`] = {
+                    title: title,
+                    checked: checkbox.checked,
+                    status: status ? status.value : '',
+                    notes: notes ? notes.value : '',
+                    input: input ? input.value : ''
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `checklist_BE_${data.mission.centrale}_${data.mission.dateControle}.json`;
+            a.click();
+            
+            alert('✅ Export JSON contrôle BE réussi !');
+        }
+        
+        // Génération rapport
+        function generateReport() {
+            alert('📄 Génération rapport BE : À implémenter\n\nFonctionnalités futures :\n- Synthèse automatique contrôle\n- Tableau anomalies détectées\n- Recommandations corrections\n- Export Word/PDF');
+        }
+        
+        // Sauvegarde locale
+        function saveLocal() {
+            const data = {
+                mission: {
+                    centrale: document.getElementById('centrale').value,
+                    dateIntervention: document.getElementById('dateIntervention').value,
+                    techniciens: document.getElementById('techniciens').value,
+                    validateur: document.getElementById('validateur').value,
+                    dateControle: document.getElementById('dateControle').value,
+                    statutValidation: document.getElementById('statutValidation').value
+                },
+                checkboxes: [],
+                statuses: [],
+                notes: [],
+                inputs: []
+            };
+            
+            document.querySelectorAll('.item-checkbox').forEach((cb, i) => {
+                data.checkboxes[i] = cb.checked;
+            });
+            
+            document.querySelectorAll('.item-status').forEach((status, i) => {
+                data.statuses[i] = status.value;
+            });
+            
+            document.querySelectorAll('.item-notes').forEach((note, i) => {
+                data.notes[i] = note.value;
+            });
+            
+            document.querySelectorAll('.item-input').forEach((input, i) => {
+                data.inputs[i] = input.value;
+            });
+            
+            localStorage.setItem('checklistBE', JSON.stringify(data));
+        }
+        
+        // Chargement sauvegarde
+        function loadLocal() {
+            const saved = localStorage.getItem('checklistBE');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                if (data.mission) {
+                    document.getElementById('centrale').value = data.mission.centrale || '';
+                    document.getElementById('dateIntervention').value = data.mission.dateIntervention || '';
+                    document.getElementById('techniciens').value = data.mission.techniciens || '';
+                    document.getElementById('validateur').value = data.mission.validateur || '';
+                    document.getElementById('dateControle').value = data.mission.dateControle || '';
+                    document.getElementById('statutValidation').value = data.mission.statutValidation || '';
+                }
+                
+                if (data.checkboxes) {
+                    document.querySelectorAll('.item-checkbox').forEach((cb, i) => {
+                        if (data.checkboxes[i]) {
+                            cb.checked = true;
+                            cb.closest('.checklist-item').classList.add('checked');
+                        }
+                    });
+                }
+                
+                if (data.statuses) {
+                    document.querySelectorAll('.item-status').forEach((status, i) => {
+                        if (data.statuses[i]) {
+                            status.value = data.statuses[i];
+                            const item = status.closest('.checklist-item');
+                            if (data.statuses[i] === 'warning') item.classList.add('warning');
+                            else if (data.statuses[i] === 'error') item.classList.add('error');
+                        }
+                    });
+                }
+                
+                if (data.notes) {
+                    document.querySelectorAll('.item-notes').forEach((note, i) => {
+                        note.value = data.notes[i] || '';
+                    });
+                }
+                
+                if (data.inputs) {
+                    document.querySelectorAll('.item-input').forEach((input, i) => {
+                        input.value = data.inputs[i] || '';
+                    });
+                }
+                
+                updateProgress();
+            }
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLocal();
+            updateProgress();
+            
+            // Date contrôle par défaut
+            if (!document.getElementById('dateControle').value) {
+                document.getElementById('dateControle').value = new Date().toISOString().split('T')[0];
+            }
+        });
+    </script>
+</body>
+</html>

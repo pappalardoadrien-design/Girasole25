@@ -1,0 +1,155 @@
+{
+  "centrale_id": "3085",
+  "centrale_nom": "Hangar Maxime Bayle",
+  "centrale_info": {
+    "puissance_kwc": 324.87,
+    "departement": 11,
+    "type": "Bâtiment à construire - A1",
+    "adresse": "Adresse centrale 3085"
+  },
+  "audit_toiture": false,
+  "date_audit": "2025-11-19T15:30:00.000Z",
+  "auditeur": "Jean Dupont",
+  "conditions_meteo": "Ensoleillé",
+  "temperature": 22,
+  "commentaire_general": "Audit réalisé dans de bonnes conditions. Quelques défauts mineurs détectés sur string 3.",
+  "photos": [
+    {
+      "nom": "GEN_vue_ensemble_nord.jpg",
+      "data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a...",
+      "taille": 245678,
+      "type": "image/jpeg",
+      "date": "2025-11-19T15:32:15.000Z"
+    },
+    {
+      "nom": "ELEC_onduleur_huawei_1.jpg",
+      "data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a...",
+      "taille": 198234,
+      "type": "image/jpeg",
+      "date": "2025-11-19T15:35:22.000Z"
+    },
+    {
+      "nom": "MP_hotspot_string_3.jpg",
+      "data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a...",
+      "taille": 312456,
+      "type": "image/jpeg",
+      "date": "2025-11-19T15:42:08.000Z"
+    }
+  ],
+  "sections": {
+    "preparation": {
+      "progression": 100,
+      "points_coches": [
+        "Accès centrale sécurisé et balisé",
+        "Contact gestionnaire/propriétaire effectué",
+        "Consignes sécurité lues et comprises",
+        "Matériel vérifié (caméra thermique, multimètre, EPI)"
+      ],
+      "commentaires": "Accès facile. Contact téléphonique avec propriétaire OK."
+    },
+    "modules": {
+      "progression": 87,
+      "points_coches": [
+        "Aspect général modules satisfaisant",
+        "Absence casse/fissures visibles",
+        "Encrassement acceptable",
+        "Absence délamination/buée",
+        "Boîtiers jonction modules OK"
+      ],
+      "commentaires": "Quelques salissures légères sur rangée nord. Nettoyage recommandé.",
+      "anomalies": [
+        {
+          "type": "Encrassement modéré",
+          "localisation": "Rangée nord, strings 1-3",
+          "gravite": "Faible",
+          "photo": "MP_encrassement_nord.jpg"
+        }
+      ]
+    },
+    "onduleurs": {
+      "progression": 100,
+      "points_coches": [
+        "Onduleurs opérationnels",
+        "Affichage écrans OK (pas erreurs)",
+        "Température normale",
+        "Ventilation fonctionnelle",
+        "Câblage AC/DC conforme"
+      ],
+      "commentaires": "Onduleur Huawei SUN2000-100KTL-M1. Production normale."
+    },
+    "thermographie": {
+      "progression": 75,
+      "points_coches": [
+        "Conditions thermographie OK (ensoleillement > 700 W/m²)",
+        "Scan complet installation réalisé",
+        "Hotspots détectés et photographiés"
+      ],
+      "commentaires": "3 hotspots détectés sur string 3 (température +15°C). Cellules défectueuses.",
+      "anomalies": [
+        {
+          "type": "Hotspots modules",
+          "localisation": "String 3, modules 8-10",
+          "temperature_delta": "+15°C",
+          "gravite": "Moyenne",
+          "photo": "MP_hotspot_string_3.jpg"
+        }
+      ]
+    },
+    "boitiers_protection": {
+      "progression": 100,
+      "points_coches": [
+        "Boîtiers protection AC/DC accessibles",
+        "Étanchéité boîtiers OK",
+        "Câblage organisé et conforme",
+        "Absence corrosion/oxydation"
+      ],
+      "commentaires": "Boîtiers en bon état général."
+    },
+    "suivi_production": {
+      "progression": 100,
+      "points_coches": [
+        "Monitoring actif et accessible",
+        "Production conforme prévisions",
+        "Historique production analysé"
+      ],
+      "commentaires": "Production conforme. Ratio performance ~82% (acceptable)."
+    }
+  },
+  "progression": {
+    "preparation": 100,
+    "modules": 87,
+    "onduleurs": 100,
+    "thermographie": 75,
+    "boitiers_protection": 100,
+    "suivi_production": 100,
+    "global": 93
+  },
+  "statistiques_photos": {
+    "nombre_total": 25,
+    "taille_totale_mb": 6.8,
+    "categories": {
+      "GEN": 5,
+      "ELEC": 6,
+      "MP": 8,
+      "BP": 4,
+      "DOC": 2
+    }
+  },
+  "synthese": {
+    "anomalies_majeures": 0,
+    "anomalies_moyennes": 1,
+    "anomalies_mineures": 1,
+    "recommandations": [
+      "Nettoyage rangée nord (salissures légères)",
+      "Remplacement 3 modules string 3 (hotspots)",
+      "Suivi thermographie dans 6 mois"
+    ]
+  },
+  "metadata": {
+    "version_checklist": "1.0",
+    "date_export": "2025-11-19T16:05:00.000Z",
+    "format": "GIRASOLE_2025",
+    "autosave_enabled": true,
+    "browser": "Firefox 120.0"
+  }
+}

@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Audit - Antunez - SCI ANAUJA</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .centrale-info {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .centrale-info p { margin: 4px 0; }
+        
+        .section {
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .question {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+        }
+        .question label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        .question input[type="text"],
+        .question textarea,
+        .question select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .question textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        /* PHOTOS SECTION */
+        .photo-section {
+            background: #fff3cd;
+            border: 3px dashed #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .photo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .photo-category {
+            font-size: 18px;
+            font-weight: bold;
+            color: #856404;
+        }
+        .photo-count {
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .photo-guide {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+        .photo-guide strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .btn-photo {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #28a745 0%, #20803a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-photo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        }
+        .btn-photo:active {
+            transform: translateY(0);
+        }
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .photo-preview img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: all 0.3s;
+        }
+        .photo-preview img:hover {
+            transform: scale(1.05);
+            border-color: #28a745;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            color: #0c5460;
+        }
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #155724;
+            color: #155724;
+        }
+        
+        .btn-export {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px 0;
+        }
+        .btn-export:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .footer p { margin: 5px 0; }
+        
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📋 CHECKLIST AUDIT PHOTOVOLTAÏQUE</h1>
+            <p>Diagnostic Photovoltaïque - Mission GIRASOLE 2025</p>
+            <div class="centrale-info">
+                <p><strong>🏭 Centrale :</strong> 31971 - Antunez - SCI ANAUJA</p>
+                <p><strong>⚡ Puissance :</strong> 269.45 kWc</p>
+                <p><strong>📍 Adresse :</strong> 253 Bd Robert Koch, 34500 Béziers, France</p>
+                <p><strong>🏷️ Type :</strong> SOL</p>
+            </div>
+        </div>
+
+        <!-- SECTION 1 : INFORMATIONS GÉNÉRALES -->
+        <div class="section">
+            <div class="section-header">
+                <span>📅 1. INFORMATIONS GÉNÉRALES</span>
+            </div>
+            
+            <div class="question">
+                <label>Date intervention</label>
+                <input type="date" id="date_intervention">
+            </div>
+            
+            <div class="question">
+                <label>Heure début</label>
+                <input type="time" id="heure_debut">
+            </div>
+            
+            <div class="question">
+                <label>Technicien (Nom + Prénom)</label>
+                <input type="text" id="technicien" placeholder="Ex: Dupont Jean">
+            </div>
+            
+            <div class="question">
+                <label>Météo</label>
+                <select id="meteo">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Ensoleillé">☀️ Ensoleillé</option>
+                    <option value="Nuageux">☁️ Nuageux</option>
+                    <option value="Pluvieux">🌧️ Pluvieux</option>
+                    <option value="Venteux">💨 Venteux</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Température (°C)</label>
+                <input type="number" id="temperature" placeholder="Ex: 25">
+            </div>
+        </div>
+
+        <!-- SECTION 2 : CONFORMITÉ ÉLECTRIQUE + PHOTOS ELEC -->
+        <div class="section">
+            <div class="section-header">
+                <span>⚡ 2. CONFORMITÉ ÉLECTRIQUE</span>
+            </div>
+            
+            <div class="question">
+                <label>État AGCP (Appareil Général de Coupure et Protection)</label>
+                <select id="agcp">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Conforme">✅ Conforme</option>
+                    <option value="Non conforme">❌ Non conforme</option>
+                    <option value="À vérifier">⚠️ À vérifier</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Onduleurs fonctionnels</label>
+                <select id="onduleurs">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Oui">✅ Oui - tous fonctionnels</option>
+                    <option value="Non">❌ Non - défaillances détectées</option>
+                    <option value="Partiel">⚠️ Partiel - certains défauts</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Câblage et protections</label>
+                <textarea id="cablage" placeholder="Décrire état général, défauts détectés, points d'attention..."></textarea>
+            </div>
+            
+            <!-- PHOTOS ÉLECTRIQUE -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS ÉLECTRIQUE (ELEC)</span>
+                    <span class="photo-count" id="count_ELEC">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 5 photos) :</strong>
+                    • AGCP complet (vue d'ensemble + détail)<br>
+                    • Chaque onduleur (façade + écran état)<br>
+                    • Tableau électrique AC<br>
+                    • Câblage général DC/AC<br>
+                    • Dispositifs protection (parafoudres, sectionneurs)
+                </div>
+                <input type="file" id="photo_ELEC" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_ELEC').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS ÉLECTRIQUE
+                </button>
+                <div class="photo-preview" id="preview_ELEC"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 3 : MODULES PHOTOVOLTAÏQUES + PHOTOS MP -->
+        <div class="section">
+            <div class="section-header">
+                <span>☀️ 3. MODULES PHOTOVOLTAÏQUES</span>
+            </div>
+            
+            <div class="question">
+                <label>État visuel général modules</label>
+                <select id="etat_modules">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Bon">✅ Bon état</option>
+                    <option value="Moyen">⚠️ État moyen - défauts mineurs</option>
+                    <option value="Mauvais">❌ Mauvais état - défauts majeurs</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Défauts détectés (salissures, fissures, décoloration...)</label>
+                <textarea id="defauts_modules" placeholder="Lister tous défauts observés avec localisation..."></textarea>
+            </div>
+            
+            <div class="question">
+                <label>Points chauds détectés (thermographie)</label>
+                <select id="points_chauds">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Non">✅ Non - pas de points chauds</option>
+                    <option value="Oui">❌ Oui - points chauds détectés</option>
+                </select>
+            </div>
+            
+            <!-- PHOTOS MODULES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS MODULES (MP)</span>
+                    <span class="photo-count" id="count_MP">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 10 photos) :</strong>
+                    • Vue d'ensemble installation (plusieurs angles)<br>
+                    • Modules avec défauts (fissures, taches, décoloration)<br>
+                    • Points chauds thermographie (si détectés)<br>
+                    • Connecteurs MC4<br>
+                    • Salissures importantes<br>
+                    • Plaques signalétiques modules (marque, puissance)
+                </div>
+                <input type="file" id="photo_MP" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_MP').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS MODULES
+                </button>
+                <div class="photo-preview" id="preview_MP"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 4 : STRUCTURE + PHOTOS TOIT -->
+        <div class="section">
+            <div class="section-header">
+                <span>🏗️ 4. STRUCTURE & SUPPORT</span>
+            </div>
+            
+            <div class="question">
+                <label>Type installation</label>
+                <select id="type_install">
+                    <option value="Sol" selected>🌾 Installation au sol</option>
+                    <option value="Toiture" >🏠 Installation toiture</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>État structure porteuse</label>
+                <select id="structure">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Bon">✅ Bon état</option>
+                    <option value="Moyen">⚠️ État moyen - attention requise</option>
+                    <option value="Mauvais">❌ Mauvais état - intervention nécessaire</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Fixations et boulonnerie</label>
+                <textarea id="fixations" placeholder="État boulons, rails, corrosion éventuelle..."></textarea>
+            </div>
+            
+            <!-- PHOTOS STRUCTURE -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS STRUCTURE (TOIT)</span>
+                    <span class="photo-count" id="count_TOIT">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 5 photos) :</strong>
+                    • Vue d'ensemble structure support<br>
+                    • Fondations ou ancrages toiture<br>
+                    • Rails et fixations modules<br>
+                    • Boulonnerie (état, corrosion)<br>
+                    • Défauts structure (déformations, fissures)
+                </div>
+                <input type="file" id="photo_TOIT" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_TOIT').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS STRUCTURE
+                </button>
+                <div class="photo-preview" id="preview_TOIT"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 5 : BOÎTES PROTECTION + PHOTOS BP -->
+        <div class="section">
+            <div class="section-header">
+                <span>📦 5. BOÎTES DE PROTECTION</span>
+            </div>
+            
+            <div class="question">
+                <label>Boîtes de jonction accessibles</label>
+                <select id="boites_access">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Oui">✅ Oui - toutes accessibles</option>
+                    <option value="Non">❌ Non - certaines inaccessibles</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>État boîtes (étanchéité, câblage)</label>
+                <textarea id="etat_boites" placeholder="Étanchéité, serrage câbles, propreté..."></textarea>
+            </div>
+            
+            <!-- PHOTOS BOÎTES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS BOÎTES (BP)</span>
+                    <span class="photo-count" id="count_BP">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 2 photos) :</strong>
+                    • Chaque boîte de jonction (extérieur)<br>
+                    • Intérieur boîtes (câblage, protections)<br>
+                    • Défauts détectés (étanchéité, corrosion)
+                </div>
+                <input type="file" id="photo_BP" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_BP').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS BOÎTES
+                </button>
+                <div class="photo-preview" id="preview_BP"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 6 : GÉNÉRAL + PHOTOS GEN -->
+        <div class="section">
+            <div class="section-header">
+                <span>🌍 6. VUE GÉNÉRALE & ENVIRONNEMENT</span>
+            </div>
+            
+            <div class="question">
+                <label>Accès site</label>
+                <select id="acces">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Facile">✅ Facile</option>
+                    <option value="Moyen">⚠️ Moyen</option>
+                    <option value="Difficile">❌ Difficile</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Végétation / Ombrage</label>
+                <textarea id="vegetation" placeholder="Présence végétation, ombres portées, nécessité débroussaillage..."></textarea>
+            </div>
+            
+            <div class="question">
+                <label>Observations générales</label>
+                <textarea id="observations" placeholder="Tout élément remarquable, anomalie, point d'attention..."></textarea>
+            </div>
+            
+            <!-- PHOTOS GÉNÉRALES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS GÉNÉRALES (GEN)</span>
+                    <span class="photo-count" id="count_GEN">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 5 photos) :</strong>
+                    • Vue aérienne ou panoramique installation complète<br>
+                    • Accès site (entrée, parking)<br>
+                    • Environnement immédiat<br>
+                    • Végétation si impactante<br>
+                    • Signalétique site
+                </div>
+                <input type="file" id="photo_GEN" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_GEN').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS GÉNÉRALES
+                </button>
+                <div class="photo-preview" id="preview_GEN"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 7 : DOCUMENTS + PHOTOS DOC -->
+        <div class="section">
+            <div class="section-header">
+                <span>📄 7. DOCUMENTS & SCHÉMAS</span>
+            </div>
+            
+            <div class="question">
+                <label>Documents accessibles sur site</label>
+                <select id="documents">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Oui">✅ Oui - documents présents</option>
+                    <option value="Non">❌ Non - documents absents</option>
+                    <option value="Partiel">⚠️ Partiel - certains manquants</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Liste documents consultés</label>
+                <textarea id="liste_docs" placeholder="Schéma unifilaire, plans, PV réception, attestations..."></textarea>
+            </div>
+            
+            <!-- PHOTOS DOCUMENTS -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS DOCUMENTS (DOC)</span>
+                    <span class="photo-count" id="count_DOC">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 1 photo) :</strong>
+                    • Schéma électrique unifilaire<br>
+                    • Plans installation<br>
+                    • Plaques signalétiques (onduleurs, modules)<br>
+                    • PV réception ou autocontrôles<br>
+                    • Attestations conformité
+                </div>
+                <input type="file" id="photo_DOC" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_DOC').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS DOCUMENTS
+                </button>
+                <div class="photo-preview" id="preview_DOC"></div>
+            </div>
+        </div>
+
+        <!-- RÉCAPITULATIF PHOTOS -->
+        <div class="section">
+            <div class="alert alert-success">
+                <strong>📊 RÉCAPITULATIF PHOTOS</strong><br><br>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div>
+                        <strong>GEN (Général):</strong> <span id="total_GEN">0</span> / 5 min<br>
+                        <strong>ELEC (Électrique):</strong> <span id="total_ELEC">0</span> / 5 min<br>
+                        <strong>MP (Modules):</strong> <span id="total_MP">0</span> / 10 min
+                    </div>
+                    <div>
+                        <strong>BP (Boîtes):</strong> <span id="total_BP">0</span> / 2 min<br>
+                        <strong>TOIT (Structure):</strong> <span id="total_TOIT">0</span> / 5 min<br>
+                        <strong>DOC (Documents):</strong> <span id="total_DOC">0</span> / 1 min
+                    </div>
+                </div>
+                <hr style="margin: 15px 0; border: none; border-top: 2px solid #155724;">
+                <strong style="font-size: 16px;">TOTAL: <span id="total_ALL">0</span> photos / 28 minimum requis</strong>
+            </div>
+        </div>
+
+        <!-- EXPORT -->
+        <div class="section">
+            <div class="alert alert-info">
+                <strong>💾 SAUVEGARDE AUTOMATIQUE :</strong><br>
+                Vos données sont sauvegardées localement toutes les 10 secondes.<br>
+                Vous pouvez fermer et rouvrir cette page sans perdre vos données.
+            </div>
+            
+            <button class="btn-export" onclick="exporterJSON()">
+                📥 EXPORTER CHECKLIST + PHOTOS (JSON)
+            </button>
+            
+            <div class="alert alert-info">
+                <strong>📤 APRÈS EXPORT :</strong><br>
+                1. Récupère le fichier <strong>31971_terrain.json</strong><br>
+                2. Envoie-le par email à <strong>contact@diagpv.fr</strong><br>
+                3. Ou copie-le dans <strong>/exports_json/</strong> pour génération automatique rapport
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><strong>Diagnostic Photovoltaïque - Groupe Watt&co</strong></p>
+            <p>3 rue d'Apollo, 31240 L'UNION</p>
+            <p>☎️ 05.81.10.16.59 | 📧 contact@diagpv.fr | 🌐 www.diagnosticphotovoltaique.fr</p>
+            <p style="margin-top: 10px;">RCS Toulouse 792 972 309 | Mission GIRASOLE 2025</p>
+        </div>
+    </div>
+
+    <script>
+        const CENTRALE_ID = '31971';
+        const CENTRALE_NOM = 'Antunez - SCI ANAUJA';
+        const STORAGE_KEY = 'checklist_' + CENTRALE_ID;
+        
+        const photos = {
+            GEN: [],
+            ELEC: [],
+            MP: [],
+            BP: [],
+            TOIT: [],
+            DOC: []
+        };
+        
+        document.getElementById('date_intervention').value = new Date().toISOString().split('T')[0];
+        
+        ['GEN', 'ELEC', 'MP', 'BP', 'TOIT', 'DOC'].forEach(cat => {
+            document.getElementById('photo_' + cat).addEventListener('change', function(e) {
+                const files = e.target.files;
+                let processed = 0;
+                
+                for (let file of files) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        photos[cat].push({
+                            categorie: cat,
+                            nom: file.name,
+                            taille: file.size,
+                            type: file.type,
+                            data: event.target.result,
+                            date: new Date().toISOString()
+                        });
+                        
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.onclick = function() { window.open(event.target.result); };
+                        document.getElementById('preview_' + cat).appendChild(img);
+                        
+                        processed++;
+                        if (processed === files.length) {
+                            updatePhotoStats();
+                            saveLocal();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+        
+        function updatePhotoStats() {
+            let total = 0;
+            ['GEN', 'ELEC', 'MP', 'BP', 'TOIT', 'DOC'].forEach(cat => {
+                const count = photos[cat].length;
+                document.getElementById('count_' + cat).textContent = count + ' photo' + (count > 1 ? 's' : '');
+                document.getElementById('total_' + cat).textContent = count;
+                total += count;
+            });
+            document.getElementById('total_ALL').textContent = total;
+        }
+        
+        function exporterJSON() {
+            const data = {
+                centrale: {
+                    id: CENTRALE_ID,
+                    nom: CENTRALE_NOM,
+                    puissance_kwc: 269.45,
+                    adresse: '253 Bd Robert Koch, 34500 Béziers, France',
+                    type: 'SOL'
+                },
+                audit: {
+                    date_intervention: document.getElementById('date_intervention').value,
+                    heure_debut: document.getElementById('heure_debut').value,
+                    technicien: document.getElementById('technicien').value,
+                    meteo: document.getElementById('meteo').value,
+                    temperature: document.getElementById('temperature').value
+                },
+                conformite_electrique: {
+                    agcp: document.getElementById('agcp').value,
+                    onduleurs: document.getElementById('onduleurs').value,
+                    cablage: document.getElementById('cablage').value
+                },
+                modules: {
+                    etat_general: document.getElementById('etat_modules').value,
+                    defauts: document.getElementById('defauts_modules').value,
+                    points_chauds: document.getElementById('points_chauds').value
+                },
+                structure: {
+                    type: document.getElementById('type_install').value,
+                    etat: document.getElementById('structure').value,
+                    fixations: document.getElementById('fixations').value
+                },
+                boites_protection: {
+                    accessibles: document.getElementById('boites_access').value,
+                    etat: document.getElementById('etat_boites').value
+                },
+                general: {
+                    acces: document.getElementById('acces').value,
+                    vegetation: document.getElementById('vegetation').value,
+                    observations: document.getElementById('observations').value
+                },
+                documents: {
+                    accessibles: document.getElementById('documents').value,
+                    liste: document.getElementById('liste_docs').value
+                },
+                photos: photos,
+                stats_photos: {
+                    total: Object.values(photos).reduce((sum, arr) => sum + arr.length, 0),
+                    par_categorie: {
+                        GEN: photos.GEN.length,
+                        ELEC: photos.ELEC.length,
+                        MP: photos.MP.length,
+                        BP: photos.BP.length,
+                        TOIT: photos.TOIT.length,
+                        DOC: photos.DOC.length
+                    }
+                },
+                metadata: {
+                    version: '3.0',
+                    export_date: new Date().toISOString(),
+                    device: navigator.userAgent
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = CENTRALE_ID + '_terrain.json';
+            a.click();
+            
+            alert('✅ Export réussi !\n\n' +
+                  'Fichier: ' + CENTRALE_ID + '_terrain.json\n' +
+                  'Photos: ' + data.stats_photos.total + ' incluses\n\n' +
+                  'Envoie ce fichier à contact@diagpv.fr');
+        }
+        
+        function saveLocal() {
+            const data = {
+                date_intervention: document.getElementById('date_intervention').value,
+                heure_debut: document.getElementById('heure_debut').value,
+                technicien: document.getElementById('technicien').value,
+                meteo: document.getElementById('meteo').value,
+                temperature: document.getElementById('temperature').value,
+                agcp: document.getElementById('agcp').value,
+                onduleurs: document.getElementById('onduleurs').value,
+                cablage: document.getElementById('cablage').value,
+                etat_modules: document.getElementById('etat_modules').value,
+                defauts_modules: document.getElementById('defauts_modules').value,
+                points_chauds: document.getElementById('points_chauds').value,
+                type_install: document.getElementById('type_install').value,
+                structure: document.getElementById('structure').value,
+                fixations: document.getElementById('fixations').value,
+                boites_access: document.getElementById('boites_access').value,
+                etat_boites: document.getElementById('etat_boites').value,
+                acces: document.getElementById('acces').value,
+                vegetation: document.getElementById('vegetation').value,
+                observations: document.getElementById('observations').value,
+                documents: document.getElementById('documents').value,
+                liste_docs: document.getElementById('liste_docs').value,
+                photos: photos
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        function loadLocal() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    if (key === 'photos') {
+                        Object.keys(data.photos).forEach(cat => {
+                            photos[cat] = data.photos[cat];
+                            data.photos[cat].forEach(photo => {
+                                const img = document.createElement('img');
+                                img.src = photo.data;
+                                img.onclick = function() { window.open(photo.data); };
+                                document.getElementById('preview_' + cat).appendChild(img);
+                            });
+                        });
+                        updatePhotoStats();
+                    } else {
+                        const elem = document.getElementById(key);
+                        if (elem) elem.value = data[key];
+                    }
+                });
+            }
+        }
+        
+        setInterval(saveLocal, 10000);
+        loadLocal();
+        
+        document.querySelectorAll('input, select, textarea').forEach(elem => {
+            elem.addEventListener('change', saveLocal);
+        });
+        
+        console.log('📋 Checklist GIRASOLE V3 - Centrale 31971');
+    </script>
+</body>
+</html>

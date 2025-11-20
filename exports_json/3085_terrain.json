@@ -1,0 +1,58 @@
+{
+  "centrale_id": "3085",
+  "nom_centrale": "Hangar Maxime Bayle",
+  "date_audit": "2025-11-19",
+  "auditeur": "DiagPV Test",
+  "type_installation": "SOL",
+  "puissance_kwc": 100.0,
+  "nb_photos_prises": 45,
+  "observations_terrain": "Installation en bon état général. Végétation excessive autour des structures à nettoyer. Quelques modules présentant des salissures importantes. Onduleurs fonctionnels, aucune alarme active.",
+  "sections_completees": {
+    "vue_generale": true,
+    "structures": true,
+    "modules": true,
+    "onduleurs": true,
+    "cablage": true,
+    "securite": true,
+    "monitoring": true,
+    "documentation": true
+  },
+  "anomalies_detectees": [
+    {
+      "type": "MINEURE",
+      "description": "Végétation excessive - nettoyage requis",
+      "localisation": "Périphérie tables 1-5",
+      "photo_id": "GEN_001"
+    },
+    {
+      "type": "MINEURE",
+      "description": "Modules sales - perte production estimée 2-3%",
+      "localisation": "Tables 8, 12, 15",
+      "photo_id": "MP_003"
+    },
+    {
+      "type": "MAJEURE",
+      "description": "Défaut d'isolement string 3",
+      "localisation": "Onduleur #2",
+      "photo_id": "ELEC_012"
+    }
+  ],
+  "mesures_electriques": {
+    "tension_dc_moy": 825.5,
+    "courant_strings": [
+      8.2,
+      8.1,
+      0.3,
+      8.3
+    ],
+    "puissance_ac_instant": 87.5,
+    "production_jour": 450.0
+  },
+  "conformite_visuelle": {
+    "modules": "Conforme - quelques salissures",
+    "structures": "Conforme",
+    "cablage": "Conforme",
+    "protection_elec": "Conforme",
+    "mise_terre": "Conforme"
+  }
+}

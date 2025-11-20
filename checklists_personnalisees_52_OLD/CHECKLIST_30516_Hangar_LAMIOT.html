@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Audit - Hangar LAMIOT</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 26px; margin-bottom: 10px; }
+        .centrale-info {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .centrale-info p { margin: 5px 0; font-size: 14px; }
+        .info-section {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        .info-section input, .info-section select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .section {
+            padding: 25px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .section-header {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2ecc71;
+            font-weight: 700;
+        }
+        .check-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #95a5a6;
+            transition: all 0.3s;
+        }
+        .check-item.checked {
+            background: #d4edda;
+            border-left-color: #2ecc71;
+        }
+        .check-item.critique {
+            border-left-color: #e74c3c;
+            background: #ffe6e6;
+        }
+        .check-item label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .check-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+        .check-item textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .photo-zone {
+            margin: 20px 0;
+            padding: 25px;
+            background: white;
+            border: 3px dashed #2ecc71;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .photo-zone input[type="file"] { display: none; }
+        .btn-upload {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-upload:hover { background: #27ae60; transform: translateY(-2px); }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .photo-preview img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #2ecc71;
+            cursor: pointer;
+        }
+        .photo-stats {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        .btn-export {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+        .btn-export:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .footer {
+            padding: 25px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            font-size: 13px;
+        }
+        .alert { padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+        .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔆 CHECKLIST AUDIT PV</h1>
+            <h2>Hangar LAMIOT</h2>
+            <div class="centrale-info">
+                <p><strong>ID Centrale:</strong> 30516</p>
+                <p><strong>Puissance:</strong> 343.07 kWc</p>
+                <p><strong>Type:</strong> Bâtiment à construire - C</p>
+                <p><strong>Département:</strong> 42</p>
+                <p><strong>Adresse:</strong> La Gélopière, 42110 Feurs, France</p>
+                <p><strong>Audit toiture:</strong> ✅ OUI</p>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">📝 Informations Intervention</h3>
+            <input type="text" id="auditeur" placeholder="Nom auditeur / technicien *" required>
+            <input type="date" id="date" required>
+            <select id="meteo">
+                <option value="">Conditions météo *</option>
+                <option value="Ensoleillé">☀️ Ensoleillé</option>
+                <option value="Nuageux">⛅ Nuageux</option>
+                <option value="Couvert">☁️ Couvert</option>
+                <option value="Pluie">🌧️ Pluie</option>
+            </select>
+            <input type="text" id="temperature" placeholder="Température ambiante (°C)">
+        </div>
+
+        <div class="section">
+            <div class="section-header">🎒 1. PRÉPARATION INTERVENTION</div>
+
+            <div class="check-item " id="item_preparation_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_0')">
+                    <span>Équipement DiagPV complet (testeurs, drones, EPI)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_1')">
+                    <span>Documentation centrale consultée (schémas, DOE)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_2')">
+                    <span>Contact exploitant confirmé</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_preparation_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('preparation_3')">
+                    <span>Conditions météo favorables (irradiation >500 W/m²)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">☀️ 2. MODULES PHOTOVOLTAÏQUES</div>
+
+            <div class="check-item " id="item_modules_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('modules_0')">
+                    <span>État général modules (propreté, intégrité)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_modules_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('modules_1')">
+                    <span>Absence fissures visibles</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_modules_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('modules_2')">
+                    <span>Boîtes jonction modules OK</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_modules_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('modules_3')">
+                    <span>Câblage modules conforme</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_modules_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('modules_4')">
+                    <span>Photos modules (min 10 photos détails + défauts)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">⚡ 3. ONDULEURS & PROTECTION ÉLECTRIQUE</div>
+
+            <div class="check-item " id="item_onduleurs_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('onduleurs_0')">
+                    <span>Onduleurs opérationnels (voyants verts)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_onduleurs_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('onduleurs_1')">
+                    <span>Affichage production instantanée cohérente</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_onduleurs_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('onduleurs_2')">
+                    <span>Absence alarmes/codes erreur</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_onduleurs_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('onduleurs_3')">
+                    <span>Protection AC/DC conformes</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_onduleurs_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('onduleurs_4')">
+                    <span>Mesures tension/courant strings</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_onduleurs_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('onduleurs_5')">
+                    <span>Photos onduleurs + tableau électrique (min 5)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🌡️ 4. THERMOGRAPHIE IR (si applicable)</div>
+
+            <div class="check-item " id="item_thermographie_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('thermographie_0')">
+                    <span>Conditions thermographie validées (>500 W/m², vent <20 km/h)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_thermographie_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('thermographie_1')">
+                    <span>Vol drone thermographie effectué</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_thermographie_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('thermographie_2')">
+                    <span>Couverture complète champ PV</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_thermographie_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('thermographie_3')">
+                    <span>Hotspots détectés et localisés</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_thermographie_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('thermographie_4')">
+                    <span>Images thermiques sauvegardées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🏠 5. INSPECTION TOITURE (OBLIGATOIRE)</div>
+
+            <div class="check-item critique" id="item_toiture_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_0')">
+                    <span>⚠️ SÉCURITÉ: EPI complet (harnais, ligne vie, casque)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item critique" id="item_toiture_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_1')">
+                    <span>⚠️ MOP interventions toiture respectée</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_2')">
+                    <span>Étanchéité toiture OK (absence infiltrations)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_3')">
+                    <span>Fixations structures conformes et étanches</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_4')">
+                    <span>Traversées toiture étanches</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_5">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_5')">
+                    <span>État général couverture satisfaisant</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_6">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_6')">
+                    <span>Absence déformations/affaissements</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_7">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_7')">
+                    <span>Évacuation eaux pluviales OK</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_toiture_8">
+                <label>
+                    <input type="checkbox" onchange="updateItem('toiture_8')">
+                    <span>Photos toiture (min 8: vue ensemble, fixations, traversées, défauts)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">✅ 6. POST-INTERVENTION</div>
+
+            <div class="check-item " id="item_post_0">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_0')">
+                    <span>Toutes photos nomenclature prises (GEN/ELEC/MP/BP/DOC/TOIT)</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_1">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_1')">
+                    <span>Observations terrain complétées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_2">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_2')">
+                    <span>Mesures électriques enregistrées</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_3">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_3')">
+                    <span>Installation remise en état</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+
+            <div class="check-item " id="item_post_4">
+                <label>
+                    <input type="checkbox" onchange="updateItem('post_4')">
+                    <span>Site nettoyé et sécurisé</span>
+                </label>
+                <textarea placeholder="Observations..." onchange="saveLocal()"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">📸 PHOTOS TERRAIN</div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ NOMENCLATURE PHOTOS OBLIGATOIRE :</strong><br>
+                • <strong>GEN</strong> : Vues générales (min 5)<br>
+                • <strong>ELEC</strong> : Onduleurs, câbles, protections (min 5)<br>
+                • <strong>MP</strong> : Modules détails (min 10)<br>
+                • <strong>BP</strong> : Boîtes protection (min 2)<br>
+                • <strong>TOIT</strong> : Toiture, fixations, traversées (min 8)<br>
+                • <strong>DOC</strong> : Documents, schémas (min 1)<br>
+                <strong>TOTAL MINIMUM : 33 photos</strong>
+            </div>
+            
+            <div class="photo-zone">
+                <input type="file" id="photoInput" accept="image/*" multiple>
+                <button class="btn-upload" onclick="document.getElementById('photoInput').click()">
+                    📷 AJOUTER PHOTOS
+                </button>
+                <p style="margin-top: 15px; color: #666;">Sélectionner plusieurs photos à la fois</p>
+            </div>
+            
+            <div class="photo-stats" id="photoStats">
+                📊 Photos: <span id="nbPhotos">0</span> | Taille: <span id="taillePhotos">0 MB</span>
+            </div>
+            
+            <div class="photo-preview" id="photoPreview"></div>
+        </div>
+        
+        <div class="section">
+            <div class="alert alert-info">
+                <strong>💾 SAUVEGARDE AUTOMATIQUE :</strong> Les données sont sauvegardées localement toutes les 10 secondes.
+            </div>
+            
+            <button class="btn-export" onclick="exporterJSON()">
+                📥 EXPORTER CHECKLIST + PHOTOS (JSON)
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Diagnostic Photovoltaïque</strong> | 3 rue d'Apollo, 31240 L'Union</p>
+            <p>☎️ 05.81.10.16.59 | 📧 contact@diagpv.fr | 🌐 www.diagnosticphotovoltaique.fr</p>
+            <p style="margin-top: 10px;">RCS Toulouse 792 972 309 | Mission GIRASOLE 2025</p>
+        </div>
+    </div>
+    
+    <script>
+        const CENTRALE_ID = '30516';
+        const CENTRALE_NOM = 'Hangar LAMIOT';
+        let photosBase64 = [];
+        let totalSize = 0;
+        
+        // Date du jour par défaut
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        
+        // Update item état
+        function updateItem(itemId) {
+            const item = document.getElementById('item_' + itemId);
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+            saveLocal();
+        }
+        
+        // Gestion photos
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64Data = event.target.result;
+                    totalSize += base64Data.length;
+                    
+                    photosBase64.push({
+                        nom: file.name,
+                        taille: file.size,
+                        type: file.type,
+                        data: base64Data,
+                        date: new Date().toISOString()
+                    });
+                    
+                    // Prévisualisation
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    img.onclick = function() { window.open(base64Data); };
+                    document.getElementById('photoPreview').appendChild(img);
+                    
+                    updatePhotoStats();
+                    saveLocal();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function updatePhotoStats() {
+            document.getElementById('nbPhotos').textContent = photosBase64.length;
+            document.getElementById('taillePhotos').textContent = (totalSize / (1024 * 1024)).toFixed(2);
+        }
+        
+        // Export JSON
+        function exporterJSON() {
+            const auditeur = document.getElementById('auditeur').value;
+            const date = document.getElementById('date').value;
+            const meteo = document.getElementById('meteo').value;
+            const temperature = document.getElementById('temperature').value;
+            
+            if (!auditeur || !date || !meteo) {
+                alert('⚠️ Veuillez remplir les champs obligatoires: Nom, Date, Météo');
+                return;
+            }
+            
+            const data = {
+                centrale_id: CENTRALE_ID,
+                centrale_nom: CENTRALE_NOM,
+                auditeur: auditeur,
+                date_audit: date,
+                meteo: meteo,
+                temperature: temperature,
+                horodatage: new Date().toISOString(),
+                audit_toiture: true,
+                points_controle: [],
+                photos: photosBase64,
+                nb_photos: photosBase64.length,
+                taille_totale_mb: (totalSize / (1024 * 1024)).toFixed(2)
+            };
+            
+            // Récupération points contrôle
+            document.querySelectorAll('.check-item').forEach((item, index) => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const textarea = item.querySelector('textarea');
+                const label = item.querySelector('label span');
+                
+                data.points_controle.push({
+                    id: index,
+                    titre: label.textContent.trim(),
+                    checked: checkbox.checked,
+                    observations: textarea.value
+                });
+            });
+            
+            // Téléchargement
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audit_${CENTRALE_ID}_${date}_${Date.now()}.json`;
+            a.click();
+            
+            alert(`✅ Export réussi !\n\n` +
+                  `Centrale: ${CENTRALE_ID} - ${CENTRALE_NOM}\n` +
+                  `Photos: ${photosBase64.length}\n` +
+                  `Taille: ${(totalSize / (1024 * 1024)).toFixed(2)} MB\n\n` +
+                  `📧 Envoyer ce fichier JSON à DiagPV`);
+        }
+        
+        // Auto-save LocalStorage
+        function saveLocal() {
+            const data = {
+                centrale_id: CENTRALE_ID,
+                auditeur: document.getElementById('auditeur').value,
+                date: document.getElementById('date').value,
+                meteo: document.getElementById('meteo').value,
+                temperature: document.getElementById('temperature').value,
+                checkboxes: [],
+                textareas: [],
+                photos_count: photosBase64.length,
+                last_save: new Date().toISOString()
+            };
+            
+            document.querySelectorAll('.check-item input[type="checkbox"]').forEach(cb => {
+                data.checkboxes.push(cb.checked);
+            });
+            
+            document.querySelectorAll('.check-item textarea').forEach(ta => {
+                data.textareas.push(ta.value);
+            });
+            
+            localStorage.setItem('checklist_' + CENTRALE_ID, JSON.stringify(data));
+        }
+        
+        // Chargement auto-save
+        function loadLocal() {
+            const saved = localStorage.getItem('checklist_' + CENTRALE_ID);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('auditeur').value = data.auditeur || '';
+                document.getElementById('date').value = data.date || '';
+                document.getElementById('meteo').value = data.meteo || '';
+                document.getElementById('temperature').value = data.temperature || '';
+                
+                const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+                const textareas = document.querySelectorAll('.check-item textarea');
+                
+                data.checkboxes.forEach((checked, i) => {
+                    if (checkboxes[i]) {
+                        checkboxes[i].checked = checked;
+                        if (checked) {
+                            checkboxes[i].closest('.check-item').classList.add('checked');
+                        }
+                    }
+                });
+                
+                data.textareas.forEach((value, i) => {
+                    if (textareas[i]) {
+                        textareas[i].value = value;
+                    }
+                });
+            }
+        }
+        
+        // Auto-save périodique
+        setInterval(saveLocal, 10000);
+        
+        // Init
+        window.addEventListener('DOMContentLoaded', loadLocal);
+    </script>
+</body>
+</html>

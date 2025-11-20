@@ -1,0 +1,50 @@
+{
+  "centrale_id": "3085",
+  "nom_centrale": "Hangar Maxime Bayle",
+  "date_validation": "2025-11-19",
+  "valideur_be": "Fabien CORRERA",
+  "statut_audit": "VALIDÉ",
+  "nb_anomalies_critiques": 0,
+  "nb_anomalies_majeures": 1,
+  "nb_anomalies_mineures": 2,
+  "conformite_IEC_62446": "CONFORME avec réserves",
+  "conformite_NF_C15_100": "CONFORME",
+  "conformite_DTU_40_35": "CONFORME",
+  "recommandations_prioritaires": "1. URGENT: Investiguer défaut isolement string 3 (risque sécurité)\n2. MAINTENANCE: Nettoyage modules tables 8/12/15 (gain 2-3% production)\n3. ENTRETIEN: Débroussaillage périphérie installation",
+  "observations_be": "Audit complet réalisé conformément IEC 62446-3. Installation globalement conforme aux normes en vigueur. Défaut d'isolement string 3 nécessite intervention prioritaire sous 7 jours. Production actuelle estimée à 95-97% du potentiel.",
+  "plan_actions": [
+    {
+      "priorite": "HAUTE",
+      "action": "Dépannage électrique string 3",
+      "delai": "7 jours",
+      "cout_estime": "800-1200 EUR",
+      "impact": "Rétablir 25% puissance onduleur #2"
+    },
+    {
+      "priorite": "MOYENNE",
+      "action": "Nettoyage modules",
+      "delai": "30 jours",
+      "cout_estime": "500-800 EUR",
+      "impact": "Gain 2-3% production annuelle"
+    },
+    {
+      "priorite": "BASSE",
+      "action": "Débroussaillage",
+      "delai": "60 jours",
+      "cout_estime": "300-400 EUR",
+      "impact": "Prévention ombrages futurs"
+    }
+  ],
+  "analyse_production": {
+    "ratio_performance": 0.82,
+    "production_annuelle_estimee": 127500,
+    "potentiel_optimisation": 3500,
+    "taux_disponibilite": 97.5
+  },
+  "validation_finale": {
+    "rapport_approuve": true,
+    "signature_be": "Fabien CORRERA",
+    "date_signature": "2025-11-19",
+    "prochain_audit": "2025-12-31"
+  }
+}

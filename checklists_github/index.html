@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIRASOLE 2025 - Checklists Audits</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .checklist-link {
+            display: block;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .checklist-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏭 GIRASOLE 2025</h1>
+        <div class="subtitle">52 Audits Toitures Photovoltaïques</div>
+        
+        <div class="checklist-grid" id="checklistGrid"></div>
+        
+        <div class="footer">
+            Diagnostic Photovoltaïque © 2025<br>
+            API: girasole2025.pappalardoadrien.workers.dev
+        </div>
+    </div>
+
+    <script>
+        // Générer automatiquement les liens vers les 52 checklists
+        const checklistFiles = [
+            'CHECKLIST_15843_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_17966_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_17996_Mathieu_Montet.html',
+            'CHECKLIST_20614_HANGAR_Benoit_BERTELOOT.html',
+            'CHECKLIST_22147_HANGAR_Christian_MIGNARD.html',
+            'CHECKLIST_23207_Hangar_de_la_Palun.html',
+            'CHECKLIST_23363_Hangar_de_la_Palun.html',
+            'CHECKLIST_24219_Hangar_Béatrice_PEGHAIRE.html',
+            'CHECKLIST_26016_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_26018_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_26328_Bâtiment_1_Chez_Papon.html',
+            'CHECKLIST_26329_Bâtiment_2_Chez_Papon.html',
+            'CHECKLIST_27173_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_28007_Hangar_Agnès_MAZAU.html',
+            'CHECKLIST_28049_Hangar_Brigitte_MARCHAND.html',
+            'CHECKLIST_29020_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29031_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29154_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29224_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29320_Bâtiment_Agricole_2_Chez_Bellay.html',
+            'CHECKLIST_29321_Bâtiment_Agricole_1_Chez_Bellay.html',
+            'CHECKLIST_29358_Hangar_Agricole_2_-_La_Moulie.html',
+            'CHECKLIST_29359_Hangar_Agricole_1_-_La_Moulie.html',
+            'CHECKLIST_29389_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29444_Hangar_1_-_Lagrézette.html',
+            'CHECKLIST_29445_Hangar_2_-_Lagrézette.html',
+            'CHECKLIST_29585_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29612_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29772_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29824_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_29865_Hangar_Agricole_les_Courbes.html',
+            'CHECKLIST_29892_Hangar_Agricole_Perissac.html',
+            'CHECKLIST_29941_Bâtiment_Agricole_Chez_Gaudet.html',
+            'CHECKLIST_30034_Hangar_Laurent_ROUX.html',
+            'CHECKLIST_30170_Hangar_2_-_Chez_Gaudet.html',
+            'CHECKLIST_30171_Hangar_1_-_Chez_Gaudet.html',
+            'CHECKLIST_30195_Hangar_2_-_Moulinier.html',
+            'CHECKLIST_30196_Hangar_1_-_Moulinier.html',
+            'CHECKLIST_30222_Hangar_La_Prade.html',
+            'CHECKLIST_30238_Bâtiment_Agricole_Chez_Couralet.html',
+            'CHECKLIST_30249_Bâtiment_Chez_Galinat.html',
+            'CHECKLIST_30256_Hangar_de_la_Monie.html',
+            'CHECKLIST_30268_Hangar_Les_Mortroux.html',
+            'CHECKLIST_30270_Bâtiment_Agricole_la_Fayolle.html',
+            'CHECKLIST_30392_Hangar_Agricole_Le_Buche.html',
+            'CHECKLIST_30398_Hangar_2_Agricole_Montauban.html',
+            'CHECKLIST_30399_Hangar_1_Agricole_Montauban.html',
+            'CHECKLIST_30483_Hangar_Agricole_Cournauds.html',
+            'CHECKLIST_30502_Hangar_Besse.html',
+            'CHECKLIST_30522_Bâtiment_Agricole_Coudoin.html',
+            'CHECKLIST_30563_Hangar_Agricole_Lacoste.html',
+            'CHECKLIST_3085_Hangar_Maxime_Bayle.html'
+        ];
+
+        const grid = document.getElementById('checklistGrid');
+        
+        checklistFiles.forEach((filename, index) => {
+            const link = document.createElement('a');
+            link.href = filename;
+            link.className = 'checklist-link';
+            
+            // Extraire l'ID du fichier
+            const match = filename.match(/CHECKLIST_(\d+)/);
+            const id = match ? match[1] : (index + 1);
+            
+            link.textContent = `Audit #${id}`;
+            grid.appendChild(link);
+        });
+    </script>
+</body>
+</html>

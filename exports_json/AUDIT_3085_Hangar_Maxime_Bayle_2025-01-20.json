@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "version": "4.0",
+    "conformite_cdc": "100%",
+    "norme_reference": "CDC PERF-CDC-001",
+    "normes_appliquees": [
+      "IEC 62446-1",
+      "NF C 15-100",
+      "UTE C 15-712-1",
+      "DTU 40.35"
+    ],
+    "date_export": "2025-01-20T14:30:00Z"
+  },
+  "centrale": {
+    "id": "3085",
+    "nom": "Hangar Maxime Bayle",
+    "puissance_kwc": "100",
+    "type_installation": "SOL",
+    "adresse": "Lieu-dit Les Granges, 47000 Agen",
+    "departement": "47"
+  },
+  "audit": {
+    "date_audit": "2025-01-18",
+    "auditeur_nom": "Fabien CORRERA",
+    "conditions_meteo": "Ensoleillé, 15°C",
+    "statut_global": "Conforme avec réserves mineures",
+    
+    "doc_autocontrole": "Présent et correctement renseigné",
+    "doc_plan_implantation": "Présent et correctement renseigné",
+    "doc_plan_electrique": "Présent mais incomplet",
+    "doc_schema_boites": "Présent et correctement renseigné",
+    
+    "cablage_type_cheminement": "Galvanisé à chaud",
+    "cablage_couleurs_dc": "Différentes (+/-)",
+    "cablage_sections_dc": "6 mm² conforme",
+    "cablage_sections_ac": "4 mm² conforme",
+    "cablage_etat_general": "Bon état général",
+    "cablage_fixations": "Conformes - tous les 50cm",
+    "cablage_protection_mecanique": "Présente",
+    "cablage_etancheite_presse_etoupes": "IP65 conforme",
+    "cablage_rayon_courbure": "Respecté",
+    
+    "elec_equipotentielles": "Vérifiée et conforme",
+    "elec_terre_valeur": "28 Ω",
+    "elec_parafoudre_type": "Type II",
+    "elec_etat_coffrets": "Bon état général",
+    "elec_etancheite_coffrets": "IP65 conforme",
+    "elec_etiquetage_presence": "Complet",
+    "elec_etiquetage_qualite": "Lisible et durable",
+    "elec_serrages_borniers": "Vérifiés et serrés",
+    "elec_coupure_dc": "Présents et opérationnels",
+    "elec_protection_dc": "Fusibles 15A présents",
+    "elec_protection_ac": "Disjoncteur 40A présent",
+    "elec_differentiel_sensibilite": "30 mA Type A",
+    "elec_accessibilite": "Facile",
+    "elec_ventilation": "Suffisante",
+    "elec_signalisation": "Présente conforme",
+    "elec_protection_surtension": "SPD Type II installé",
+    "elec_continuite_terre": "Vérifiée < 1 Ω",
+    
+    "tranchees_accessibilite": "Non accessible",
+    "tranchees_conformite": "Tranchées fermées - Vérification impossible",
+    
+    "modules_etat_general": "Bon état général",
+    "modules_defauts_visibles": "Salissures légères (poussières)",
+    "modules_cablage": "Bon état - Boîtes jonction étanches",
+    "modules_connecteurs_mc4": "Correctement serrés et non corrodés",
+    "modules_fixations": "Conformes - Boulons stable",
+    "modules_orientation": "Conforme projet - Sud 30°",
+    "modules_masques_ombrages": "Aucun masque détecté",
+    
+    "structure_etat_general": "Bon état - Légère corrosion superficielle",
+    "structure_type": "Châssis sol fixe",
+    "structure_fixations": "Conformes - Tous serrés",
+    "structure_stabilite": "Stable",
+    "structure_acces_maintenance": "Correct - Accès facile",
+    
+    "boites_etat_general": "Bon état général",
+    "boites_etancheite": "IP65 conforme",
+    "boites_accessibilite": "Facile",
+    "boites_cablage_interne": "Conforme - Bien organisé",
+    
+    "toiture_applicable": "Non",
+    
+    "recommandations_prioritaires": "1. Nettoyage modules recommandé (gain production 2-3%)\n2. Retouche peinture structure (corrosion superficielle)\n3. Compléter plan électrique unifilaire manquant",
+    "observations_terrain": "Installation globalement bien maintenue. Accès site facile. Aucun risque sécurité identifié. Production normale selon monitoring."
+  },
+  "photos": {
+    "DOC": [
+      {"nom": "DOC_autocontrole.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:15:00Z"},
+      {"nom": "DOC_plan_implantation.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:16:00Z"},
+      {"nom": "DOC_plan_electrique.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:17:00Z"},
+      {"nom": "DOC_schema_boites.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:18:00Z"},
+      {"nom": "DOC_notice_onduleur.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:19:00Z"}
+    ],
+    "ELEC": [
+      {"nom": "ELEC_coffret_principal.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:30:00Z"},
+      {"nom": "ELEC_parafoudre_spd.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:31:00Z"},
+      {"nom": "ELEC_differentiel_30ma.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:32:00Z"},
+      {"nom": "ELEC_mise_a_terre.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:33:00Z"},
+      {"nom": "ELEC_cablage_dc_couleurs.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:34:00Z"},
+      {"nom": "ELEC_cablage_ac.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:35:00Z"},
+      {"nom": "ELEC_borniers_serres.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:36:00Z"},
+      {"nom": "ELEC_presse_etoupes.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:37:00Z"},
+      {"nom": "ELEC_etiquetage.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:38:00Z"},
+      {"nom": "ELEC_cheminement_galva.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:39:00Z"}
+    ],
+    "TRANCHEES": [
+      {"nom": "TRANCHEES_non_accessible.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:45:00Z"},
+      {"nom": "TRANCHEES_fermees.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T10:46:00Z"}
+    ],
+    "MP": [
+      {"nom": "MP_vue_generale.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:00:00Z"},
+      {"nom": "MP_etat_modules_1.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:01:00Z"},
+      {"nom": "MP_etat_modules_2.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:02:00Z"},
+      {"nom": "MP_cablage_modules.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:03:00Z"},
+      {"nom": "MP_connecteurs_mc4.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:04:00Z"},
+      {"nom": "MP_fixations.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:05:00Z"},
+      {"nom": "MP_orientation_sud.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:06:00Z"},
+      {"nom": "MP_salissures_legeres.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:07:00Z"},
+      {"nom": "MP_boites_jonction.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:08:00Z"},
+      {"nom": "MP_aucun_masque.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:09:00Z"}
+    ],
+    "TOIT": [
+      {"nom": "TOIT_structure_generale.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:15:00Z"},
+      {"nom": "TOIT_chassis_sol.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:16:00Z"},
+      {"nom": "TOIT_fixations_serrees.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:17:00Z"},
+      {"nom": "TOIT_corrosion_superficielle.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:18:00Z"},
+      {"nom": "TOIT_acces_facile.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:19:00Z"}
+    ],
+    "BP": [
+      {"nom": "BP_boites_regroupement.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:25:00Z"},
+      {"nom": "BP_etancheite_ip65.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:26:00Z"},
+      {"nom": "BP_cablage_interne.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:27:00Z"}
+    ],
+    "GEN": [
+      {"nom": "GEN_vue_ensemble_nord.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:35:00Z"},
+      {"nom": "GEN_vue_ensemble_sud.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:36:00Z"},
+      {"nom": "GEN_vue_ensemble_est.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:37:00Z"},
+      {"nom": "GEN_vue_ensemble_ouest.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:38:00Z"},
+      {"nom": "GEN_acces_site.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-18T11:39:00Z"}
+    ],
+    "TOITURE_DETAIL": []
+  },
+  "statistiques": {
+    "total_photos": 40,
+    "anomalies_critiques": 0,
+    "anomalies_majeures": 0,
+    "anomalies_mineures": 2,
+    "photos_par_categorie": {
+      "DOC": 5,
+      "ELEC": 10,
+      "TRANCHEES": 2,
+      "MP": 10,
+      "TOIT": 5,
+      "BP": 3,
+      "GEN": 5,
+      "TOITURE_DETAIL": 0
+    }
+  }
+}

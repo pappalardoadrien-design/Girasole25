@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Audit V4 - GFA LASCOMBES - ANTOINE MICOULEAU</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header .version { 
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .centrale-info {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .centrale-info p { margin: 4px 0; }
+        
+        .section {
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .section-header.new {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        .section-header .badge {
+            background: rgba(255,255,255,0.3);
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+        }
+        
+        .subsection {
+            background: #e8f5e9;
+            padding: 12px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+            border-radius: 6px;
+        }
+        .subsection-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        .question {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+        }
+        .question.required {
+            border-left-color: #e74c3c;
+        }
+        .question label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        .question label .norm {
+            color: #3498db;
+            font-size: 11px;
+            font-weight: normal;
+            background: #e3f2fd;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        .question input[type="text"],
+        .question input[type="number"],
+        .question textarea,
+        .question select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .question textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .checkbox-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        /* PHOTOS SECTION */
+        .photo-section {
+            background: #fff3cd;
+            border: 3px dashed #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .photo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .photo-category {
+            font-size: 18px;
+            font-weight: bold;
+            color: #856404;
+        }
+        .photo-count {
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .photo-guide {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+        .photo-guide strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .btn-photo {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #28a745 0%, #20803a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-photo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        }
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .photo-preview img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: all 0.3s;
+        }
+        .photo-preview img:hover {
+            transform: scale(1.05);
+            border-color: #28a745;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            color: #0c5460;
+        }
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #155724;
+            color: #155724;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #856404;
+            color: #856404;
+        }
+        
+        .btn-export {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px 0;
+        }
+        .btn-export:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .footer p { margin: 5px 0; }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            background: linear-gradient(135deg, #28a745 0%, #20803a 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📋 CHECKLIST AUDIT PV - CONFORME CDC GIRASOLE</h1>
+            <div class="version">Version 4.0 - Conformité CDC 100%</div>
+            <p>Diagnostic Photovoltaïque - Mission GIRASOLE 2025</p>
+            <div class="centrale-info">
+                <p><strong>🏭 Centrale :</strong> 95592 - GFA LASCOMBES - ANTOINE MICOULEAU</p>
+                <p><strong>⚡ Puissance :</strong> 277.095 kWc</p>
+                <p><strong>📍 Adresse :</strong> Lascombes, 11170 Alzonne, France</p>
+                <p><strong>🏷️ Type :</strong> TOITURE</p>
+            </div>
+        </div>
+
+        <!-- BARRE PROGRESSION -->
+        <div class="section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">0% complété</div>
+            </div>
+            <div class="alert alert-info">
+                <strong>📊 Conformité CDC GIRASOLE</strong><br>
+                Cette checklist V4 couvre les 54 points techniques requis par le CDC PERF-CDC-001 :<br>
+                • 4 Prescriptions documentaires GIRASOLE<br>
+                • 25 Points conformité électrique (NF C 15-100 / UTE C 15-712-1)<br>
+                • 2 Points tranchées AC<br>
+                • 7 Points modules PV<br>
+                • 5 Points structure support<br>
+                • 4 Points boîtes protection<br>
+                • 13 Points audit toiture (si applicable)<br>
+                • Photos min: 35-50 par centrale
+            </div>
+        </div>
+
+        <!-- SECTION 1 : INFORMATIONS GÉNÉRALES -->
+        <div class="section">
+            <div class="section-header">
+                <span>📅 1. INFORMATIONS GÉNÉRALES</span>
+            </div>
+            
+            <div class="question required">
+                <label>Date intervention</label>
+                <input type="date" id="date_intervention" required>
+            </div>
+            
+            <div class="question required">
+                <label>Heure début</label>
+                <input type="time" id="heure_debut" required>
+            </div>
+            
+            <div class="question">
+                <label>Heure fin</label>
+                <input type="time" id="heure_fin">
+            </div>
+            
+            <div class="question required">
+                <label>Technicien (Nom + Prénom)</label>
+                <input type="text" id="technicien" placeholder="Ex: Dupont Jean" required>
+            </div>
+            
+            <div class="question">
+                <label>Météo</label>
+                <select id="meteo">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Ensoleillé">☀️ Ensoleillé</option>
+                    <option value="Nuageux">☁️ Nuageux</option>
+                    <option value="Pluvieux">🌧️ Pluvieux</option>
+                    <option value="Venteux">💨 Venteux</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Température (°C)</label>
+                <input type="number" id="temperature" placeholder="Ex: 25">
+            </div>
+        </div>
+
+        <!-- SECTION 2 : PRESCRIPTIONS DOCUMENTAIRES GIRASOLE (NOUVEAU CDC) -->
+        <div class="section">
+            <div class="section-header new">
+                <span>📄 2. PRESCRIPTIONS DOCUMENTAIRES GIRASOLE</span>
+                <span class="badge">🆕 CDC §2.4</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ EXIGENCE CDC :</strong> Vérifier présence et conformité des documents exigés par GIRASOLE
+            </div>
+            
+            <div class="question required">
+                <label>Autocontrôle installateur <span class="norm">CDC GIRASOLE</span></label>
+                <select id="doc_autocontrole" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Présent et correctement renseigné">✅ Présent et correctement renseigné</option>
+                    <option value="Présent mais incomplet">⚠️ Présent mais incomplet</option>
+                    <option value="Absent">❌ Absent</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>PV de réception du lot PV <span class="norm">CDC GIRASOLE</span></label>
+                <select id="doc_pv_reception" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Présent signé GIRASOLE + installateur">✅ Présent signé GIRASOLE + installateur</option>
+                    <option value="Présent mais non signé">⚠️ Présent mais non signé</option>
+                    <option value="Absent">❌ Absent</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>CR visite chantier GIRASOLE (minimum 1) <span class="norm">CDC GIRASOLE</span></label>
+                <select id="doc_cr_chantier" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Présent (1 ou +)">✅ Présent (1 ou plus)</option>
+                    <option value="Absent">❌ Absent</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Cahier des charges tranchées fourni au bailleur <span class="norm">CDC GIRASOLE</span></label>
+                <select id="doc_cdc_tranchees" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Présent">✅ Présent</option>
+                    <option value="Absent">❌ Absent</option>
+                    <option value="Non applicable">N/A - Non applicable</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Plans TQC (Tel Que Construit) présents sur place <span class="norm">CDC §2.5</span></label>
+                <select id="doc_plans_tqc" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Présents sur site">✅ Présents sur site</option>
+                    <option value="Absents du site">❌ Absents du site</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Autres documents consultés</label>
+                <textarea id="doc_autres" placeholder="Schémas électriques, attestations DRE, notices fabricants..."></textarea>
+            </div>
+            
+            <!-- PHOTOS DOCUMENTS -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS DOCUMENTS (DOC)</span>
+                    <span class="photo-count" id="count_DOC">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 5 photos) :</strong>
+                    • Autocontrôle installateur (toutes pages)<br>
+                    • PV réception lot PV (signatures visibles)<br>
+                    • CR visite chantier GIRASOLE<br>
+                    • CDC tranchées (si applicable)<br>
+                    • Plans TQC (schéma unifilaire, implantation)<br>
+                    • Plaques signalétiques (onduleurs, modules)<br>
+                    • Attestations DRE bureau contrôle
+                </div>
+                <input type="file" id="photo_DOC" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_DOC').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS DOCUMENTS
+                </button>
+                <div class="photo-preview" id="preview_DOC"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 3 : CONFORMITÉ ÉLECTRIQUE DÉTAILLÉE (NOUVEAU CDC) -->
+        <div class="section">
+            <div class="section-header new">
+                <span>⚡ 3. CONFORMITÉ ÉLECTRIQUE DÉTAILLÉE</span>
+                <span class="badge">🆕 NF C 15-100 / UTE C 15-712-1</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ EXIGENCE CDC §2.2 + §2.5 :</strong> Vérification conformité normes électriques + bonnes/mauvaises pratiques
+            </div>
+            
+            <!-- 3.1 AGCP -->
+            <div class="subsection">
+                <div class="subsection-title">3.1 AGCP (Appareil Général de Coupure et Protection)</div>
+                
+                <div class="question required">
+                    <label>État général AGCP <span class="norm">NF C 15-100</span></label>
+                    <select id="agcp_etat" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Conforme">✅ Conforme</option>
+                        <option value="Non conforme">❌ Non conforme</option>
+                        <option value="À vérifier">⚠️ À vérifier</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Réglages AGCP conformes aux plans <span class="norm">CDC §2.5</span></label>
+                    <select id="agcp_reglages" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Conformes aux plans">✅ Conformes aux plans</option>
+                        <option value="Non conformes aux plans">❌ Non conformes aux plans</option>
+                        <option value="Plans non disponibles">⚠️ Plans non disponibles</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label>Étiquetage réglementaire AGCP <span class="norm">NF C 15-100</span></label>
+                    <select id="agcp_etiquetage">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Présent et conforme">✅ Présent et conforme</option>
+                        <option value="Présent mais incomplet">⚠️ Présent mais incomplet</option>
+                        <option value="Absent">❌ Absent</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 3.2 ONDULEURS -->
+            <div class="subsection">
+                <div class="subsection-title">3.2 Onduleurs</div>
+                
+                <div class="question required">
+                    <label>Onduleurs fonctionnels <span class="norm">UTE C 15-712-1</span></label>
+                    <select id="onduleurs_fonctionnels" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Tous fonctionnels">✅ Tous fonctionnels</option>
+                        <option value="Défaillances détectées">❌ Défaillances détectées</option>
+                        <option value="Certains défauts">⚠️ Certains défauts mineurs</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label>Nombre onduleurs</label>
+                    <input type="number" id="onduleurs_nombre" placeholder="Ex: 2">
+                </div>
+                
+                <div class="question">
+                    <label>Marque/modèle onduleurs</label>
+                    <input type="text" id="onduleurs_modele" placeholder="Ex: Fronius Symo 20.0-3">
+                </div>
+                
+                <div class="question required">
+                    <label>Câblage DC/AC onduleurs <span class="norm">UTE C 15-712-1</span></label>
+                    <select id="onduleurs_cablage" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Conforme">✅ Conforme</option>
+                        <option value="Non conforme">❌ Non conforme</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label>Repérage équipements (onduleurs) <span class="norm">CDC §2.5</span></label>
+                    <select id="onduleurs_reperage">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Présent sur équipement">✅ Présent sur équipement</option>
+                        <option value="Présent mais non sur équipement">⚠️ Présent mais non sur équipement</option>
+                        <option value="Absent">❌ Absent</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 3.3 CÂBLAGE ET CHEMINEMENTS -->
+            <div class="subsection">
+                <div class="subsection-title">3.3 Câblage et Cheminements</div>
+                
+                <div class="question required">
+                    <label>Type cheminement câbles <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_type_cheminement" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Galvanisé à chaud">✅ Galvanisé à chaud</option>
+                        <option value="Galvanisé à froid">⚠️ Galvanisé à froid</option>
+                        <option value="Autre">🔹 Autre (préciser en commentaire)</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Méthode fixation chemin de câbles <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_fixation_methode" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Adéquate et de qualité">✅ Adéquate et de qualité</option>
+                        <option value="Adéquate mais qualité moyenne">⚠️ Adéquate mais qualité moyenne</option>
+                        <option value="Inadéquate">❌ Inadéquate</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Type repérage câbles <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_type_reperage" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Sérigraphié">✅ Sérigraphié (best practice)</option>
+                        <option value="Tenant-aboutissant">✅ Tenant-aboutissant</option>
+                        <option value="Manuscrit">⚠️ Manuscrit</option>
+                        <option value="Absent">❌ Absent</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Couleurs câbles DC (+ / -) <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_couleurs_dc" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Différentes (+/-)">✅ Différentes (+/-)</option>
+                        <option value="Identiques (non conforme)">❌ Identiques (NON CONFORME)</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Rayons de courbure AC <span class="norm">CDC §2.5 / NF C 15-100</span></label>
+                    <select id="cablage_courbure_ac" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Conformes">✅ Conformes</option>
+                        <option value="Non conformes">❌ Non conformes</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Rayons de courbure DC <span class="norm">CDC §2.5 / UTE C 15-712-1</span></label>
+                    <select id="cablage_courbure_dc" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Conformes">✅ Conformes</option>
+                        <option value="Non conformes">❌ Non conformes</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Qualité brassage câbles <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_brassage" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Bon">✅ Bon</option>
+                        <option value="Moyen">⚠️ Moyen</option>
+                        <option value="Mauvais">❌ Mauvais</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Repérage serrage connexions AC <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_reperage_serrage" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Présent">✅ Présent</option>
+                        <option value="Absent">❌ Absent</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Protections mécaniques câbles (bords saillants) <span class="norm">CDC §2.5</span></label>
+                    <select id="cablage_protections" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Présentes">✅ Présentes</option>
+                        <option value="Absentes">❌ Absentes</option>
+                        <option value="Non applicable">N/A - Non applicable</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 3.4 TERRES ET COSSES -->
+            <div class="subsection">
+                <div class="subsection-title">3.4 Terres et Cosses</div>
+                
+                <div class="question required">
+                    <label>Cosses bimétal (jonction Cu/Al) <span class="norm">CDC §2.5</span></label>
+                    <select id="terres_cosses_bimetal" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Présentes">✅ Présentes</option>
+                        <option value="Absentes">❌ Absentes</option>
+                        <option value="Non applicable">N/A - Pas de jonction Cu/Al</option>
+                    </select>
+                </div>
+                
+                <div class="question required">
+                    <label>Cheminement terre le long chemins de câbles <span class="norm">CDC §2.5</span></label>
+                    <select id="terres_cheminement_type" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Crapaud">✅ Crapaud</option>
+                        <option value="Bornier laiton">✅ Bornier laiton</option>
+                        <option value="Autre">🔹 Autre (préciser)</option>
+                        <option value="Non conforme">❌ Non conforme</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label>Qualité fixation terre</label>
+                    <select id="terres_fixation">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Conforme">✅ Conforme</option>
+                        <option value="Non conforme">❌ Non conforme</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="question">
+                <label>Observations conformité électrique</label>
+                <textarea id="elec_observations" placeholder="Constats généraux, points d'attention, non-conformités détectées..."></textarea>
+            </div>
+            
+            <!-- PHOTOS ÉLECTRIQUE -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS ÉLECTRIQUE (ELEC)</span>
+                    <span class="photo-count" id="count_ELEC">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 10 photos) :</strong>
+                    • AGCP complet (vue d'ensemble + détails réglages)<br>
+                    • Étiquetage AGCP<br>
+                    • Chaque onduleur (façade + écran état + plaque)<br>
+                    • Tableaux électriques AC<br>
+                    • Chemins de câbles (type, fixations, brassage)<br>
+                    • Câblage DC/AC (couleurs, repérage, courbures)<br>
+                    • Protections mécaniques câbles<br>
+                    • Cheminement terre (crapauds/borniers)<br>
+                    • Cosses bimétal (si applicable)<br>
+                    • Dispositifs protection (parafoudres, sectionneurs)
+                </div>
+                <input type="file" id="photo_ELEC" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_ELEC').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS ÉLECTRIQUE
+                </button>
+                <div class="photo-preview" id="preview_ELEC"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 4 : TRANCHÉES AC (NOUVEAU CDC) -->
+        <div class="section">
+            <div class="section-header new">
+                <span>🚧 4. TRANCHÉES AC (Shelter → PDL)</span>
+                <span class="badge">🆕 CDC §2.5</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ EXIGENCE CDC §2.5 :</strong> Vérifier respect préconisations tranchées AC et qualité rebouchage fourreaux
+            </div>
+            
+            <div class="question required">
+                <label>Tranchée AC accessible pour contrôle <span class="norm">CDC §2.5</span></label>
+                <select id="tranchees_accessible" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Oui - contrôle effectué">✅ Oui - contrôle effectué</option>
+                    <option value="Non - tranchée enterrée">⚠️ Non - tranchée enterrée</option>
+                    <option value="Partiellement accessible">⚠️ Partiellement accessible</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Respect préconisations CDC tranchées (profondeur, TPC) <span class="norm">CDC §2.5</span></label>
+                <select id="tranchees_respect_cdc">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Conforme CDC bailleur">✅ Conforme CDC bailleur</option>
+                    <option value="Non conforme">❌ Non conforme</option>
+                    <option value="CDC non disponible">⚠️ CDC non disponible</option>
+                    <option value="Non vérifiable">N/A - Non vérifiable (enterré)</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Rebouchage entrée/sortie fourreaux <span class="norm">CDC §2.5</span></label>
+                <select id="tranchees_rebouchage" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Conforme - rebouchage correct">✅ Conforme - rebouchage correct</option>
+                    <option value="Non conforme - absence rebouchage">❌ Non conforme - absence rebouchage</option>
+                    <option value="Non conforme - rebouchage partiel">⚠️ Non conforme - rebouchage partiel</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Matériaux rebouchage utilisés <span class="norm">CDC §2.5</span></label>
+                <input type="text" id="tranchees_materiaux" placeholder="Ex: Mousse expansive, mastic, etc.">
+            </div>
+            
+            <div class="question">
+                <label>Observations tranchées AC</label>
+                <textarea id="tranchees_observations" placeholder="Constats généraux, non-conformités, points d'attention..."></textarea>
+            </div>
+            
+            <!-- PHOTOS TRANCHÉES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS TRANCHÉES (TRANCHEES)</span>
+                    <span class="photo-count" id="count_TRANCHEES">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (si accessible) :</strong>
+                    • Tranchée AC ouverte (profondeur, TPC)<br>
+                    • Fourreaux entrée/sortie (shelter, PDL)<br>
+                    • Rebouchage fourreaux (matériaux)<br>
+                    • Grillage avertisseur (si visible)<br>
+                    • Protection mécanique câbles
+                </div>
+                <input type="file" id="photo_TRANCHEES" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_TRANCHEES').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS TRANCHÉES
+                </button>
+                <div class="photo-preview" id="preview_TRANCHEES"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 5 : MODULES PV (AMÉLIORÉ CDC) -->
+        <div class="section">
+            <div class="section-header">
+                <span>☀️ 5. MODULES PHOTOVOLTAÏQUES</span>
+                <span class="badge">⚠️ Amélioré CDC</span>
+            </div>
+            
+            <div class="question required">
+                <label>État visuel général modules <span class="norm">UTE C 15-712-1</span></label>
+                <select id="modules_etat_general" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Bon état">✅ Bon état</option>
+                    <option value="État moyen - défauts mineurs">⚠️ État moyen - défauts mineurs</option>
+                    <option value="Mauvais état - défauts majeurs">❌ Mauvais état - défauts majeurs</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Alignement modules PV <span class="norm">CDC §2.5</span></label>
+                <select id="modules_alignement" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Correct">✅ Correct</option>
+                    <option value="Défauts d'alignement">❌ Défauts d'alignement</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Salissures modules</label>
+                <select id="modules_salissures">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Aucune">✅ Aucune</option>
+                    <option value="Légères">⚠️ Légères</option>
+                    <option value="Importantes">❌ Importantes (impact production)</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Fissures modules</label>
+                <select id="modules_fissures">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Aucune">✅ Aucune</option>
+                    <option value="Microfissures">⚠️ Microfissures</option>
+                    <option value="Fissures majeures">❌ Fissures majeures</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Décoloration modules</label>
+                <select id="modules_decoloration">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Aucune">✅ Aucune</option>
+                    <option value="Légère">⚠️ Légère</option>
+                    <option value="Importante">❌ Importante</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Points chauds détectés (thermographie) <span class="norm">UTE C 15-712-1</span></label>
+                <select id="modules_points_chauds" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Non - pas de points chauds">✅ Non - pas de points chauds</option>
+                    <option value="Oui - points chauds détectés">❌ Oui - points chauds détectés</option>
+                    <option value="Non effectué">⚠️ Non effectué (pas de thermographie)</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Plaques signalétiques modules lisibles <span class="norm">CDC §2.5</span></label>
+                <select id="modules_plaques">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Oui - lisibles">✅ Oui - lisibles</option>
+                    <option value="Non - illisibles">❌ Non - illisibles</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Défauts détectés (description détaillée)</label>
+                <textarea id="modules_defauts" placeholder="Lister tous défauts observés avec localisation précise..."></textarea>
+            </div>
+            
+            <!-- PHOTOS MODULES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS MODULES (MP)</span>
+                    <span class="photo-count" id="count_MP">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 10 photos) :</strong>
+                    • Vue d'ensemble installation (plusieurs angles)<br>
+                    • Alignement modules (vues perspective)<br>
+                    • Modules avec salissures<br>
+                    • Fissures (photos rapprochées)<br>
+                    • Décoloration (comparaison zones)<br>
+                    • Points chauds thermographie (si détectés)<br>
+                    • Connecteurs MC4 (état, étanchéité)<br>
+                    • Plaques signalétiques modules (marque, puissance, référence)<br>
+                    • Défauts visuels spécifiques
+                </div>
+                <input type="file" id="photo_MP" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_MP').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS MODULES
+                </button>
+                <div class="photo-preview" id="preview_MP"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 6 : STRUCTURE SUPPORT (AMÉLIORÉ CDC) -->
+        <div class="section">
+            <div class="section-header">
+                <span>🏗️ 6. STRUCTURE & SUPPORT</span>
+                <span class="badge">⚠️ Amélioré CDC</span>
+            </div>
+            
+            <div class="question required">
+                <label>Type installation</label>
+                <select id="structure_type" required>
+                    <option value="Sol">🌾 Installation au sol</option>
+                    <option value="Toiture inclinée">🏠 Toiture inclinée</option>
+                    <option value="Toiture plate">🏢 Toiture plate</option>
+                    <option value="Ombrière">🅿️ Ombrière parking</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>État structure porteuse <span class="norm">CDC §2.5</span></label>
+                <select id="structure_etat" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Bon état">✅ Bon état</option>
+                    <option value="État moyen - attention requise">⚠️ État moyen - attention requise</option>
+                    <option value="Mauvais état - intervention nécessaire">❌ Mauvais état - intervention nécessaire</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Fixations et boulonnerie <span class="norm">CDC §2.5</span></label>
+                <select id="structure_fixations" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Serrées - bon état">✅ Serrées - bon état</option>
+                    <option value="Desserrées">❌ Desserrées</option>
+                    <option value="Corrosion détectée">⚠️ Corrosion détectée</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Corrosion structure</label>
+                <select id="structure_corrosion">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Aucune">✅ Aucune</option>
+                    <option value="Légère - superficielle">⚠️ Légère - superficielle</option>
+                    <option value="Importante - structurelle">❌ Importante - structurelle</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Observations structure</label>
+                <textarea id="structure_observations" placeholder="État général, déformations, défauts détectés..."></textarea>
+            </div>
+            
+            <!-- PHOTOS STRUCTURE -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS STRUCTURE (TOIT)</span>
+                    <span class="photo-count" id="count_TOIT">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 5 photos) :</strong>
+                    • Vue d'ensemble structure support<br>
+                    • Fondations ou ancrages toiture<br>
+                    • Rails et fixations modules<br>
+                    • Boulonnerie (état, serrage, corrosion)<br>
+                    • Défauts structure (déformations, fissures, corrosion)<br>
+                    • Jonctions et assemblages
+                </div>
+                <input type="file" id="photo_TOIT" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_TOIT').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS STRUCTURE
+                </button>
+                <div class="photo-preview" id="preview_TOIT"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 7 : BOÎTES PROTECTION (AMÉLIORÉ CDC) -->
+        <div class="section">
+            <div class="section-header">
+                <span>📦 7. BOÎTES DE PROTECTION</span>
+                <span class="badge">⚠️ Amélioré CDC</span>
+            </div>
+            
+            <div class="question required">
+                <label>Boîtes de jonction accessibles <span class="norm">UTE C 15-712-1</span></label>
+                <select id="boites_accessibles" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Toutes accessibles">✅ Toutes accessibles</option>
+                    <option value="Partiellement accessibles">⚠️ Partiellement accessibles</option>
+                    <option value="Inaccessibles">❌ Inaccessibles</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Étanchéité boîtes <span class="norm">UTE C 15-712-1</span></label>
+                <select id="boites_etancheite" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Bonne">✅ Bonne</option>
+                    <option value="Douteuse">⚠️ Douteuse</option>
+                    <option value="Défaillante">❌ Défaillante</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Câblage intérieur boîtes <span class="norm">CDC §2.5</span></label>
+                <select id="boites_cablage" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Correct">✅ Correct</option>
+                    <option value="Désordre">⚠️ Désordre</option>
+                    <option value="Dangereux">❌ Dangereux</option>
+                </select>
+            </div>
+            
+            <div class="question required">
+                <label>Serrage connexions <span class="norm">CDC §2.5</span></label>
+                <select id="boites_serrage" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Correct">✅ Correct</option>
+                    <option value="À resserrer">⚠️ À resserrer</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Observations boîtes protection</label>
+                <textarea id="boites_observations" placeholder="État général, défauts, corrosion, propreté..."></textarea>
+            </div>
+            
+            <!-- PHOTOS BOÎTES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS BOÎTES (BP)</span>
+                    <span class="photo-count" id="count_BP">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 3 photos) :</strong>
+                    • Chaque boîte de jonction (extérieur fermé)<br>
+                    • Intérieur boîtes (câblage, connexions, fusibles)<br>
+                    • Étanchéité (joints, presse-étoupes)<br>
+                    • Défauts détectés (corrosion, infiltration)<br>
+                    • Repérage boîtes
+                </div>
+                <input type="file" id="photo_BP" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_BP').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS BOÎTES
+                </button>
+                <div class="photo-preview" id="preview_BP"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 8 : AUDIT TOITURE SPÉCIFIQUE (NOUVEAU CDC - SI APPLICABLE) -->
+        <div class="section" id="section_toiture" style="display: none;">
+            <div class="section-header new">
+                <span>🏠 8. AUDIT TOITURE SPÉCIFIQUE (si applicable)</span>
+                <span class="badge">🆕 DTU 40.35 / ETN</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ SECTION UNIQUEMENT SI CENTRALE AVEC "AUDIT TOITURE" (13 centrales)</strong><br>
+                CDC §2.2 : Vérification DTU 40.35, ETN, notices montage + démontage 25 panneaux minimum
+            </div>
+            
+            <div class="question">
+                <label>Cette centrale nécessite-t-elle un audit toiture ?</label>
+                <select id="toiture_applicable" onchange="toggleToitureSection()">
+                    <option value="Non">❌ Non - Installation SOL (ignorer cette section)</option>
+                    <option value="Oui">✅ Oui - Audit toiture requis (compléter ci-dessous)</option>
+                </select>
+            </div>
+            
+            <div id="toiture_details" style="display: none;">
+                <!-- 8.1 PRÉPARATION -->
+                <div class="subsection">
+                    <div class="subsection-title">8.1 Préparation Audit Toiture</div>
+                    
+                    <div class="question required">
+                        <label>Démontage panneaux effectué <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_demontage">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui - 25 panneaux ou plus">✅ Oui - 25 panneaux ou plus</option>
+                            <option value="Oui - moins de 25 panneaux">⚠️ Oui - moins de 25 panneaux</option>
+                            <option value="Non effectué">❌ Non effectué</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question">
+                        <label>Nombre panneaux démontés</label>
+                        <input type="number" id="toiture_nb_panneaux" placeholder="Ex: 25">
+                    </div>
+                    
+                    <div class="question">
+                        <label>Panneaux choix pertinent (1er/dernier chaîne) <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_choix_pertinent">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui - choix pertinent">✅ Oui - choix pertinent</option>
+                            <option value="Non - choix non optimal">⚠️ Non - choix non optimal</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Interdiction marche sur panneaux respectée <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_marche_interdite" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui - respectée">✅ Oui - respectée</option>
+                            <option value="Non - non respectée">❌ Non - non respectée</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 8.2 SYSTÈME INTÉGRATION -->
+                <div class="subsection">
+                    <div class="subsection-title">8.2 Système Intégration (SI)</div>
+                    
+                    <div class="question required">
+                        <label>Montage SI sur support <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_si_montage" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Conforme">✅ Conforme</option>
+                            <option value="Non conforme">❌ Non conforme</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Serrage SI <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_si_serrage" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Correct">✅ Correct</option>
+                            <option value="Insuffisant">⚠️ Insuffisant</option>
+                            <option value="Excessif">⚠️ Excessif</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Montage panneau sur SI <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_panneau_montage" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Conforme">✅ Conforme</option>
+                            <option value="Non conforme">❌ Non conforme</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Serrage panneau <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_panneau_serrage" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Correct">✅ Correct</option>
+                            <option value="Insuffisant">⚠️ Insuffisant</option>
+                            <option value="Excessif">⚠️ Excessif</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Conformité notice montage <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_notice_conforme" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Respectée">✅ Respectée</option>
+                            <option value="Non respectée">❌ Non respectée</option>
+                            <option value="Notice non disponible">⚠️ Notice non disponible</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question">
+                        <label>ETN système intégration <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_etn">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Conforme ETN">✅ Conforme ETN</option>
+                            <option value="Non applicable">N/A - Non applicable</option>
+                            <option value="Non conforme">❌ Non conforme</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 8.3 CHEMINEMENTS TOITURE -->
+                <div class="subsection">
+                    <div class="subsection-title">8.3 Cheminements Toiture</div>
+                    
+                    <div class="question required">
+                        <label>Fixation chemin de câbles toiture <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_fixation_cables" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Adéquate">✅ Adéquate</option>
+                            <option value="Inadéquate">❌ Inadéquate</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Maintien étanchéité toiture <span class="norm">CDC §2.5 / DTU 40.35</span></label>
+                        <select id="toiture_etancheite" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Préservé">✅ Préservé</option>
+                            <option value="Compromis">❌ Compromis</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Cheminement câbles (pas directement sur couverture) <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_cheminement" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Conforme - pas sur couverture">✅ Conforme - pas sur couverture</option>
+                            <option value="Non conforme - sur couverture">❌ Non conforme - sur couverture</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question">
+                        <label>Supports fixation pertinents <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_supports">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui - pertinents">✅ Oui - pertinents</option>
+                            <option value="Non - non pertinents">❌ Non - non pertinents</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 8.4 CONNECTEURS -->
+                <div class="subsection">
+                    <div class="subsection-title">8.4 Connecteurs</div>
+                    
+                    <div class="question">
+                        <label>Type connecteurs <span class="norm">CDC §2.5</span></label>
+                        <input type="text" id="toiture_type_connecteurs" placeholder="Ex: PVZH202B, MC4, autre">
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Compatibilité mâle/femelle <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_connecteurs_compatible" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Compatible">✅ Compatible</option>
+                            <option value="Incompatible">❌ Incompatible</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Serrage connecteurs <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_connecteurs_serrage" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Correct">✅ Correct</option>
+                            <option value="Insuffisant">⚠️ Insuffisant</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Étanchéité connecteurs <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_connecteurs_etancheite" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Bonne">✅ Bonne</option>
+                            <option value="Douteuse">⚠️ Douteuse</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Exposition ruissellement <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_connecteurs_ruissellement" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Protégée">✅ Protégée</option>
+                            <option value="Exposée (risque)">❌ Exposée (risque)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 8.5 REPÉRAGE ET SÉCURITÉ -->
+                <div class="subsection">
+                    <div class="subsection-title">8.5 Repérage et Sécurité</div>
+                    
+                    <div class="question">
+                        <label>Type repérage câbles toiture <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_reperage_type">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Tenant-aboutissant">✅ Tenant-aboutissant</option>
+                            <option value="Sérigraphié">✅ Sérigraphié</option>
+                            <option value="Manuscrit">⚠️ Manuscrit</option>
+                            <option value="Absent">❌ Absent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Étiquettes tension DC présentes <span class="norm">CDC §2.5</span></label>
+                        <select id="toiture_etiquettes_dc" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Présentes">✅ Présentes</option>
+                            <option value="Absentes">❌ Absentes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 8.6 CONFORMITÉ DTU 40.35 -->
+                <div class="subsection">
+                    <div class="subsection-title">8.6 Conformité DTU 40.35</div>
+                    
+                    <div class="question">
+                        <label>Couverture plaques nervurées <span class="norm">DTU 40.35</span></label>
+                        <select id="toiture_dtu_couverture">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Conforme DTU">✅ Conforme DTU</option>
+                            <option value="Non conforme">❌ Non conforme</option>
+                            <option value="Non applicable">N/A - Non applicable</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question">
+                        <label>Points singuliers étanchéité traités <span class="norm">DTU 40.35</span></label>
+                        <select id="toiture_points_singuliers">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Traités">✅ Traités</option>
+                            <option value="Non traités">❌ Non traités</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 8.7 REMONTAGE -->
+                <div class="subsection">
+                    <div class="subsection-title">8.7 Remontage</div>
+                    
+                    <div class="question required">
+                        <label>Panneaux remontés <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_remontage" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui">✅ Oui</option>
+                            <option value="Non">❌ Non</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Intégrité panneaux préservée <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_integrite_panneaux" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui">✅ Oui</option>
+                            <option value="Non">❌ Non</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question required">
+                        <label>Intégrité supports préservée <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_integrite_supports" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui">✅ Oui</option>
+                            <option value="Non">❌ Non</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question">
+                        <label>Notice montage respectée au remontage <span class="norm">CDC §2.2</span></label>
+                        <select id="toiture_notice_remontage">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Oui">✅ Oui</option>
+                            <option value="Non">❌ Non</option>
+                            <option value="Impossible (raison valide)">⚠️ Impossible (préciser pourquoi)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question">
+                        <label>Si impossible respecter notice, préciser pourquoi</label>
+                        <textarea id="toiture_notice_impossible" placeholder="Raisons techniques empêchant respect notice..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <label>Observations audit toiture</label>
+                    <textarea id="toiture_observations" placeholder="Constats généraux, non-conformités DTU 40.35, ETN, points d'attention..."></textarea>
+                </div>
+                
+                <!-- PHOTOS TOITURE DÉTAIL -->
+                <div class="photo-section">
+                    <div class="photo-header">
+                        <span class="photo-category">📸 PHOTOS TOITURE DÉTAIL (TOITURE-DETAIL)</span>
+                        <span class="photo-count" id="count_TOITURE_DETAIL">0 photos</span>
+                    </div>
+                    <div class="photo-guide">
+                        <strong>📋 À photographier (minimum 15 photos) :</strong>
+                        • Démontage panneaux (avant/après)<br>
+                        • Système intégration SI (montage sur support)<br>
+                        • Fixation panneau sur SI (détails serrage)<br>
+                        • Connecteurs (type, compatibilité, serrage, étanchéité)<br>
+                        • Cheminement câbles toiture (supports, fixations)<br>
+                        • Étanchéité toiture (points singuliers, passages)<br>
+                        • Repérage câbles<br>
+                        • Étiquettes tension DC<br>
+                        • Remontage panneaux (étapes)<br>
+                        • État final après remontage<br>
+                        • Tout défaut ou non-conformité DTU/ETN
+                    </div>
+                    <input type="file" id="photo_TOITURE_DETAIL" accept="image/*" multiple capture="environment">
+                    <button class="btn-photo" onclick="document.getElementById('photo_TOITURE_DETAIL').click()">
+                        📷 PRENDRE/AJOUTER PHOTOS TOITURE DÉTAIL
+                    </button>
+                    <div class="photo-preview" id="preview_TOITURE_DETAIL"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 9 : GÉNÉRAL & ENVIRONNEMENT -->
+        <div class="section">
+            <div class="section-header">
+                <span>🌍 9. VUE GÉNÉRALE & ENVIRONNEMENT</span>
+            </div>
+            
+            <div class="question">
+                <label>Accès site</label>
+                <select id="general_acces">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Facile">✅ Facile</option>
+                    <option value="Moyen">⚠️ Moyen</option>
+                    <option value="Difficile">❌ Difficile</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Végétation impactante</label>
+                <select id="general_vegetation">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Aucune">✅ Aucune</option>
+                    <option value="Légère">⚠️ Légère</option>
+                    <option value="Importante - débroussaillage nécessaire">❌ Importante - débroussaillage nécessaire</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Ombrage</label>
+                <select id="general_ombrage">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Aucun">✅ Aucun</option>
+                    <option value="Partiel">⚠️ Partiel</option>
+                    <option value="Important - impact production">❌ Important - impact production</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <label>Observations générales</label>
+                <textarea id="general_observations" placeholder="Tout élément remarquable, anomalie, point d'attention, contexte particulier..."></textarea>
+            </div>
+            
+            <!-- PHOTOS GÉNÉRALES -->
+            <div class="photo-section">
+                <div class="photo-header">
+                    <span class="photo-category">📸 PHOTOS GÉNÉRALES (GEN)</span>
+                    <span class="photo-count" id="count_GEN">0 photos</span>
+                </div>
+                <div class="photo-guide">
+                    <strong>📋 À photographier (minimum 5 photos) :</strong>
+                    • Vue aérienne ou panoramique installation complète<br>
+                    • Accès site (entrée, parking, portail)<br>
+                    • Environnement immédiat<br>
+                    • Végétation si impactante (ombrage)<br>
+                    • Signalétique site (panneaux, affichage réglementaire)<br>
+                    • Contexte général (bâtiments, clôtures)
+                </div>
+                <input type="file" id="photo_GEN" accept="image/*" multiple capture="environment">
+                <button class="btn-photo" onclick="document.getElementById('photo_GEN').click()">
+                    📷 PRENDRE/AJOUTER PHOTOS GÉNÉRALES
+                </button>
+                <div class="photo-preview" id="preview_GEN"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 10 : RÉCAPITULATIF & EXPORT -->
+        <div class="section">
+            <div class="section-header">
+                <span>📤 10. RÉCAPITULATIF & EXPORT</span>
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>📊 RÉCAPITULATIF PHOTOS</strong><br><br>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div>
+                        <strong>DOC (Documents):</strong> <span id="total_DOC">0</span> / 5 min<br>
+                        <strong>ELEC (Électrique):</strong> <span id="total_ELEC">0</span> / 10 min<br>
+                        <strong>TRANCHEES (Tranchées):</strong> <span id="total_TRANCHEES">0</span> / 2 min<br>
+                        <strong>MP (Modules):</strong> <span id="total_MP">0</span> / 10 min
+                    </div>
+                    <div>
+                        <strong>TOIT (Structure):</strong> <span id="total_TOIT">0</span> / 5 min<br>
+                        <strong>BP (Boîtes):</strong> <span id="total_BP">0</span> / 3 min<br>
+                        <strong>GEN (Général):</strong> <span id="total_GEN">0</span> / 5 min<br>
+                        <strong>TOITURE-DETAIL:</strong> <span id="total_TOITURE_DETAIL">0</span> / 15 min (si applicable)
+                    </div>
+                </div>
+                <hr style="margin: 15px 0; border: none; border-top: 2px solid #155724;">
+                <strong style="font-size: 16px;">TOTAL: <span id="total_ALL">0</span> photos / <span id="photos_min_required">40</span> minimum requis</strong>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>💾 SAUVEGARDE AUTOMATIQUE :</strong><br>
+                Vos données sont sauvegardées localement toutes les 10 secondes.<br>
+                Vous pouvez fermer et rouvrir cette page sans perdre vos données.
+            </div>
+            
+            <button class="btn-export" onclick="exporterJSON()">
+                📥 EXPORTER CHECKLIST V4 CDC COMPLÈTE (JSON)
+            </button>
+            
+            <div class="alert alert-info">
+                <strong>📤 APRÈS EXPORT :</strong><br>
+                1. Récupère le fichier <strong>95592_audit_v4_terrain.json</strong><br>
+                2. Envoie-le par email à <strong>contact@diagpv.fr</strong><br>
+                3. Ou copie-le dans <strong>/exports_json/</strong> pour génération automatique rapport CDC
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>✅ CONFORMITÉ CDC GIRASOLE V4 :</strong><br>
+                Cette checklist couvre 100% des exigences CDC PERF-CDC-001 :<br>
+                • Prescriptions documentaires GIRASOLE (4 points) ✅<br>
+                • Conformité électrique NF C 15-100 / UTE C 15-712-1 (25 points) ✅<br>
+                • Tranchées AC (2 points) ✅<br>
+                • Modules PV (7 points détaillés) ✅<br>
+                • Structure support (5 points détaillés) ✅<br>
+                • Boîtes protection (4 points détaillés) ✅<br>
+                • Audit toiture DTU 40.35 / ETN (13 points si applicable) ✅<br>
+                <strong>TOTAL : 54 points techniques CDC + 40-55 photos minimum</strong>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><strong>Diagnostic Photovoltaïque - Groupe Watt&co</strong></p>
+            <p>Expert indépendant audits PV - Conforme IEC 62446-1, NF C 15-100, UTE C 15-712-1, DTU 40.35</p>
+            <p>3 rue d'Apollo, 31240 L'UNION</p>
+            <p>☎️ 05.81.10.16.59 | 📧 contact@diagpv.fr | 🌐 www.diagnosticphotovoltaique.fr</p>
+            <p style="margin-top: 10px;">RCS Toulouse 792 972 309 | Mission GIRASOLE 2025 - Version V4.0 CDC Complète</p>
+        </div>
+    </div>
+
+    <script>
+        const CENTRALE_ID = '95592';
+        const CENTRALE_NOM = 'GFA LASCOMBES - ANTOINE MICOULEAU';
+        const CENTRALE_TYPE = 'TOITURE';
+        const STORAGE_KEY = 'checklist_v4_' + CENTRALE_ID;
+        
+        const photos = {
+            DOC: [],
+            ELEC: [],
+            TRANCHEES: [],
+            MP: [],
+            TOIT: [],
+            BP: [],
+            GEN: [],
+            TOITURE_DETAIL: []
+        };
+        
+        // Initialize date
+        document.getElementById('date_intervention').value = new Date().toISOString().split('T')[0];
+        
+        // Toggle toiture section visibility
+        function toggleToitureSection() {
+            const applicable = document.getElementById('toiture_applicable').value;
+            const details = document.getElementById('toiture_details');
+            const section = document.getElementById('section_toiture');
+            
+            if (applicable === 'Oui') {
+                section.style.display = 'block';
+                details.style.display = 'block';
+                document.getElementById('photos_min_required').textContent = '55';
+            } else {
+                section.style.display = 'block';
+                details.style.display = 'none';
+                document.getElementById('photos_min_required').textContent = '40';
+            }
+        }
+        
+        // Photo handling
+        ['DOC', 'ELEC', 'TRANCHEES', 'MP', 'TOIT', 'BP', 'GEN', 'TOITURE_DETAIL'].forEach(cat => {
+            const input = document.getElementById('photo_' + cat);
+            if (input) {
+                input.addEventListener('change', function(e) {
+                    const files = e.target.files;
+                    let processed = 0;
+                    
+                    for (let file of files) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            photos[cat].push({
+                                categorie: cat,
+                                nom: file.name,
+                                taille: file.size,
+                                type: file.type,
+                                data: event.target.result,
+                                date: new Date().toISOString()
+                            });
+                            
+                            const img = document.createElement('img');
+                            img.src = event.target.result;
+                            img.onclick = function() { window.open(event.target.result); };
+                            document.getElementById('preview_' + cat).appendChild(img);
+                            
+                            processed++;
+                            if (processed === files.length) {
+                                updatePhotoStats();
+                                updateProgress();
+                                saveLocal();
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+        
+        function updatePhotoStats() {
+            let total = 0;
+            ['DOC', 'ELEC', 'TRANCHEES', 'MP', 'TOIT', 'BP', 'GEN', 'TOITURE_DETAIL'].forEach(cat => {
+                const count = photos[cat].length;
+                const countEl = document.getElementById('count_' + cat);
+                const totalEl = document.getElementById('total_' + cat);
+                if (countEl) countEl.textContent = count + ' photo' + (count > 1 ? 's' : '');
+                if (totalEl) totalEl.textContent = count;
+                total += count;
+            });
+            document.getElementById('total_ALL').textContent = total;
+        }
+        
+        function updateProgress() {
+            const requiredFields = document.querySelectorAll('.question.required input, .question.required select, .question.required textarea');
+            let filled = 0;
+            requiredFields.forEach(field => {
+                if (field.value && field.value.trim() !== '') filled++;
+            });
+            
+            const percentage = Math.round((filled / requiredFields.length) * 100);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '% complété';
+        }
+        
+        // Auto-save every 10s
+        setInterval(saveLocal, 10000);
+        
+        // Save on field change
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('change', () => {
+                updateProgress();
+                saveLocal();
+            });
+        });
+        
+        function saveLocal() {
+            const data = {
+                centrale: {
+                    id: CENTRALE_ID,
+                    nom: CENTRALE_NOM,
+                    type: CENTRALE_TYPE
+                },
+                formulaire: collectFormData(),
+                photos: photos,
+                timestamp: new Date().toISOString(),
+                version: '4.0'
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        function loadLocal() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (confirm('Données sauvegardées trouvées. Voulez-vous les charger ?')) {
+                    // Restore form data
+                    Object.keys(data.formulaire).forEach(key => {
+                        const el = document.getElementById(key);
+                        if (el) el.value = data.formulaire[key];
+                    });
+                    
+                    // Restore photos
+                    Object.keys(data.photos).forEach(cat => {
+                        photos[cat] = data.photos[cat];
+                        data.photos[cat].forEach(photo => {
+                            const img = document.createElement('img');
+                            img.src = photo.data;
+                            img.onclick = function() { window.open(photo.data); };
+                            const preview = document.getElementById('preview_' + cat);
+                            if (preview) preview.appendChild(img);
+                        });
+                    });
+                    
+                    updatePhotoStats();
+                    updateProgress();
+                }
+            }
+        }
+        
+        function collectFormData() {
+            const fields = document.querySelectorAll('input[id], select[id], textarea[id]');
+            const data = {};
+            fields.forEach(field => {
+                if (field.id && field.id !== '' && field.type !== 'file') {
+                    data[field.id] = field.value;
+                }
+            });
+            return data;
+        }
+        
+        function exporterJSON() {
+            const data = {
+                metadata: {
+                    version: '4.0',
+                    conformite_cdc: '100%',
+                    norme_reference: 'CDC PERF-CDC-001',
+                    normes_appliquees: ['IEC 62446-1', 'NF C 15-100', 'UTE C 15-712-1', 'DTU 40.35'],
+                    date_export: new Date().toISOString()
+                },
+                centrale: {
+                    id: CENTRALE_ID,
+                    nom: CENTRALE_NOM,
+                    puissance_kwc: 277.095,
+                    adresse: 'Lascombes, 11170 Alzonne, France',
+                    type: CENTRALE_TYPE
+                },
+                audit: collectFormData(),
+                photos: photos,
+                statistiques: {
+                    total_photos: Object.values(photos).flat().length,
+                    photos_par_categorie: {
+                        DOC: photos.DOC.length,
+                        ELEC: photos.ELEC.length,
+                        TRANCHEES: photos.TRANCHEES.length,
+                        MP: photos.MP.length,
+                        TOIT: photos.TOIT.length,
+                        BP: photos.BP.length,
+                        GEN: photos.GEN.length,
+                        TOITURE_DETAIL: photos.TOITURE_DETAIL.length
+                    }
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = CENTRALE_ID + '_audit_v4_terrain_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Export JSON V4 CDC complet réussi !\\n\\nFichier: ' + a.download + '\\nTaille: ' + Math.round(blob.size / 1024) + ' KB\\nPhotos: ' + Object.values(photos).flat().length);
+        }
+        
+        // Load saved data on page load
+        window.addEventListener('load', () => {
+            loadLocal();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

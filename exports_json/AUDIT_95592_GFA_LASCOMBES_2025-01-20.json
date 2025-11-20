@@ -1,0 +1,189 @@
+{
+  "metadata": {
+    "version": "4.0",
+    "conformite_cdc": "100%",
+    "norme_reference": "CDC PERF-CDC-001",
+    "normes_appliquees": [
+      "IEC 62446-1",
+      "NF C 15-100",
+      "UTE C 15-712-1",
+      "DTU 40.35"
+    ],
+    "date_export": "2025-01-20T15:45:00Z"
+  },
+  "centrale": {
+    "id": "95592",
+    "nom": "GFA LASCOMBES - ANTOINE MICOULEAU",
+    "puissance_kwc": "250",
+    "type_installation": "TOITURE",
+    "adresse": "Exploitation Agricole Lascombes, 82100 Castelsarrasin",
+    "departement": "82"
+  },
+  "audit": {
+    "date_audit": "2025-01-19",
+    "auditeur_nom": "Fabien CORRERA",
+    "conditions_meteo": "Partiellement nuageux, 12°C",
+    "statut_global": "Conforme avec réserves majeures (toiture)",
+    
+    "doc_autocontrole": "Présent et correctement renseigné",
+    "doc_plan_implantation": "Présent et correctement renseigné",
+    "doc_plan_electrique": "Présent et correctement renseigné",
+    "doc_schema_boites": "Présent et correctement renseigné",
+    
+    "cablage_type_cheminement": "Galvanisé à chaud",
+    "cablage_couleurs_dc": "Différentes (+/-)",
+    "cablage_sections_dc": "6 mm² conforme",
+    "cablage_sections_ac": "6 mm² conforme",
+    "cablage_etat_general": "Bon état général",
+    "cablage_fixations": "Conformes - tous les 50cm",
+    "cablage_protection_mecanique": "Présente",
+    "cablage_etancheite_presse_etoupes": "IP65 conforme",
+    "cablage_rayon_courbure": "Respecté",
+    
+    "elec_equipotentielles": "Vérifiée et conforme",
+    "elec_terre_valeur": "25 Ω",
+    "elec_parafoudre_type": "Type II",
+    "elec_etat_coffrets": "Bon état général",
+    "elec_etancheite_coffrets": "IP65 conforme",
+    "elec_etiquetage_presence": "Complet",
+    "elec_etiquetage_qualite": "Lisible et durable",
+    "elec_serrages_borniers": "Vérifiés et serrés",
+    "elec_coupure_dc": "Présents et opérationnels",
+    "elec_protection_dc": "Fusibles 25A présents",
+    "elec_protection_ac": "Disjoncteur 63A présent",
+    "elec_differentiel_sensibilite": "30 mA Type A",
+    "elec_accessibilite": "Facile",
+    "elec_ventilation": "Suffisante",
+    "elec_signalisation": "Présente conforme",
+    "elec_protection_surtension": "SPD Type II installé",
+    "elec_continuite_terre": "Vérifiée < 1 Ω",
+    
+    "tranchees_accessibilite": "Accessible",
+    "tranchees_conformite": "Conforme NF P 98-331 : Profondeur 70cm, fourreau TPC rouge, lit de sable 15cm, grillage avertisseur présent",
+    
+    "modules_etat_general": "Bon état général",
+    "modules_defauts_visibles": "Aucun défaut détecté",
+    "modules_cablage": "Bon état - Boîtes jonction étanches",
+    "modules_connecteurs_mc4": "Correctement serrés et non corrodés",
+    "modules_fixations": "Conformes - Boulons stable",
+    "modules_orientation": "Conforme projet - Sud 25°",
+    "modules_masques_ombrages": "Aucun masque détecté",
+    
+    "structure_etat_general": "Bon état général",
+    "structure_type": "Toiture intégrée",
+    "structure_fixations": "Conformes - Tous serrés",
+    "structure_stabilite": "Stable",
+    "structure_acces_maintenance": "Difficile - Toiture 6m hauteur",
+    
+    "boites_etat_general": "Bon état général",
+    "boites_etancheite": "IP65 conforme",
+    "boites_accessibilite": "Facile (sol)",
+    "boites_cablage_interne": "Conforme - Bien organisé",
+    
+    "toiture_applicable": "Oui",
+    "toiture_demontage": "Oui - 30 panneaux démo ntés (zone test)",
+    "toiture_si_type": "Avis Technique CSTB n°14/12-1234",
+    "toiture_si_validite": "Valide jusqu'à 2027",
+    "toiture_plaques_type": "Fibrociment ondulé",
+    "toiture_plaques_etat": "Corrosion localisée (5 plaques)",
+    "toiture_fixations": "Desserrées sur 3 plaques",
+    "toiture_etancheite": "Défauts localisés (zones corrosion)",
+    "toiture_ecrans": "Présent mais dégradé (20% surface)",
+    "toiture_charpente": "Bon état - Pas d'affaissement",
+    "toiture_risques_infiltration": "Importants (zones corrosion + écrans dégradés)",
+    "toiture_conformite_dtu": "Non conforme (corrosion + fixations)",
+    "toiture_conformite_etn": "Non conforme (écrans dégradés)",
+    
+    "recommandations_prioritaires": "1. URGENT : Remplacement 5 plaques fibrociment corrodées (risque infiltration)\n2. URGENT : Réfection écrans sous-toiture (20% surface dégradée)\n3. PRIORITAIRE : Resserrage fixations (3 plaques instables)\n4. Expertise complémentaire étanchéité recommandée (thermographie drone)\n5. Suivi trimestriel zones à risque durant 1 an",
+    "observations_terrain": "Installation toiture avec défauts structurels identifiés. Risques infiltration confirmés (traces humidité visibles sous certaines plaques). Production normale mais surveillance renforcée nécessaire. Accès difficile (hauteur 6m, échafaudage requis)."
+  },
+  "photos": {
+    "DOC": [
+      {"nom": "DOC_autocontrole.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:15:00Z"},
+      {"nom": "DOC_plan_implantation.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:16:00Z"},
+      {"nom": "DOC_plan_electrique.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:17:00Z"},
+      {"nom": "DOC_schema_boites.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:18:00Z"},
+      {"nom": "DOC_avis_technique_si.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:19:00Z"}
+    ],
+    "ELEC": [
+      {"nom": "ELEC_coffret_principal.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:30:00Z"},
+      {"nom": "ELEC_parafoudre_spd.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:31:00Z"},
+      {"nom": "ELEC_differentiel_30ma.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:32:00Z"},
+      {"nom": "ELEC_mise_a_terre_25ohm.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:33:00Z"},
+      {"nom": "ELEC_cablage_dc_couleurs.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:34:00Z"},
+      {"nom": "ELEC_cablage_ac_6mm.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:35:00Z"},
+      {"nom": "ELEC_borniers_serres.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:36:00Z"},
+      {"nom": "ELEC_presse_etoupes_ip65.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:37:00Z"},
+      {"nom": "ELEC_etiquetage_complet.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:38:00Z"},
+      {"nom": "ELEC_cheminement_galva.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:39:00Z"}
+    ],
+    "TRANCHEES": [
+      {"nom": "TRANCHEES_profondeur_70cm.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:45:00Z"},
+      {"nom": "TRANCHEES_fourreau_tpc_grillage.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T09:46:00Z"}
+    ],
+    "MP": [
+      {"nom": "MP_vue_generale_toiture.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:00:00Z"},
+      {"nom": "MP_etat_modules_1.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:01:00Z"},
+      {"nom": "MP_etat_modules_2.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:02:00Z"},
+      {"nom": "MP_cablage_modules_etanche.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:03:00Z"},
+      {"nom": "MP_connecteurs_mc4_ok.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:04:00Z"},
+      {"nom": "MP_fixations_toiture.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:05:00Z"},
+      {"nom": "MP_orientation_sud_25deg.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:06:00Z"},
+      {"nom": "MP_proprete_modules.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:07:00Z"},
+      {"nom": "MP_boites_jonction_ip65.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:08:00Z"},
+      {"nom": "MP_aucun_masque.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:09:00Z"}
+    ],
+    "TOIT": [
+      {"nom": "TOIT_structure_toiture_integree.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:15:00Z"},
+      {"nom": "TOIT_vue_ensemble_toiture.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:16:00Z"},
+      {"nom": "TOIT_fixations_modules.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:17:00Z"},
+      {"nom": "TOIT_stabilite_ok.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:18:00Z"},
+      {"nom": "TOIT_acces_difficile_6m.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:19:00Z"}
+    ],
+    "BP": [
+      {"nom": "BP_boites_regroupement.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:25:00Z"},
+      {"nom": "BP_etancheite_ip65.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:26:00Z"},
+      {"nom": "BP_cablage_interne_organise.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:27:00Z"}
+    ],
+    "GEN": [
+      {"nom": "GEN_vue_ensemble_batiment.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:35:00Z"},
+      {"nom": "GEN_vue_toiture_sud.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:36:00Z"},
+      {"nom": "GEN_vue_toiture_est.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:37:00Z"},
+      {"nom": "GEN_vue_toiture_ouest.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:38:00Z"},
+      {"nom": "GEN_acces_exploitation.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T10:39:00Z"}
+    ],
+    "TOITURE_DETAIL": [
+      {"nom": "TOIT_DETAIL_demontage_30_panneaux.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:00:00Z"},
+      {"nom": "TOIT_DETAIL_avis_technique_plaque.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:05:00Z"},
+      {"nom": "TOIT_DETAIL_plaques_fibrociment.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:10:00Z"},
+      {"nom": "TOIT_DETAIL_corrosion_plaque_1.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:15:00Z"},
+      {"nom": "TOIT_DETAIL_corrosion_plaque_2.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:20:00Z"},
+      {"nom": "TOIT_DETAIL_corrosion_plaque_3.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:25:00Z"},
+      {"nom": "TOIT_DETAIL_fixation_desserree_1.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:30:00Z"},
+      {"nom": "TOIT_DETAIL_fixation_desserree_2.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:35:00Z"},
+      {"nom": "TOIT_DETAIL_etancheite_defaut.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:40:00Z"},
+      {"nom": "TOIT_DETAIL_ecran_degrade_1.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:45:00Z"},
+      {"nom": "TOIT_DETAIL_ecran_degrade_2.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:50:00Z"},
+      {"nom": "TOIT_DETAIL_trace_humidite.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T11:55:00Z"},
+      {"nom": "TOIT_DETAIL_charpente_ok.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T12:00:00Z"},
+      {"nom": "TOIT_DETAIL_remontage_panneaux.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T12:05:00Z"},
+      {"nom": "TOIT_DETAIL_zone_risque_infiltration.jpg", "data": "data:image/jpeg;base64,/9j/4AAQSkZJRg==", "timestamp": "2025-01-19T12:10:00Z"}
+    ]
+  },
+  "statistiques": {
+    "total_photos": 55,
+    "anomalies_critiques": 0,
+    "anomalies_majeures": 3,
+    "anomalies_mineures": 0,
+    "photos_par_categorie": {
+      "DOC": 5,
+      "ELEC": 10,
+      "TRANCHEES": 2,
+      "MP": 10,
+      "TOIT": 5,
+      "BP": 3,
+      "GEN": 5,
+      "TOITURE_DETAIL": 15
+    }
+  }
+}

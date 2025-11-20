@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Audit Qualité - Hangar Denis Balavoine</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 15px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1a3a6b 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        
+        .header .centrale-info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .header .centrale-info strong {
+            color: #ffd700;
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            height: 6px;
+            border-radius: 3px;
+            margin: 20px 25px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .section {
+            padding: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c5aa0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            font-size: 24px;
+        }
+        
+        .section-subtitle {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .check-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        
+        .check-item.checked {
+            background: #f0f9ff;
+            border-color: #3b82f6;
+        }
+        
+        .check-item.non-conforme {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        
+        .check-item-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .check-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .check-item label {
+            flex: 1;
+            cursor: pointer;
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .check-item select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 8px;
+            background: white;
+        }
+        
+        .check-item textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .photo-zone {
+            margin-top: 10px;
+            padding: 15px;
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 6px;
+        }
+        
+        .photo-zone label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 13px;
+        }
+        
+        .photo-input {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .photo-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 10px 0;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5aa0, #1a3a6b);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .footer {
+            padding: 25px;
+            background: #f9fafb;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .alert {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+            }
+            
+            .section {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+
+<style>
+.alert {
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+#btn-envoyer-api:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+</style>
+
+</head>
+<body>
+    ';
+        
+
+        // Récupération données formulaire
+        const auditeur = document.getElementById('auditeur')?.value || '';
+        const dateAudit = document.getElementById('date-audit')?.value || '';
+        const meteo = document.getElementById('meteo')?.value || '';
+        const temperature = document.getElementById('temperature')?.value || '';
+        
+        if (!auditeur || !dateAudit) {
+            throw new Error('❌ Veuillez renseigner au minimum votre nom et la date');
+        }
+        
+        // Compilation données checklist
+        const checklistData = {
+            auditeur,
+            date_audit: dateAudit,
+            meteo,
+            temperature,
+            horodatage_local: new Date().toISOString(),
+            geolocalisation: await getGeolocation(),
+            points: []
+        };
+        
+        // Récupération tous points contrôle
+        document.querySelectorAll('[data-point-id]').forEach(point => {
+            const pointId = point.getAttribute('data-point-id');
+            const checkbox = point.querySelector('input[type="checkbox"]');
+            const conforme = point.querySelector('input[type="radio"]:checked');
+            const commentaire = point.querySelector('textarea');
+            
+            checklistData.points.push({
+                id: pointId,
+                controle_effectue: checkbox?.checked || false,
+                conforme: conforme?.value || 'N/A',
+                commentaire: commentaire?.value || '',
+                photos_count: (JSON.parse(localStorage.getItem(`photos_${CENTRALE_ID}_${pointId}`) || '[]')).length
+            });
+        });
+        
+        // Préparation FormData
+        const formData = new FormData();
+        formData.append('centrale_id', CENTRALE_ID);
+        formData.append('centrale_nom', CENTRALE_NOM);
+        formData.append('donnees', JSON.stringify(checklistData));
+        
+        statusDiv.innerHTML = '<div class="alert alert-info">📸 Préparation photos...</div>';
+        
+        // Upload toutes photos
+        let totalPhotos = 0;
+        for (const point of checklistData.points) {
+            const photos = JSON.parse(localStorage.getItem(`photos_${CENTRALE_ID}_${point.id}`) || '[]');
+            
+            for (const photoData of photos) {
+                const blob = await fetch(photoData.data).then(res => res.blob());
+                formData.append('photos', blob, `${CENTRALE_ID}_${point.id}_${Date.now()}.jpg`);
+                totalPhotos++;
+            }
+        }
+        
+        statusDiv.innerHTML = `<div class="alert alert-info">☁️ Envoi ${totalPhotos} photos + données vers Cloudflare...</div>`;
+        
+        // Envoi API Cloudflare Workers
+        const response = await fetch(`${API_URL}/api/upload-audit`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Erreur serveur (${response.status})`);
+        }
+        
+        const result = await response.json();
+        
+        // SUCCÈS
+        statusDiv.innerHTML = `
+            <div class="alert alert-success">
+                <strong>✅ AUDIT ENVOYÉ AVEC SUCCÈS !</strong><br><br>
+                <strong>ID Audit :</strong> ${result.audit_id}<br>
+                <strong>Centrale :</strong> ${result.centrale_nom}<br>
+                <strong>Photos reçues :</strong> ${result.photos_recues}<br>
+                <strong>Horodatage :</strong> ${new Date().toLocaleString('fr-FR')}<br><br>
+                <em>✅ Les données ont été reçues par DiagPV et sont stockées de manière sécurisée sur Cloudflare.</em><br>
+                <em>Vous pouvez passer à la centrale suivante.</em>
+            </div>
+        `;
+        
+        btnEnvoyer.innerHTML = '✅ Envoyé avec succès';
+        
+        // Proposer nettoyage LocalStorage
+        setTimeout(() => {
+            if (confirm('Audit envoyé avec succès !\n\nVoulez-vous effacer les données locales de cette centrale ?\n(Recommandé pour libérer mémoire)')) {
+                // Nettoyer seulement cette centrale
+                Object.keys(localStorage).forEach(key => {
+                    if (key.includes(CENTRALE_ID)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                alert('✅ Données locales effacées. Vous pouvez fermer cette page.');
+            }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Erreur envoi audit:', error);
+        
+        statusDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>❌ ERREUR ENVOI</strong><br>
+                ${error.message}<br><br>
+                <strong>📞 Support DiagPV :</strong><br>
+                Adrien PAPPALARDO<br>
+                📱 06 07 29 22 12<br>
+                📧 info@diagnosticphotovoltaique.fr<br><br>
+                <em>⚠️ Vérifiez votre connexion internet et réessayez.<br>
+                Les données restent sauvegardées localement.</em>
+            </div>
+        `;
+        
+        btnEnvoyer.disabled = false;
+        btnEnvoyer.innerHTML = '📤 RÉESSAYER ENVOI';
+    }
+}
+
+// Fonction géolocalisation (optionnelle)
+async function getGeolocation() {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            resolve(null);
+            return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    precision: position.coords.accuracy
+                });
+            },
+            () => resolve(null),
+            { timeout: 5000 }
+        );
+    });
+}
+
+</script>
+
+<div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+    <h3 style="color: white; margin-bottom: 20px; font-size: 24px;">📤 Finaliser et envoyer l'audit</h3>
+    
+    <div class="alert alert-warning">
+        <strong>⚠️ VÉRIFICATIONS AVANT ENVOI :</strong><br>
+        ✓ Toutes les photos importantes sont prises<br>
+        ✓ Les champs obligatoires sont remplis (nom, date)<br>
+        ✓ Les commentaires importants sont notés<br>
+        ✓ Vous avez une connexion internet stable<br><br>
+        <strong>💾 Sauvegarde automatique :</strong> Les données sont sauvegardées localement toutes les 10 secondes.
+    </div>
+    
+    <button id="btn-envoyer-api" onclick="envoyerAuditAPI()" 
+            style="width: 100%; padding: 22px; background: white; 
+                   color: #667eea; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; 
+                   cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                   transition: all 0.3s;">
+        📤 ENVOYER AUDIT COMPLET À DIAGPV
+    </button>
+    
+    <div id="status-envoi" style="margin-top: 20px;"></div>
+    
+    <p style="color: white; font-size: 13px; margin-top: 15px; opacity: 0.9;">
+        🔒 Envoi sécurisé HTTPS vers Cloudflare Workers<br>
+        📞 Support : Adrien 06 07 29 22 12
+    </p>
+</div>
+
+</body>
+</html>
