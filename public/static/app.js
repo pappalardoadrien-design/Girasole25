@@ -38,6 +38,8 @@ function showTab(tabName) {
     loadCentrales();
   } else if (tabName === 'upload') {
     loadUploadForm();
+  } else if (tabName === 'planning') {
+    loadPlanningData();
   } else if (tabName === 'analytics') {
     loadAnalytics();
   }

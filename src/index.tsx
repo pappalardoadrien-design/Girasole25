@@ -239,6 +239,362 @@ app.get('/api/stats/progression', async (c) => {
   }
 })
 
+// ==============================
+// API ROUTES - SOUS-TRAITANTS
+// ==============================
+
+// GET /api/sous-traitants - Liste tous les sous-traitants
+app.get('/api/sous-traitants', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT 
+        st.*,
+        COUNT(DISTINCT t.id) as nb_techniciens,
+        COUNT(DISTINCT om.id) as nb_missions
+      FROM sous_traitants st
+      LEFT JOIN techniciens t ON st.id = t.sous_traitant_id AND t.statut != 'INDISPONIBLE'
+      LEFT JOIN ordres_mission om ON st.id = om.sous_traitant_id AND om.statut NOT IN ('ANNULE', 'TERMINE', 'VALIDE')
+      WHERE st.statut = 'ACTIF'
+      GROUP BY st.id
+      ORDER BY st.nom_entreprise
+    `).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/sous-traitants - Créer nouveau sous-traitant
+app.post('/api/sous-traitants', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { nom_entreprise, email_contact, telephone, adresse, siret, contact_principal } = body
+    
+    if (!nom_entreprise) {
+      return c.json({ success: false, error: 'Nom entreprise requis' }, 400)
+    }
+    
+    const result = await DB.prepare(`
+      INSERT INTO sous_traitants (nom_entreprise, email_contact, telephone, adresse, siret, contact_principal)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(nom_entreprise, email_contact || null, telephone || null, adresse || null, siret || null, contact_principal || null).run()
+    
+    return c.json({ success: true, data: { id: result.meta.last_row_id } })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/sous-traitants/:id - Modifier sous-traitant
+app.put('/api/sous-traitants/:id', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    const body = await c.req.json()
+    const { nom_entreprise, email_contact, telephone, adresse, siret, contact_principal, statut } = body
+    
+    await DB.prepare(`
+      UPDATE sous_traitants 
+      SET nom_entreprise = ?, email_contact = ?, telephone = ?, adresse = ?, siret = ?, contact_principal = ?, statut = ?, date_modification = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(nom_entreprise, email_contact, telephone, adresse, siret, contact_principal, statut || 'ACTIF', id).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ==========================
+// API ROUTES - TECHNICIENS
+// ==========================
+
+// GET /api/techniciens - Liste tous les techniciens
+app.get('/api/techniciens', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT 
+        t.*,
+        st.nom_entreprise,
+        COUNT(DISTINCT om.id) as nb_missions_actives
+      FROM techniciens t
+      LEFT JOIN sous_traitants st ON t.sous_traitant_id = st.id
+      LEFT JOIN ordres_mission om ON t.id = om.technicien_id AND om.statut NOT IN ('ANNULE', 'TERMINE', 'VALIDE')
+      GROUP BY t.id
+      ORDER BY st.nom_entreprise, t.nom, t.prenom
+    `).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/techniciens - Créer nouveau technicien
+app.post('/api/techniciens', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { sous_traitant_id, prenom, nom, email, telephone } = body
+    
+    if (!sous_traitant_id || !prenom || !nom) {
+      return c.json({ success: false, error: 'sous_traitant_id, prenom et nom requis' }, 400)
+    }
+    
+    const result = await DB.prepare(`
+      INSERT INTO techniciens (sous_traitant_id, prenom, nom, email, telephone)
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(sous_traitant_id, prenom, nom, email || null, telephone || null).run()
+    
+    return c.json({ success: true, data: { id: result.meta.last_row_id } })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/techniciens/:id - Modifier technicien
+app.put('/api/techniciens/:id', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    const body = await c.req.json()
+    const { sous_traitant_id, prenom, nom, email, telephone, statut } = body
+    
+    await DB.prepare(`
+      UPDATE techniciens 
+      SET sous_traitant_id = ?, prenom = ?, nom = ?, email = ?, telephone = ?, statut = ?, date_modification = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(sous_traitant_id, prenom, nom, email, telephone, statut || 'DISPONIBLE', id).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ==============================
+// API ROUTES - ORDRES DE MISSION
+// ==============================
+
+// GET /api/ordres-mission - Liste tous les ordres de mission
+app.get('/api/ordres-mission', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT 
+        om.*,
+        c.nom as centrale_nom,
+        c.type as centrale_type,
+        c.puissance_kwc,
+        c.localisation,
+        t.prenom as technicien_prenom,
+        t.nom as technicien_nom,
+        t.email as technicien_email,
+        st.nom_entreprise
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      ORDER BY om.date_mission DESC, om.id DESC
+    `).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/ordres-mission - Créer nouvel ordre de mission
+app.post('/api/ordres-mission', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_id, technicien_id, sous_traitant_id, date_mission, heure_debut, duree_estimee_heures, commentaires } = body
+    
+    if (!centrale_id || !technicien_id || !sous_traitant_id || !date_mission) {
+      return c.json({ success: false, error: 'centrale_id, technicien_id, sous_traitant_id et date_mission requis' }, 400)
+    }
+    
+    // Vérifier si centrale déjà attribuée
+    const existing = await DB.prepare(`
+      SELECT id FROM ordres_mission 
+      WHERE centrale_id = ? AND statut NOT IN ('ANNULE', 'VALIDE')
+    `).bind(centrale_id).first()
+    
+    if (existing) {
+      return c.json({ success: false, error: 'Cette centrale a déjà un ordre de mission actif' }, 400)
+    }
+    
+    // Créer ordre de mission
+    const result = await DB.prepare(`
+      INSERT INTO ordres_mission (centrale_id, technicien_id, sous_traitant_id, date_mission, heure_debut, duree_estimee_heures, commentaires)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(centrale_id, technicien_id, sous_traitant_id, date_mission, heure_debut || null, duree_estimee_heures || 7.0, commentaires || null).run()
+    
+    const ordreId = result.meta.last_row_id
+    
+    // Créer événement planning
+    const heure_fin = heure_debut ? `${parseInt(heure_debut.split(':')[0]) + (duree_estimee_heures || 7)}:${heure_debut.split(':')[1]}` : null
+    
+    await DB.prepare(`
+      INSERT INTO planning_events (ordre_mission_id, centrale_id, technicien_id, sous_traitant_id, date_debut, date_fin, titre, statut)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'PLANIFIE')
+    `).bind(
+      ordreId, 
+      centrale_id, 
+      technicien_id, 
+      sous_traitant_id,
+      `${date_mission} ${heure_debut || '08:00'}`,
+      `${date_mission} ${heure_fin || '16:00'}`,
+      `Audit Centrale`
+    ).run()
+    
+    // Mettre à jour statut centrale
+    await DB.prepare(`
+      UPDATE centrales SET statut = 'EN_COURS' WHERE id = ?
+    `).bind(centrale_id).run()
+    
+    return c.json({ success: true, data: { id: ordreId } })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/ordres-mission/:id/statut - Changer statut ordre de mission
+app.put('/api/ordres-mission/:id/statut', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    const { statut, raison_annulation } = await c.req.json()
+    
+    if (!['PLANIFIE', 'CONFIRME', 'EN_COURS', 'TERMINE', 'VALIDE', 'ANNULE', 'REPORTE'].includes(statut)) {
+      return c.json({ success: false, error: 'Statut invalide' }, 400)
+    }
+    
+    await DB.prepare(`
+      UPDATE ordres_mission 
+      SET statut = ?,
+          raison_annulation = ?,
+          date_annulation = CASE WHEN ? = 'ANNULE' THEN CURRENT_TIMESTAMP ELSE date_annulation END,
+          date_validation = CASE WHEN ? = 'VALIDE' THEN CURRENT_TIMESTAMP ELSE date_validation END
+      WHERE id = ?
+    `).bind(statut, raison_annulation || null, statut, statut, id).run()
+    
+    // Mettre à jour planning event
+    await DB.prepare(`
+      UPDATE planning_events SET statut = ? WHERE ordre_mission_id = ?
+    `).bind(statut, id).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/planning - Événements planning (vue calendrier)
+app.get('/api/planning', async (c) => {
+  const { DB } = c.env
+  const { start, end } = c.req.query()
+  
+  try {
+    let query = `
+      SELECT 
+        pe.*,
+        c.nom as centrale_nom,
+        c.type as centrale_type,
+        c.puissance_kwc,
+        t.prenom as technicien_prenom,
+        t.nom as technicien_nom,
+        st.nom_entreprise
+      FROM planning_events pe
+      JOIN centrales c ON pe.centrale_id = c.id
+      JOIN techniciens t ON pe.technicien_id = t.id
+      JOIN sous_traitants st ON pe.sous_traitant_id = st.id
+      WHERE 1=1
+    `
+    
+    if (start && end) {
+      query += ` AND date_debut >= '${start}' AND date_fin <= '${end}'`
+    }
+    
+    query += ` ORDER BY pe.date_debut ASC`
+    
+    const result = await DB.prepare(query).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/stats/planning - Stats planning
+app.get('/api/stats/planning', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Centrales non attribuées
+    const nonAttribuees = await DB.prepare(`
+      SELECT COUNT(*) as count
+      FROM centrales c
+      WHERE NOT EXISTS (
+        SELECT 1 FROM ordres_mission om 
+        WHERE om.centrale_id = c.id AND om.statut NOT IN ('ANNULE')
+      )
+    `).first()
+    
+    // Missions par statut
+    const parStatut = await DB.prepare(`
+      SELECT statut, COUNT(*) as count
+      FROM ordres_mission
+      GROUP BY statut
+    `).all()
+    
+    // Techniciens disponibles
+    const techniciensDisponibles = await DB.prepare(`
+      SELECT COUNT(*) as count
+      FROM techniciens
+      WHERE statut = 'DISPONIBLE'
+    `).first()
+    
+    // Missions par sous-traitant
+    const parSousTraitant = await DB.prepare(`
+      SELECT 
+        st.nom_entreprise,
+        COUNT(om.id) as nb_missions,
+        SUM(CASE WHEN om.statut IN ('PLANIFIE', 'CONFIRME', 'EN_COURS') THEN 1 ELSE 0 END) as missions_actives
+      FROM sous_traitants st
+      LEFT JOIN ordres_mission om ON st.id = om.sous_traitant_id
+      WHERE st.statut = 'ACTIF'
+      GROUP BY st.id
+    `).all()
+    
+    return c.json({ 
+      success: true, 
+      data: {
+        centrales_non_attribuees: nonAttribuees?.count || 0,
+        techniciens_disponibles: techniciensDisponibles?.count || 0,
+        missions_par_statut: parStatut.results,
+        missions_par_sous_traitant: parSousTraitant.results
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 // ======================
 // PAGE PRINCIPALE
 // ======================
@@ -290,6 +646,9 @@ app.get('/', (c) => {
                     </button>
                     <button onclick="showTab('upload')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-upload mr-2"></i>Upload JSON
+                    </button>
+                    <button onclick="showTab('planning')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-calendar-alt mr-2"></i>Planning
                     </button>
                     <button onclick="showTab('analytics')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-chart-pie mr-2"></i>Analytics
@@ -460,6 +819,133 @@ app.get('/', (c) => {
                     </form>
                     
                     <div id="upload-result" class="mt-6 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Planning Tab -->
+            <div id="tab-planning" class="tab-content hidden">
+                <!-- Stats Planning -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Centrales Non Attribuées</p>
+                                <p id="planning-stat-non-attribuees" class="text-3xl font-bold text-orange-600">-</p>
+                            </div>
+                            <i class="fas fa-exclamation-triangle text-4xl text-orange-500"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Missions Planifiées</p>
+                                <p id="planning-stat-planifiees" class="text-3xl font-bold text-blue-600">-</p>
+                            </div>
+                            <i class="fas fa-calendar-check text-4xl text-blue-500"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Techniciens Disponibles</p>
+                                <p id="planning-stat-techniciens" class="text-3xl font-bold text-green-600">-</p>
+                            </div>
+                            <i class="fas fa-user-check text-4xl text-green-500"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Sous-Traitants Actifs</p>
+                                <p id="planning-stat-sous-traitants" class="text-3xl font-bold text-purple-600">-</p>
+                            </div>
+                            <i class="fas fa-building text-4xl text-purple-500"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Rapides -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <button onclick="showModalSousTraitant()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-6 px-6 rounded-lg shadow-lg transition transform hover:scale-105">
+                        <i class="fas fa-building text-3xl mb-2"></i>
+                        <p class="text-lg">Ajouter Sous-Traitant</p>
+                    </button>
+                    <button onclick="showModalTechnicien()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-6 px-6 rounded-lg shadow-lg transition transform hover:scale-105">
+                        <i class="fas fa-user-plus text-3xl mb-2"></i>
+                        <p class="text-lg">Ajouter Technicien</p>
+                    </button>
+                    <button onclick="showModalOrdreMission()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-6 px-6 rounded-lg shadow-lg transition transform hover:scale-105">
+                        <i class="fas fa-clipboard-list text-3xl mb-2"></i>
+                        <p class="text-lg">Créer Ordre de Mission</p>
+                    </button>
+                </div>
+
+                <!-- Tabs Secondaires -->
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <div class="border-b">
+                        <nav class="flex space-x-4 px-6">
+                            <button onclick="showPlanningSubTab('missions')" class="planning-subtab-btn active py-4 px-4 border-b-2 border-blue-600 font-semibold text-blue-600">
+                                Ordres de Mission
+                            </button>
+                            <button onclick="showPlanningSubTab('techniciens')" class="planning-subtab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                                Techniciens
+                            </button>
+                            <button onclick="showPlanningSubTab('sous-traitants')" class="planning-subtab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                                Sous-Traitants
+                            </button>
+                            <button onclick="showPlanningSubTab('calendrier')" class="planning-subtab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                                Calendrier
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Ordres de Mission -->
+                    <div id="planning-subtab-missions" class="planning-subtab-content p-6">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Ordres de Mission</h3>
+                            <p class="text-gray-600 text-sm">Gestion des attributions centrales → techniciens</p>
+                        </div>
+                        <div id="missions-list">
+                            <p class="text-center text-gray-500 py-8">Chargement...</p>
+                        </div>
+                    </div>
+
+                    <!-- Techniciens -->
+                    <div id="planning-subtab-techniciens" class="planning-subtab-content p-6 hidden">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Techniciens</h3>
+                            <p class="text-gray-600 text-sm">Liste des techniciens et leurs missions</p>
+                        </div>
+                        <div id="techniciens-list">
+                            <p class="text-center text-gray-500 py-8">Chargement...</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-Traitants -->
+                    <div id="planning-subtab-sous-traitants" class="planning-subtab-content p-6 hidden">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Sous-Traitants</h3>
+                            <p class="text-gray-600 text-sm">Entreprises partenaires et capacités</p>
+                        </div>
+                        <div id="sous-traitants-list">
+                            <p class="text-center text-gray-500 py-8">Chargement...</p>
+                        </div>
+                    </div>
+
+                    <!-- Calendrier -->
+                    <div id="planning-subtab-calendrier" class="planning-subtab-content p-6 hidden">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Vue Calendrier</h3>
+                            <p class="text-gray-600 text-sm">Planning des missions par date</p>
+                        </div>
+                        <div id="calendrier-view">
+                            <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+                                <i class="fas fa-calendar-alt text-6xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600">Vue calendrier en cours de développement</p>
+                                <p class="text-gray-500 text-sm mt-2">Utilisez pour l'instant l'onglet "Ordres de Mission"</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -704,6 +1190,7 @@ app.get('/', (c) => {
 
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="/static/app.js"></script>
+        <script src="/static/planning.js"></script>
     </body>
     </html>
   `)
