@@ -1,0 +1,40 @@
+-- Migration 0003: Tables pour checklist temps réel (version simplifiée)
+
+CREATE TABLE IF NOT EXISTS checklist_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ordre_mission_id INTEGER NOT NULL,
+  categorie TEXT NOT NULL,
+  item_numero INTEGER NOT NULL,
+  item_texte TEXT NOT NULL,
+  statut TEXT DEFAULT 'NON_VERIFIE',
+  conformite INTEGER,
+  commentaire TEXT,
+  photo_base64 TEXT,
+  photo_filename TEXT,
+  mesure_valeur TEXT,
+  mesure_unite TEXT,
+  date_verification TEXT DEFAULT (datetime('now')),
+  date_modification TEXT DEFAULT (datetime('now')),
+  technicien_nom TEXT
+);
+
+CREATE TABLE IF NOT EXISTS retours_json (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ordre_mission_id INTEGER NOT NULL,
+  centrale_id INTEGER NOT NULL,
+  technicien_id INTEGER NOT NULL,
+  json_data TEXT NOT NULL,
+  taille_mo REAL,
+  nb_photos INTEGER,
+  date_upload TEXT DEFAULT (datetime('now')),
+  statut TEXT DEFAULT 'RECU',
+  rapport_final_genere INTEGER DEFAULT 0,
+  date_rapport_final TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_checklist_mission ON checklist_items(ordre_mission_id);
+CREATE INDEX IF NOT EXISTS idx_checklist_categorie ON checklist_items(categorie);
+CREATE INDEX IF NOT EXISTS idx_checklist_statut ON checklist_items(statut);
+CREATE INDEX IF NOT EXISTS idx_retours_mission ON retours_json(ordre_mission_id);
+CREATE INDEX IF NOT EXISTS idx_retours_centrale ON retours_json(centrale_id);
+CREATE INDEX IF NOT EXISTS idx_retours_date ON retours_json(date_upload);

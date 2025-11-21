@@ -26,11 +26,9 @@ app.get('/api/centrales', async (c) => {
     const result = await DB.prepare(`
       SELECT 
         c.*,
-        COUNT(r.id) as nb_retours,
-        SUM(r.nb_photos) as total_photos
+        0 as nb_retours,
+        0 as total_photos
       FROM centrales c
-      LEFT JOIN retours_json r ON c.id = r.centrale_id
-      GROUP BY c.id
       ORDER BY c.nom
     `).all()
     
@@ -972,22 +970,26 @@ app.get('/api/planning/centrales', async (c) => {
   const { DB } = c.env
   
   try {
-    // Récupérer toutes les centrales
+    // Récupérer toutes les centrales avec distances GPS réelles
     const centrales = await DB.prepare(`
-      SELECT * FROM centrales ORDER BY id
+      SELECT * FROM centrales 
+      WHERE distance_toulouse_km IS NOT NULL OR distance_lyon_km IS NOT NULL
+      ORDER BY 
+        CASE 
+          WHEN distance_toulouse_km IS NULL THEN distance_lyon_km
+          WHEN distance_lyon_km IS NULL THEN distance_toulouse_km
+          WHEN distance_toulouse_km < distance_lyon_km THEN distance_toulouse_km
+          ELSE distance_lyon_km
+        END ASC
     `).all()
     
-    // Ajouter informations de distance (simplifiées pour démo)
-    const centralesAvecDistance = centrales.results.map((centrale: any) => {
-      // Extraction du département depuis localisation
-      const deptMatch = centrale.localisation?.match(/\b(\d{1,2})\d{3}\b/)
-      const dept = deptMatch ? deptMatch[1] : '00'
-      
+    // Ajouter distance_km calculée côté JavaScript
+    const centralesAvecDistance = centrales.results.map((c: any) => {
+      const distToulouse = c.distance_toulouse_km || 999999
+      const distLyon = c.distance_lyon_km || 999999
       return {
-        ...centrale,
-        dept: dept,
-        distance_km: Math.floor(Math.random() * 150), // Simplification pour démo
-        base_proche: Math.random() > 0.5 ? 'Toulouse' : 'Lyon'
+        ...c,
+        distance_km: Math.min(distToulouse, distLyon)
       }
     })
     
