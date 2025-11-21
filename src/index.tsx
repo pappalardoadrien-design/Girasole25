@@ -3172,4 +3172,564 @@ app.get('/planning-girasole', (c) => {
   `)
 })
 
+// ========================================
+// PAGE - GESTION PLANNING COMPLET 52 CENTRALES
+// ========================================
+app.get('/planning-manager', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gestion Planning GIRASOLE - 52 Centrales</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            .stat-card {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            }
+            .table-row:hover {
+                background-color: #f9fafb;
+            }
+            .loader-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            .loader-overlay.active {
+                display: flex;
+            }
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3b82f6;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50">
+        <!-- Loader -->
+        <div id="loader" class="loader-overlay">
+            <div class="text-center">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-white text-lg">Chargement...</p>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+            <div class="container mx-auto px-6 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold">
+                            <i class="fas fa-tasks mr-3"></i>
+                            Gestion Planning GIRASOLE 2025
+                        </h1>
+                        <p class="text-blue-100 mt-2">
+                            <i class="fas fa-building mr-2"></i>
+                            Attribution sous-traitants et planning complet 52 centrales
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <a href="/" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition mr-2">
+                            <i class="fas fa-home mr-2"></i>Accueil
+                        </a>
+                        <a href="/planning-girasole" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition">
+                            <i class="fas fa-eye mr-2"></i>Vue simple
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-6 py-8">
+            
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Total Centrales</p>
+                            <p id="stat-total" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-solar-panel text-4xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Assignées</p>
+                            <p id="stat-assigned" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-check-circle text-4xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Non assignées</p>
+                            <p id="stat-unassigned" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-hourglass-half text-4xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Planifiées</p>
+                            <p id="stat-planned" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-calendar-check text-4xl opacity-80"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attribution automatique batch -->
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg shadow-md p-6 mb-6 border-2 border-green-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-magic mr-2 text-green-600"></i>
+                    Attribution Automatique Intelligente
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-hashtag mr-1"></i>Nb centrales
+                        </label>
+                        <input 
+                            type="number" 
+                            id="max-centrales" 
+                            value="25"
+                            min="1"
+                            max="52"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar mr-1"></i>Date début
+                        </label>
+                        <input 
+                            type="date" 
+                            id="date-debut-batch" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-building mr-1"></i>ST Toulouse
+                        </label>
+                        <select 
+                            id="st-toulouse-batch" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="">Sélectionner...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-building mr-1"></i>ST Lyon
+                        </label>
+                        <select 
+                            id="st-lyon-batch" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="">Sélectionner...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-tie mr-1"></i>Technicien
+                        </label>
+                        <select 
+                            id="tech-batch" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="">Sélectionner...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        <strong>Assignation intelligente :</strong> Les centrales proches de Toulouse seront assignées au ST Toulouse, celles proches de Lyon au ST Lyon. Dates séquentielles (1 jour/centrale).
+                    </div>
+                    <button 
+                        onclick="autoAssignBatch()" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md"
+                    >
+                        <i class="fas fa-bolt mr-2"></i>Assigner automatiquement
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-search mr-2"></i>Recherche
+                        </label>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Nom, localisation, sous-traitant..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            oninput="filterPlanning()"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt mr-2"></i>Base
+                        </label>
+                        <select 
+                            id="base-filter" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            onchange="filterPlanning()"
+                        >
+                            <option value="all">Toutes les bases</option>
+                            <option value="Toulouse">Toulouse</option>
+                            <option value="Lyon">Lyon</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-filter mr-2"></i>Statut
+                        </label>
+                        <select 
+                            id="statut-filter" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            onchange="filterPlanning()"
+                        >
+                            <option value="all">Tous les statuts</option>
+                            <option value="assigned">Assignées</option>
+                            <option value="unassigned">Non assignées</option>
+                            <option value="planned">Planifiées</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Planning -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-table mr-2"></i>
+                            Planning Complet 52 Centrales
+                        </h3>
+                        <div class="flex items-center space-x-4">
+                            <div id="selection-counter" class="bg-blue-600 text-white px-4 py-2 rounded-full font-bold">
+                                0 sélectionnée(s)
+                            </div>
+                            <button onclick="exportPlanningExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                                <i class="fas fa-file-excel mr-2"></i>Export Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="planning-table" class="overflow-x-auto">
+                    <div class="p-12 text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                        <p>Chargement du planning...</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white mt-12 py-6">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+                <p class="text-gray-400 text-sm mt-2">Gestion Planning GIRASOLE 2025 - 52 Centrales</p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="/static/planning-manager.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// ========================================
+// API ROUTES - GESTION PLANNING COMPLET
+// ========================================
+
+// PUT /api/centrales/:id/assign - Assigner sous-traitant + technicien à une centrale
+app.put('/api/centrales/:id/assign', async (c) => {
+  const { DB } = c.env
+  const centraleId = c.req.param('id')
+  
+  try {
+    const body = await c.req.json()
+    const { sous_traitant_id, technicien_id, date_mission_prevue, priorite } = body
+    
+    // Mettre à jour la centrale avec attribution
+    await DB.prepare(`
+      UPDATE centrales 
+      SET statut = 'EN_COURS'
+      WHERE id = ?
+    `).bind(centraleId).run()
+    
+    // Créer ou mettre à jour ordre de mission
+    const existingMission = await DB.prepare(`
+      SELECT id FROM ordres_mission WHERE centrale_id = ? AND statut != 'ANNULE'
+    `).bind(centraleId).first()
+    
+    if (existingMission) {
+      // Update existing mission
+      await DB.prepare(`
+        UPDATE ordres_mission
+        SET sous_traitant_id = ?, technicien_id = ?, date_mission = ?, statut = 'PLANIFIE'
+        WHERE id = ?
+      `).bind(sous_traitant_id, technicien_id, date_mission_prevue, existingMission.id).run()
+      
+      return c.json({ success: true, mission_id: existingMission.id, action: 'updated' })
+    } else {
+      // Create new mission
+      const result = await DB.prepare(`
+        INSERT INTO ordres_mission (centrale_id, sous_traitant_id, technicien_id, date_mission, heure_debut, duree_estimee_heures, statut)
+        VALUES (?, ?, ?, ?, '08:00', 7.0, 'PLANIFIE')
+      `).bind(centraleId, sous_traitant_id, technicien_id, date_mission_prevue).run()
+      
+      return c.json({ success: true, mission_id: result.meta.last_row_id, action: 'created' })
+    }
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// DELETE /api/centrales/:id/unassign - Retirer attribution d'une centrale
+app.delete('/api/centrales/:id/unassign', async (c) => {
+  const { DB } = c.env
+  const centraleId = c.req.param('id')
+  
+  try {
+    // Annuler mission existante
+    await DB.prepare(`
+      UPDATE ordres_mission SET statut = 'ANNULE' WHERE centrale_id = ? AND statut != 'TERMINE'
+    `).bind(centraleId).run()
+    
+    // Remettre centrale à auditer
+    await DB.prepare(`
+      UPDATE centrales SET statut = 'A_AUDITER' WHERE id = ?
+    `).bind(centraleId).run()
+    
+    return c.json({ success: true, message: 'Attribution retirée' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/planning/full - Planning complet des 52 centrales avec attributions
+app.get('/api/planning/full', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const planning = await DB.prepare(`
+      SELECT 
+        c.id,
+        c.nom as centrale_nom,
+        c.type,
+        c.puissance_kwc,
+        c.localisation,
+        c.statut as centrale_statut,
+        c.latitude,
+        c.longitude,
+        c.distance_toulouse_km,
+        c.distance_lyon_km,
+        c.base_proche,
+        c.dept,
+        om.id as mission_id,
+        om.date_mission,
+        om.heure_debut,
+        om.duree_estimee_heures,
+        om.statut as mission_statut,
+        st.id as sous_traitant_id,
+        st.nom_entreprise as sous_traitant_nom,
+        t.id as technicien_id,
+        t.prenom || ' ' || t.nom as technicien_nom
+      FROM centrales c
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
+      LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      LEFT JOIN techniciens t ON om.technicien_id = t.id
+      WHERE c.distance_toulouse_km IS NOT NULL OR c.distance_lyon_km IS NOT NULL
+      ORDER BY 
+        CASE 
+          WHEN c.distance_toulouse_km IS NULL THEN c.distance_lyon_km
+          WHEN c.distance_lyon_km IS NULL THEN c.distance_toulouse_km
+          WHEN c.distance_toulouse_km < c.distance_lyon_km THEN c.distance_toulouse_km
+          ELSE c.distance_lyon_km
+        END ASC
+    `).all()
+    
+    // Ajouter distance_km calculée
+    const planningComplet = planning.results.map((p: any) => {
+      const distToulouse = p.distance_toulouse_km || 999999
+      const distLyon = p.distance_lyon_km || 999999
+      return {
+        ...p,
+        distance_km: Math.min(distToulouse, distLyon),
+        is_assigned: p.mission_id !== null,
+        is_planned: p.date_mission !== null
+      }
+    })
+    
+    return c.json({ 
+      success: true, 
+      data: planningComplet,
+      stats: {
+        total: planningComplet.length,
+        assigned: planningComplet.filter((p: any) => p.is_assigned).length,
+        planned: planningComplet.filter((p: any) => p.is_planned).length,
+        unassigned: planningComplet.filter((p: any) => !p.is_assigned).length
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/planning/by-sous-traitant - Planning groupé par sous-traitant
+app.get('/api/planning/by-sous-traitant', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const sousTraitants = await DB.prepare(`
+      SELECT * FROM sous_traitants ORDER BY nom_entreprise
+    `).all()
+    
+    const planning = []
+    
+    for (const st of sousTraitants.results) {
+      const missions = await DB.prepare(`
+        SELECT 
+          om.*,
+          c.nom as centrale_nom,
+          c.puissance_kwc,
+          c.distance_toulouse_km,
+          c.distance_lyon_km,
+          c.base_proche,
+          t.prenom || ' ' || t.nom as technicien_nom
+        FROM ordres_mission om
+        JOIN centrales c ON om.centrale_id = c.id
+        LEFT JOIN techniciens t ON om.technicien_id = t.id
+        WHERE om.sous_traitant_id = ? AND om.statut != 'ANNULE'
+        ORDER BY om.date_mission
+      `).bind(st.id).all()
+      
+      planning.push({
+        sous_traitant: st,
+        missions: missions.results,
+        stats: {
+          total_missions: missions.results.length,
+          total_kwc: missions.results.reduce((sum: number, m: any) => sum + (m.puissance_kwc || 0), 0),
+          missions_planifiees: missions.results.filter((m: any) => m.date_mission).length
+        }
+      })
+    }
+    
+    return c.json({ success: true, data: planning })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/planning/auto-assign - Attribution automatique basée sur distance
+app.post('/api/planning/auto-assign', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { max_centrales, date_debut, sous_traitant_toulouse_id, sous_traitant_lyon_id, technicien_id } = body
+    
+    if (!date_debut || !sous_traitant_toulouse_id || !sous_traitant_lyon_id) {
+      return c.json({ success: false, error: 'date_debut, sous_traitant_toulouse_id et sous_traitant_lyon_id requis' }, 400)
+    }
+    
+    // Récupérer centrales non assignées triées par distance
+    const centrales = await DB.prepare(`
+      SELECT c.* 
+      FROM centrales c
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
+      WHERE om.id IS NULL
+      AND (c.distance_toulouse_km IS NOT NULL OR c.distance_lyon_km IS NOT NULL)
+      ORDER BY 
+        CASE 
+          WHEN c.distance_toulouse_km IS NULL THEN c.distance_lyon_km
+          WHEN c.distance_lyon_km IS NULL THEN c.distance_toulouse_km
+          WHEN c.distance_toulouse_km < c.distance_lyon_km THEN c.distance_toulouse_km
+          ELSE c.distance_lyon_km
+        END ASC
+      LIMIT ?
+    `).bind(max_centrales || 25).all()
+    
+    let currentDate = new Date(date_debut)
+    const assigned = []
+    
+    for (const centrale of centrales.results) {
+      // Choisir sous-traitant selon base proche
+      const sousTraitantId = centrale.base_proche === 'Toulouse' ? sous_traitant_toulouse_id : sous_traitant_lyon_id
+      
+      const result = await DB.prepare(`
+        INSERT INTO ordres_mission (centrale_id, sous_traitant_id, technicien_id, date_mission, heure_debut, duree_estimee_heures, statut)
+        VALUES (?, ?, ?, ?, '08:00', 7.0, 'PLANIFIE')
+      `).bind(centrale.id, sousTraitantId, technicien_id, currentDate.toISOString().split('T')[0]).run()
+      
+      await DB.prepare(`UPDATE centrales SET statut = 'EN_COURS' WHERE id = ?`).bind(centrale.id).run()
+      
+      assigned.push({
+        centrale_id: centrale.id,
+        centrale_nom: centrale.nom,
+        mission_id: result.meta.last_row_id,
+        date: currentDate.toISOString().split('T')[0],
+        sous_traitant: centrale.base_proche === 'Toulouse' ? 'Toulouse' : 'Lyon'
+      })
+      
+      // Incrémenter date (1 jour par centrale)
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+    
+    return c.json({ 
+      success: true, 
+      data: { assigned: assigned.length, details: assigned }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 export default app
