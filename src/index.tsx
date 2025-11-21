@@ -2336,10 +2336,10 @@ app.get('/', (c) => {
                     <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm">Photos Total</p>
+                                <p class="text-gray-500 text-sm">Missions Total</p>
                                 <p id="stat-photos" class="text-3xl font-bold text-orange-600">-</p>
                             </div>
-                            <i class="fas fa-camera text-4xl text-orange-500"></i>
+                            <i class="fas fa-clipboard-list text-4xl text-orange-500"></i>
                         </div>
                     </div>
                 </div>
@@ -2361,12 +2361,12 @@ app.get('/', (c) => {
                     <h3 class="text-lg font-bold mb-4"><i class="fas fa-database mr-2"></i>Volumétrie Mission</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="border-l-4 border-blue-500 pl-4">
-                            <p class="text-gray-500 text-sm">JSON V4 Total</p>
-                            <p id="vol-json" class="text-2xl font-bold text-blue-600">- MB</p>
+                            <p class="text-gray-500 text-sm">Missions Créées</p>
+                            <p id="vol-json" class="text-2xl font-bold text-blue-600">-</p>
                         </div>
                         <div class="border-l-4 border-green-500 pl-4">
-                            <p class="text-gray-500 text-sm">Photos Estimées</p>
-                            <p id="vol-photos" class="text-2xl font-bold text-green-600">- GB</p>
+                            <p class="text-gray-500 text-sm">Missions Planifiées</p>
+                            <p id="vol-photos" class="text-2xl font-bold text-green-600">-</p>
                         </div>
                         <div class="border-l-4 border-purple-500 pl-4">
                             <p class="text-gray-500 text-sm">Heures Terrain</p>

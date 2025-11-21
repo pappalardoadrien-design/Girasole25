@@ -62,13 +62,13 @@ async function loadDashboard() {
     document.getElementById('stat-total').textContent = statsData.global.total_centrales || 52;
     document.getElementById('stat-auditees').textContent = statsData.global.auditees || 0;
     document.getElementById('stat-validees').textContent = statsData.global.validees || 0;
-    document.getElementById('stat-photos').textContent = statsData.volumetrie.total_photos || 0;
+    document.getElementById('stat-photos').textContent = statsData.missions?.total_missions || 0;
     
-    // Volumétrie
-    const jsonMB = (statsData.volumetrie.total_json_mb || 0).toFixed(1);
-    const photosEstimGB = ((statsData.volumetrie.total_photos || 0) * 3.5 / 1024).toFixed(1);
-    document.getElementById('vol-json').textContent = `${jsonMB} MB`;
-    document.getElementById('vol-photos').textContent = `${photosEstimGB} GB`;
+    // Volumétrie missions (remplace volumétrie photos)
+    const missionsTotal = statsData.missions?.total_missions || 0;
+    const missionsPlanifiees = statsData.missions?.planifiees || 0;
+    document.getElementById('vol-json').textContent = `${missionsTotal} missions`;
+    document.getElementById('vol-photos').textContent = `${missionsPlanifiees} planifiées`;
     
     // Créer graphiques
     createChartStatut();
