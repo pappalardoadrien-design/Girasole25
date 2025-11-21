@@ -148,16 +148,20 @@ function updateSelectionCount() {
 function updateStats() {
   const total = centralesData.length;
   const puissanceTotale = centralesData.reduce((sum, c) => sum + (c.puissance_kwc || 0), 0);
-  const distanceMoyenne = centralesData.reduce((sum, c) => sum + (c.distance_km || 0), 0) / total;
   
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-puissance').textContent = puissanceTotale.toFixed(2) + ' kWc';
-  document.getElementById('stat-distance').textContent = distanceMoyenne.toFixed(1) + ' km';
+  const statTotal = document.getElementById('stat-total');
+  const statPower = document.getElementById('stat-power');
+  const statToulouse = document.getElementById('stat-toulouse');
+  const statLyon = document.getElementById('stat-lyon');
+  
+  if (statTotal) statTotal.textContent = total;
+  if (statPower) statPower.textContent = puissanceTotale.toFixed(1) + ' kWc';
   
   const toulouse = centralesData.filter(c => c.base_proche === 'Toulouse').length;
   const lyon = centralesData.filter(c => c.base_proche === 'Lyon').length;
-  document.getElementById('stat-toulouse').textContent = toulouse;
-  document.getElementById('stat-lyon').textContent = lyon;
+  
+  if (statToulouse) statToulouse.textContent = toulouse;
+  if (statLyon) statLyon.textContent = lyon;
 }
 
 // Export batch ordres de mission
@@ -249,11 +253,11 @@ function sortCentrales(column) {
 
 // Utilitaires
 function showLoader() {
-  document.getElementById('loader')?.classList.remove('hidden');
+  document.getElementById('loader')?.classList.add('active');
 }
 
 function hideLoader() {
-  document.getElementById('loader')?.classList.add('hidden');
+  document.getElementById('loader')?.classList.remove('active');
 }
 
 function showError(message) {
