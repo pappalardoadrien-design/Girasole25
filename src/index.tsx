@@ -192,13 +192,12 @@ app.get('/api/stats', async (c) => {
       FROM centrales
     `).first()
     
-    // Total photos et volumétrie
-    const statsVolume = await DB.prepare(`
+    // Stats missions (ordres_mission)
+    const statsMissions = await DB.prepare(`
       SELECT 
-        COUNT(*) as total_retours,
-        SUM(nb_photos) as total_photos,
-        SUM(taille_mo) as total_json_mb
-      FROM retours_json
+        COUNT(*) as total_missions,
+        SUM(CASE WHEN statut = 'PLANIFIE' THEN 1 ELSE 0 END) as planifiees
+      FROM ordres_mission
     `).first()
     
     return c.json({ 
@@ -207,7 +206,7 @@ app.get('/api/stats', async (c) => {
         global: statsGlobal,
         par_statut: statsStatut.results,
         par_type: statsType.results,
-        volumetrie: statsVolume
+        missions: statsMissions
       }
     })
   } catch (error) {
@@ -3565,6 +3564,7 @@ app.get('/api/planning/full', async (c) => {
     const planning = await DB.prepare(`
       SELECT 
         c.id,
+        c.id_ref,
         c.nom as centrale_nom,
         c.type,
         c.puissance_kwc,
