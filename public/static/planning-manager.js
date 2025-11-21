@@ -77,7 +77,7 @@ function renderPlanningTable(centrales) {
       </thead>
       <tbody>
         ${centrales.map((c, idx) => `
-          <tr class="table-row hover:bg-gray-50 ${c.is_assigned ? 'bg-green-50' : ''}">
+          <tr class="table-row hover:bg-gray-50 ${c.is_assigned ? 'bg-green-50' : ''}" data-centrale-id="${c.id}">
             <td class="px-3 py-2">
               <input 
                 type="checkbox" 
@@ -90,19 +90,19 @@ function renderPlanningTable(centrales) {
             <td class="px-3 py-2 text-sm">${idx + 1}</td>
             <td class="px-3 py-2">
               <div class="font-medium text-gray-900">${c.centrale_nom}</div>
-              <div class="text-xs text-gray-500">${c.dept || ''} - ${c.localisation?.substring(0, 40) || ''}...</div>
+              <div class="text-xs text-gray-500">${c.dept || 'N/A'} - ${c.localisation?.substring(0, 40) || 'Pas d\'adresse'}...</div>
             </td>
             <td class="px-3 py-2 text-center text-sm">${c.puissance_kwc?.toFixed(1) || 0}</td>
-            <td class="px-3 py-2 text-center text-sm font-mono">${c.distance_km?.toFixed(1) || 0} km</td>
+            <td class="px-3 py-2 text-center text-sm font-mono">${c.distance_km < 999999 ? c.distance_km.toFixed(1) : '-'} km</td>
             <td class="px-3 py-2 text-center">
-              <span class="px-2 py-1 text-xs rounded ${c.base_proche === 'Toulouse' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}">
+              <span class="px-2 py-1 text-xs rounded ${c.base_proche === 'Toulouse' ? 'bg-blue-100 text-blue-800' : c.base_proche === 'Lyon' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
                 ${c.base_proche || 'N/A'}
               </span>
             </td>
             <td class="px-3 py-2 text-sm">
               ${c.is_assigned ? 
                 `<div class="font-medium text-green-700">${c.sous_traitant_nom || 'N/A'}</div>` :
-                `<select class="text-xs border rounded px-1 py-1" id="st-${c.id}" onchange="quickAssignST(${c.id})">
+                `<select class="text-xs border rounded px-1 py-1 w-full" id="st-${c.id}" onchange="saveInlineChange(${c.id})">
                   <option value="">Choisir...</option>
                 </select>`
               }
@@ -110,7 +110,7 @@ function renderPlanningTable(centrales) {
             <td class="px-3 py-2 text-sm">
               ${c.is_assigned ?
                 `<div class="text-gray-600">${c.technicien_nom || 'N/A'}</div>` :
-                `<select class="text-xs border rounded px-1 py-1" id="tech-${c.id}">
+                `<select class="text-xs border rounded px-1 py-1 w-full" id="tech-${c.id}" onchange="saveInlineChange(${c.id})">
                   <option value="">Choisir...</option>
                 </select>`
               }
@@ -118,7 +118,7 @@ function renderPlanningTable(centrales) {
             <td class="px-3 py-2 text-center text-sm">
               ${c.is_planned ?
                 `<span class="font-mono text-green-700">${c.date_mission}</span>` :
-                `<input type="date" id="date-${c.id}" class="text-xs border rounded px-1 py-1" />`
+                `<input type="date" id="date-${c.id}" class="text-xs border rounded px-1 py-1" onchange="saveInlineChange(${c.id})" />`
               }
             </td>
             <td class="px-3 py-2 text-center">
@@ -126,11 +126,11 @@ function renderPlanningTable(centrales) {
             </td>
             <td class="px-3 py-2 text-center">
               ${c.is_assigned ?
-                `<button onclick="unassignCentrale(${c.id})" class="text-red-600 hover:text-red-800 text-xs">
+                `<button onclick="unassignCentrale(${c.id})" class="text-red-600 hover:text-red-800 text-xs px-2 py-1">
                   <i class="fas fa-times-circle"></i> Retirer
                 </button>` :
-                `<button onclick="assignCentrale(${c.id})" class="text-green-600 hover:text-green-800 text-xs">
-                  <i class="fas fa-check-circle"></i> Assigner
+                `<button onclick="assignCentrale(${c.id})" class="text-green-600 hover:text-green-800 text-xs px-2 py-1">
+                  <i class="fas fa-check-circle"></i> Sauvegarder
                 </button>`
               }
             </td>
@@ -216,7 +216,7 @@ function populateTechnicienSelect() {
   }
 }
 
-// Assigner une centrale individuellement
+// Assigner une centrale individuellement (ou sauvegarder modification inline)
 async function assignCentrale(centraleId) {
   const stId = document.getElementById(`st-${centraleId}`)?.value;
   const techId = document.getElementById(`tech-${centraleId}`)?.value;
@@ -229,14 +229,15 @@ async function assignCentrale(centraleId) {
   
   try {
     showLoader();
-    const response = await axios.put(`/api/centrales/${centraleId}/assign`, {
+    const response = await axios.post('/api/planning/save-attribution', {
+      centrale_id: centraleId,
       sous_traitant_id: parseInt(stId),
       technicien_id: parseInt(techId),
-      date_mission_prevue: date
+      date_mission: date
     });
     
     if (response.data.success) {
-      showSuccess('✅ Centrale assignée avec succès');
+      showSuccess('✅ Attribution sauvegardée');
       await loadPlanningData(); // Reload data
     } else {
       showError(response.data.error);
@@ -244,7 +245,69 @@ async function assignCentrale(centraleId) {
     hideLoader();
   } catch (error) {
     hideLoader();
-    showError('Erreur assignation: ' + error.message);
+    showError('Erreur sauvegarde: ' + error.message);
+  }
+}
+
+// Sauvegarder modification inline (déclenchée par onchange)
+async function saveInlineChange(centraleId) {
+  const stId = document.getElementById(`st-${centraleId}`)?.value;
+  const techId = document.getElementById(`tech-${centraleId}`)?.value;
+  const date = document.getElementById(`date-${centraleId}`)?.value;
+  
+  // Ne sauvegarder que si tous les champs sont remplis
+  if (!stId || !techId || !date) return;
+  
+  try {
+    const response = await axios.post('/api/planning/save-attribution', {
+      centrale_id: centraleId,
+      sous_traitant_id: parseInt(stId),
+      technicien_id: parseInt(techId),
+      date_mission: date
+    });
+    
+    if (response.data.success) {
+      // Visual feedback discret
+      const row = document.querySelector(`tr[data-centrale-id="${centraleId}"]`);
+      if (row) {
+        row.classList.add('bg-green-50');
+        setTimeout(() => row.classList.remove('bg-green-50'), 1000);
+      }
+    }
+  } catch (error) {
+    console.error('Erreur sauvegarde inline:', error);
+  }
+}
+
+// Générer tous les ordres de mission depuis les attributions
+async function generateAllMissions() {
+  if (!confirm('Générer les ordres de mission pour toutes les centrales attribuées ?\n\nCette action va créer/confirmer les missions planifiées.')) {
+    return;
+  }
+  
+  try {
+    showLoader();
+    const response = await axios.post('/api/planning/generate-all-missions');
+    
+    if (response.data.success) {
+      const data = response.data.data;
+      let message = `✅ Ordres de mission générés !\n\n`;
+      message += `📊 Total traités : ${data.total_traites}\n`;
+      message += `✨ Créés : ${data.created}\n`;
+      message += `🔄 Mis à jour : ${data.updated}\n`;
+      if (data.errors > 0) {
+        message += `❌ Erreurs : ${data.errors}`;
+      }
+      
+      alert(message);
+      await loadPlanningData();
+    } else {
+      showError(response.data.error);
+    }
+    hideLoader();
+  } catch (error) {
+    hideLoader();
+    showError('Erreur génération : ' + error.message);
   }
 }
 
@@ -377,6 +440,60 @@ function showError(message) {
 
 function showSuccess(message) {
   alert('✅ ' + message);
+}
+
+// Exporter planning au format Excel/CSV
+async function exportPlanningExcel() {
+  try {
+    showLoader();
+    const response = await axios.get('/api/planning/export-data');
+    
+    if (!response.data.success) {
+      showError('Erreur export: ' + response.data.error);
+      hideLoader();
+      return;
+    }
+    
+    // Générer CSV à partir des données
+    const data = response.data.data;
+    let csv = 'ID,ID_REF,Centrale,Type,Puissance (kWc),Localisation,Département,Distance (km),Base proche,Statut centrale,Date mission,Heure début,Durée (h),Statut mission,Sous-traitant,Contact ST,Technicien,Tél technicien\n';
+    
+    data.forEach(row => {
+      csv += [
+        row.id || '',
+        row.id_ref || '',
+        `"${(row.centrale_nom || '').replace(/"/g, '""')}"`,
+        row.type || '',
+        row.puissance_kwc || '',
+        `"${(row.localisation || '').replace(/"/g, '""')}"`,
+        row.dept || '',
+        row.distance_km < 999999 ? row.distance_km.toFixed(1) : '',
+        row.base_proche || '',
+        row.centrale_statut || '',
+        row.date_mission || '',
+        row.heure_debut || '',
+        row.duree_estimee_heures || '',
+        row.mission_statut || '',
+        `"${(row.sous_traitant_nom || '').replace(/"/g, '""')}"`,
+        `"${(row.sous_traitant_contact || '').replace(/"/g, '""')}"`,
+        `"${(row.technicien_nom || '').replace(/"/g, '""')}"`,
+        `"${(row.technicien_tel || '').replace(/"/g, '""')}"`
+      ].join(',') + '\n';
+    });
+    
+    // Télécharger fichier
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `planning_girasole_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    hideLoader();
+    showSuccess('Export réussi ! Fichier téléchargé');
+  } catch (error) {
+    hideLoader();
+    showError('Erreur export: ' + error.message);
+  }
 }
 
 // Init au chargement

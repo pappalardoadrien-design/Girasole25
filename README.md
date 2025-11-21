@@ -28,25 +28,57 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 
 ## 📊 Fonctionnalités Principales
 
-### 1. **Dashboard Mission** 📈
-- Vue d'ensemble 52 centrales (toutes type SOL)
+### 1. **Planning Manager** 📅 **[NOUVEAU - PRIORITÉ 1]**
+**URL** : `/planning-manager`
+
+Interface complète pour attribution et planification des 48 centrales GIRASOLE :
+
+#### **Affichage Planning Complet**
+- ✅ Tableau des 48 centrales triées par distance (plus proche = Lyon/Toulouse)
+- ✅ Colonnes : ID, Nom, Type, Puissance, Localisation, Distance (km), Département, Sous-traitant, Technicien, Date mission
+- ✅ Statut visuel : ligne verte si attribuée
+- ✅ Statistiques temps réel : Total (48) / Attribués / Non attribués / Planifiés
+
+#### **Attribution Manuelle avec Auto-Save** ⚡
+- ✅ Dropdowns inline pour Sous-traitant et Technicien
+- ✅ Input date pour Date de mission
+- ✅ **Auto-save automatique** quand les 3 champs sont remplis
+- ✅ **Flash vert visuel** (1 seconde) sur ligne sauvegardée
+- ✅ API : `POST /api/planning/save-attribution`
+
+#### **Génération Ordres de Mission** 🎯
+- ✅ **Bouton orange "Générer ordres de mission"** dans header
+- ✅ Génère/confirme tous les ordres pour centrales attribuées
+- ✅ Dialog confirmation avant exécution
+- ✅ Stats détaillées : Total traités / Créés / Mis à jour / Erreurs
+- ✅ API : `POST /api/planning/generate-all-missions`
+
+#### **Export Excel/CSV** 📊
+- ✅ **Bouton vert "Export Excel"** dans header
+- ✅ Télécharge CSV avec toutes données : Centrale, ST (nom+contact), Technicien (nom+tél), dates, distances
+- ✅ Format UTF-8 avec BOM pour Excel
+- ✅ Nom fichier : `planning_girasole_YYYY-MM-DD.csv`
+- ✅ API : `GET /api/planning/export-data`
+
+### 2. **Dashboard Mission** 📈
+- Vue d'ensemble 48 centrales (toutes type SOL)
 - Statistiques temps réel : Total / Auditées / Validées / Photos
 - Graphiques interactifs (Chart.js) : Répartition par statut
 - Monitoring volumétrie (JSON, Photos, Heures terrain)
 
-### 2. **Gestion Centrales** 📋
-- Liste complète des 52 centrales avec filtres
+### 3. **Gestion Centrales** 📋
+- Liste complète des 48 centrales avec filtres
 - Changement de statut : À Auditer → En Cours → Terminé → Validé
 - Détails par centrale : Retours JSON, photos, timeline
 - Recherche par nom, localisation et statut
 
-### 3. **Upload Retours JSON V4** 📥
+### 4. **Upload Retours JSON V4** 📥
 - Formulaire d'enregistrement métadonnées retours techniciens
 - Validation : Nom fichier, taille MB, nombre photos, technicien
 - Mise à jour automatique statut centrale
 - Historique complet des retours
 
-### 4. **Documentation Intégrée** 📚
+### 5. **Documentation Intégrée** 📚
 - Checklist V4 (54 points CDC)
 - Workflow 5 phases détaillé
 - Tableau volumétrie mission complète
@@ -56,21 +88,38 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 ## 🗄️ Architecture Base de Données
 
 ### **Cloudflare D1 SQLite**
-- **centrales** : 52 centrales avec statuts, types, puissance, dates
+- **centrales** : 48 centrales avec GPS, distances, statuts, puissance
+- **ordres_mission** : Missions planifiées avec ST, technicien, dates
+- **sous_traitants** : Liste des sous-traitants avec contacts
+- **techniciens** : Liste des techniciens avec coordonnées
 - **retours_json** : Métadonnées retours techniciens (nom fichier, taille, photos)
 - **stats_mission** : Historique statistiques globales
 
 ### **Schema Principal**
 ```sql
-centrales (52 rows)
-└── SOL (52 centrales - audits toiture incluent installations sol)
+centrales (48 rows) - Source: ANNEXE 1 Excel
+├── Données GPS : latitude, longitude, distance_toulouse_km, distance_lyon_km
+├── Métadonnées : id_ref, nom, type (SOL), puissance_kwc, localisation, dept
+└── Statuts : A_AUDITER → EN_COURS → PLANIFIE → TERMINE
 
-Statuts possibles:
-- A_AUDITER (initial)
-- EN_COURS (audit en cours)
-- TERMINE (retour JSON reçu)
-- VALIDE (validation Adrien)
+ordres_mission (missions planifiées)
+├── FK centrale_id → centrales(id)
+├── FK sous_traitant_id → sous_traitants(id)
+├── FK technicien_id → techniciens(id)
+└── date_mission, heure_debut, duree_estimee_heures, statut
+
+sous_traitants (2 rows test)
+└── nom_entreprise, contact_principal, telephone, email
+
+techniciens (3 rows test)
+└── prenom, nom, telephone, email
 ```
+
+### **Note Importante : 48 vs 52 Centrales**
+L'Excel ANNEXE 1 contient **52 lignes** mais seulement **48 centrales uniques** :
+- 4 doublons avec IDs différents (Laurent ROUX x2, Frederic Sinaud x2, Frédéric CASTET x2, Serge Maltaverne x2)
+- 1 ligne avec formule Excel cassée (ligne 52)
+- La base contient donc correctement **48 centrales valides** avec toutes leurs données GPS
 
 ## 📦 Volumétrie Mission 52 Centrales
 
@@ -176,6 +225,16 @@ npm run db:console:prod         # Console SQL production
 
 ## 📡 API Endpoints
 
+### **Planning Manager** 🆕
+- `GET /api/planning/full` - Planning complet 48 centrales avec attributions
+- `POST /api/planning/save-attribution` - Sauvegarder attribution ST + technicien + date
+- `POST /api/planning/generate-all-missions` - Générer/confirmer tous ordres de mission
+- `GET /api/planning/export-data` - Export données complètes pour Excel/CSV
+
+### **Sous-Traitants & Techniciens**
+- `GET /api/sous-traitants` - Liste sous-traitants avec contacts
+- `GET /api/techniciens` - Liste techniciens avec coordonnées
+
 ### **Centrales**
 - `GET /api/centrales` - Liste toutes les centrales (avec statistiques)
 - `GET /api/centrales/:id` - Détails centrale + retours JSON
@@ -192,6 +251,25 @@ npm run db:console:prod         # Console SQL production
 ### **Exemples Requêtes**
 
 ```bash
+# Planning Manager - Obtenir planning complet
+curl http://localhost:3000/api/planning/full | jq
+
+# Planning Manager - Attribuer centrale
+curl -X POST http://localhost:3000/api/planning/save-attribution \
+  -H "Content-Type: application/json" \
+  -d '{
+    "centrale_id": 38,
+    "sous_traitant_id": 1,
+    "technicien_id": 1,
+    "date_mission": "2025-12-01"
+  }'
+
+# Planning Manager - Générer ordres de mission
+curl -X POST http://localhost:3000/api/planning/generate-all-missions | jq
+
+# Planning Manager - Export données
+curl http://localhost:3000/api/planning/export-data | jq
+
 # Obtenir statistiques
 curl http://localhost:3000/api/stats
 
@@ -312,18 +390,40 @@ npm run deploy:prod
 ## ✅ Tests et Validation
 
 ### **Tests Effectués**
-- ✅ API `/api/stats` : 52 centrales SOL (audits toiture + sol inclus)
-- ✅ API `/api/centrales` : Liste complète avec données réelles (ANNEXE 1)
+
+#### **Planning Manager (Priorité 1)** ✅
+- ✅ API `/api/planning/full` : 48 centrales avec distances GPS
+- ✅ API `/api/planning/save-attribution` : Auto-save attribution testée (IDs 38, 50, 4)
+- ✅ API `/api/planning/generate-all-missions` : Génération 3 ordres confirmée
+- ✅ API `/api/planning/export-data` : Export CSV complet fonctionnel
+- ✅ Frontend : Bouton "Générer ordres de mission" (orange) ajouté
+- ✅ Frontend : Bouton "Export Excel" (vert) fonctionnel
+- ✅ Frontend : Auto-save inline avec flash vert validé
+- ✅ Workflow complet : Attribution → Génération → Export ✅
+
+#### **Dashboard & Centrales**
+- ✅ API `/api/stats` : 48 centrales SOL validées (Excel source = 48 uniques)
+- ✅ API `/api/centrales` : Liste complète avec données ANNEXE 1
 - ✅ Dashboard frontend : Charts + statistiques
 - ✅ Upload form : Enregistrement retours JSON
-- ✅ Database D1 locale : Migrations appliquées avec 52 centrales réelles
+- ✅ Database D1 locale : Migrations appliquées avec 48 centrales + GPS
 - ✅ PM2 process : Serveur stable et accessible
-- ✅ GitHub sync : Code pushé avec corrections type
+- ✅ GitHub sync : Code pushé avec Planning Manager
 
 ### **Statut Final**
-- **Sandbox** : ✅ 100% Opérationnel
-- **GitHub** : ✅ Synchronisé
-- **Production** : ⏳ Prêt pour déploiement
+- **Sandbox** : ✅ 100% Opérationnel (Planning Manager prêt livraison GIRASOLE)
+- **GitHub** : ✅ Synchronisé avec dernières fonctionnalités
+- **Production** : ⏳ Prêt pour déploiement Cloudflare Pages
+
+### **URL Planning Manager (PRIORITÉ GIRASOLE)**
+🔗 **https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/planning-manager**
+
+**Workflow Livraison GIRASOLE** :
+1. Ouvrir Planning Manager
+2. Assigner 48 centrales (ST + Technicien + Date)
+3. Cliquer "Générer ordres de mission" (orange)
+4. Cliquer "Export Excel" (vert) → Télécharger CSV
+5. Envoyer fichier CSV à GIRASOLE avant 14h
 
 ## 👨‍💼 Contact et Support
 

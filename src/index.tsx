@@ -3452,6 +3452,9 @@ app.get('/planning-manager', (c) => {
                             <div id="selection-counter" class="bg-blue-600 text-white px-4 py-2 rounded-full font-bold">
                                 0 sélectionnée(s)
                             </div>
+                            <button onclick="generateAllMissions()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition shadow-lg">
+                                <i class="fas fa-check-circle mr-2"></i>Générer ordres de mission
+                            </button>
                             <button onclick="exportPlanningExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
                                 <i class="fas fa-file-excel mr-2"></i>Export Excel
                             </button>
@@ -3586,10 +3589,9 @@ app.get('/api/planning/full', async (c) => {
       LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
       LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
       LEFT JOIN techniciens t ON om.technicien_id = t.id
-      WHERE c.distance_toulouse_km IS NOT NULL OR c.distance_lyon_km IS NOT NULL
       ORDER BY 
         CASE 
-          WHEN c.distance_toulouse_km IS NULL THEN c.distance_lyon_km
+          WHEN c.distance_toulouse_km IS NULL THEN 999999
           WHEN c.distance_lyon_km IS NULL THEN c.distance_toulouse_km
           WHEN c.distance_toulouse_km < c.distance_lyon_km THEN c.distance_toulouse_km
           ELSE c.distance_lyon_km
@@ -3726,6 +3728,183 @@ app.post('/api/planning/auto-assign', async (c) => {
     return c.json({ 
       success: true, 
       data: { assigned: assigned.length, details: assigned }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/planning/save-attribution - Sauvegarder attribution modifiée (inline edit)
+app.post('/api/planning/save-attribution', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_id, sous_traitant_id, technicien_id, date_mission } = body
+    
+    if (!centrale_id) {
+      return c.json({ success: false, error: 'centrale_id requis' }, 400)
+    }
+    
+    // Si ST, technicien et date fournis → créer/mettre à jour mission
+    if (sous_traitant_id && technicien_id && date_mission) {
+      // Check si mission existe
+      const existing = await DB.prepare(`
+        SELECT id FROM ordres_mission WHERE centrale_id = ? AND statut != 'ANNULE'
+      `).bind(centrale_id).first()
+      
+      if (existing) {
+        // Update
+        await DB.prepare(`
+          UPDATE ordres_mission
+          SET sous_traitant_id = ?, technicien_id = ?, date_mission = ?, statut = 'PLANIFIE'
+          WHERE id = ?
+        `).bind(sous_traitant_id, technicien_id, date_mission, existing.id).run()
+      } else {
+        // Insert
+        await DB.prepare(`
+          INSERT INTO ordres_mission (centrale_id, sous_traitant_id, technicien_id, date_mission, heure_debut, duree_estimee_heures, statut)
+          VALUES (?, ?, ?, ?, '08:00', 7.0, 'PLANIFIE')
+        `).bind(centrale_id, sous_traitant_id, technicien_id, date_mission).run()
+      }
+      
+      await DB.prepare(`UPDATE centrales SET statut = 'EN_COURS' WHERE id = ?`).bind(centrale_id).run()
+      
+      return c.json({ success: true, action: existing ? 'updated' : 'created' })
+    } else {
+      return c.json({ success: false, error: 'sous_traitant_id, technicien_id et date_mission requis' }, 400)
+    }
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/planning/generate-all-missions - Générer ordres de mission depuis attributions
+app.post('/api/planning/generate-all-missions', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Récupérer toutes les centrales avec attributions complètes (ST + technicien + date)
+    const centrales = await DB.prepare(`
+      SELECT 
+        c.id as centrale_id,
+        c.nom as centrale_nom,
+        om.id as mission_id,
+        om.sous_traitant_id,
+        om.technicien_id,
+        om.date_mission,
+        om.statut as mission_statut
+      FROM centrales c
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
+      WHERE om.sous_traitant_id IS NOT NULL 
+        AND om.technicien_id IS NOT NULL 
+        AND om.date_mission IS NOT NULL
+    `).all()
+    
+    let created = 0
+    let updated = 0
+    let errors = []
+    
+    for (const centrale of centrales.results) {
+      try {
+        // Vérifier si mission déjà validée
+        if (centrale.mission_statut === 'PLANIFIE') {
+          // Déjà générée, on compte comme updated
+          updated++
+        } else {
+          // Mettre à jour statut à PLANIFIE (confirmé)
+          await DB.prepare(`
+            UPDATE ordres_mission SET statut = 'PLANIFIE' WHERE id = ?
+          `).bind(centrale.mission_id).run()
+          
+          created++
+        }
+      } catch (error) {
+        errors.push({
+          centrale_id: centrale.centrale_id,
+          centrale_nom: centrale.centrale_nom,
+          error: String(error)
+        })
+      }
+    }
+    
+    return c.json({
+      success: true,
+      data: {
+        total_traites: centrales.results.length,
+        created,
+        updated,
+        errors: errors.length,
+        error_details: errors
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/planning/export-data - Exporter données planning pour Excel
+app.get('/api/planning/export-data', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const planning = await DB.prepare(`
+      SELECT 
+        c.id,
+        c.id_ref,
+        c.nom as centrale_nom,
+        c.type,
+        c.puissance_kwc,
+        c.localisation,
+        c.dept,
+        c.distance_toulouse_km,
+        c.distance_lyon_km,
+        c.base_proche,
+        c.statut as centrale_statut,
+        om.id as mission_id,
+        om.date_mission,
+        om.heure_debut,
+        om.duree_estimee_heures,
+        om.statut as mission_statut,
+        st.nom_entreprise as sous_traitant_nom,
+        st.contact_principal as sous_traitant_contact,
+        t.prenom || ' ' || t.nom as technicien_nom,
+        t.telephone as technicien_tel
+      FROM centrales c
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
+      LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      LEFT JOIN techniciens t ON om.technicien_id = t.id
+      ORDER BY 
+        CASE 
+          WHEN c.distance_toulouse_km IS NULL THEN 999999
+          WHEN c.distance_lyon_km IS NULL THEN c.distance_toulouse_km
+          WHEN c.distance_toulouse_km < c.distance_lyon_km THEN c.distance_toulouse_km
+          ELSE c.distance_lyon_km
+        END ASC
+    `).all()
+    
+    if (!planning || !planning.results) {
+      return c.json({ success: false, error: 'Aucune donnée disponible' }, 500)
+    }
+    
+    // Ajouter distance_km calculée
+    const planningAvecDistance = planning.results.map((p: any) => {
+      const distToulouse = p.distance_toulouse_km || 999999
+      const distLyon = p.distance_lyon_km || 999999
+      return {
+        ...p,
+        distance_km: Math.min(distToulouse, distLyon)
+      }
+    })
+    
+    return c.json({
+      success: true,
+      data: planningAvecDistance,
+      stats: {
+        total: planningAvecDistance.length,
+        avec_mission: planningAvecDistance.filter((p: any) => p.mission_id !== null).length,
+        sans_mission: planningAvecDistance.filter((p: any) => p.mission_id === null).length
+      }
     })
   } catch (error) {
     return c.json({ success: false, error: String(error) }, 500)
