@@ -27,7 +27,7 @@ app.get('/api/centrales', async (c) => {
       SELECT 
         c.*,
         COUNT(r.id) as nb_retours,
-        SUM(r.nombre_photos) as total_photos
+        SUM(r.nb_photos) as total_photos
       FROM centrales c
       LEFT JOIN retours_json r ON c.id = r.centrale_id
       GROUP BY c.id
@@ -132,16 +132,16 @@ app.post('/api/retours', async (c) => {
   
   try {
     const body = await c.req.json()
-    const { centrale_id, nom_fichier, taille_mo, nombre_photos, technicien } = body
+    const { ordre_mission_id, centrale_id, technicien_id, json_data, taille_mo, nb_photos } = body
     
-    if (!centrale_id || !nom_fichier) {
-      return c.json({ success: false, error: 'centrale_id et nom_fichier requis' }, 400)
+    if (!ordre_mission_id || !centrale_id || !technicien_id || !json_data) {
+      return c.json({ success: false, error: 'ordre_mission_id, centrale_id, technicien_id et json_data requis' }, 400)
     }
     
     const result = await DB.prepare(`
-      INSERT INTO retours_json (centrale_id, nom_fichier, taille_mo, nombre_photos, technicien)
-      VALUES (?, ?, ?, ?, ?)
-    `).bind(centrale_id, nom_fichier, taille_mo || 0, nombre_photos || 0, technicien || 'Inconnu').run()
+      INSERT INTO retours_json (ordre_mission_id, centrale_id, technicien_id, json_data, taille_mo, nb_photos)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(ordre_mission_id, centrale_id, technicien_id, json_data, taille_mo || 0, nb_photos || 0).run()
     
     // Mettre à jour statut centrale
     await DB.prepare(`
@@ -198,7 +198,7 @@ app.get('/api/stats', async (c) => {
     const statsVolume = await DB.prepare(`
       SELECT 
         COUNT(*) as total_retours,
-        SUM(nombre_photos) as total_photos,
+        SUM(nb_photos) as total_photos,
         SUM(taille_mo) as total_json_mb
       FROM retours_json
     `).first()
@@ -226,7 +226,7 @@ app.get('/api/stats/progression', async (c) => {
       SELECT 
         DATE(date_upload) as date,
         COUNT(*) as nb_retours,
-        SUM(nombre_photos) as photos
+        SUM(nb_photos) as photos
       FROM retours_json
       GROUP BY DATE(date_upload)
       ORDER BY date DESC
@@ -1132,7 +1132,7 @@ app.post('/api/admin/init-all-tables', async (c) => {
         date_upload DATETIME DEFAULT CURRENT_TIMESTAMP,
         json_data TEXT NOT NULL,
         taille_bytes INTEGER,
-        nombre_photos INTEGER,
+        nb_photos INTEGER,
         commentaire TEXT,
         FOREIGN KEY (centrale_id) REFERENCES centrales(id) ON DELETE CASCADE
       );
