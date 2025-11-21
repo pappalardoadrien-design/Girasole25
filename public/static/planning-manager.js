@@ -44,7 +44,7 @@ function updateStats(stats) {
   document.getElementById('stat-total').textContent = stats.total || 0;
   document.getElementById('stat-assigned').textContent = stats.assigned || 0;
   document.getElementById('stat-unassigned').textContent = stats.unassigned || 0;
-  document.getElementById('stat-planned').textContent = stats.planned || 0;
+  document.getElementById('stat-planned').textContent = `${stats.planned || 0} (${stats.with_checklist || 0} ✓)`;
 }
 
 // Rendre tableau planning
@@ -71,6 +71,7 @@ function renderPlanningTable(centrales) {
           <th class="px-3 py-2 text-left">Sous-traitant</th>
           <th class="px-3 py-2 text-left">Technicien</th>
           <th class="px-3 py-2 text-center">Date mission</th>
+          <th class="px-3 py-2 text-center">Checklist</th>
           <th class="px-3 py-2 text-center">Statut</th>
           <th class="px-3 py-2 text-center">Actions</th>
         </tr>
@@ -122,6 +123,9 @@ function renderPlanningTable(centrales) {
               }
             </td>
             <td class="px-3 py-2 text-center">
+              ${getChecklistBadge(c.checklist_status, c.checklist_count)}
+            </td>
+            <td class="px-3 py-2 text-center">
               ${getStatutBadge(c.centrale_statut, c.mission_statut)}
             </td>
             <td class="px-3 py-2 text-center">
@@ -150,6 +154,22 @@ function renderPlanningTable(centrales) {
       }
     });
   }, 100);
+}
+
+function getChecklistBadge(checklistStatus, count) {
+  if (checklistStatus === 'PRET') {
+    return `<span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800 font-semibold">
+      <i class="fas fa-check-circle"></i> 54/54
+    </span>`;
+  } else if (checklistStatus === 'PARTIEL') {
+    return `<span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+      <i class="fas fa-clock"></i> ${count}/54
+    </span>`;
+  } else {
+    return `<span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-600">
+      <i class="fas fa-minus-circle"></i> Non init
+    </span>`;
+  }
 }
 
 function getStatutBadge(centraleStatut, missionStatut) {
@@ -271,7 +291,16 @@ async function saveInlineChange(centraleId) {
       const row = document.querySelector(`tr[data-centrale-id="${centraleId}"]`);
       if (row) {
         row.classList.add('bg-green-50');
-        setTimeout(() => row.classList.remove('bg-green-50'), 1000);
+        setTimeout(() => {
+          row.classList.remove('bg-green-50');
+          // Recharger les données pour afficher le statut checklist
+          loadPlanningData();
+        }, 800);
+      }
+      
+      // Message de confirmation avec checklist
+      if (response.data.checklist_initialized) {
+        showSuccess('✅ Sauvegardé + Checklist 54 points créée !');
       }
     }
   } catch (error) {

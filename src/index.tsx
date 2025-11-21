@@ -3584,7 +3584,8 @@ app.get('/api/planning/full', async (c) => {
         st.id as sous_traitant_id,
         st.nom_entreprise as sous_traitant_nom,
         t.id as technicien_id,
-        t.prenom || ' ' || t.nom as technicien_nom
+        t.prenom || ' ' || t.nom as technicien_nom,
+        (SELECT COUNT(*) FROM checklist_items WHERE ordre_mission_id = om.id) as checklist_count
       FROM centrales c
       LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
       LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
@@ -3598,7 +3599,7 @@ app.get('/api/planning/full', async (c) => {
         END ASC
     `).all()
     
-    // Ajouter distance_km calculée
+    // Ajouter distance_km calculée et statut checklist
     const planningComplet = planning.results.map((p: any) => {
       const distToulouse = p.distance_toulouse_km || 999999
       const distLyon = p.distance_lyon_km || 999999
@@ -3606,7 +3607,9 @@ app.get('/api/planning/full', async (c) => {
         ...p,
         distance_km: Math.min(distToulouse, distLyon),
         is_assigned: p.mission_id !== null,
-        is_planned: p.date_mission !== null
+        is_planned: p.date_mission !== null,
+        has_checklist: p.checklist_count > 0,
+        checklist_status: p.checklist_count === 54 ? 'PRET' : (p.checklist_count > 0 ? 'PARTIEL' : 'NON_INIT')
       }
     })
     
@@ -3617,7 +3620,8 @@ app.get('/api/planning/full', async (c) => {
         total: planningComplet.length,
         assigned: planningComplet.filter((p: any) => p.is_assigned).length,
         planned: planningComplet.filter((p: any) => p.is_planned).length,
-        unassigned: planningComplet.filter((p: any) => !p.is_assigned).length
+        unassigned: planningComplet.filter((p: any) => !p.is_assigned).length,
+        with_checklist: planningComplet.filter((p: any) => p.has_checklist).length
       }
     })
   } catch (error) {
@@ -3753,6 +3757,8 @@ app.post('/api/planning/save-attribution', async (c) => {
         SELECT id FROM ordres_mission WHERE centrale_id = ? AND statut != 'ANNULE'
       `).bind(centrale_id).first()
       
+      let missionId: number
+      
       if (existing) {
         // Update
         await DB.prepare(`
@@ -3760,17 +3766,44 @@ app.post('/api/planning/save-attribution', async (c) => {
           SET sous_traitant_id = ?, technicien_id = ?, date_mission = ?, statut = 'PLANIFIE'
           WHERE id = ?
         `).bind(sous_traitant_id, technicien_id, date_mission, existing.id).run()
+        missionId = existing.id as number
       } else {
         // Insert
-        await DB.prepare(`
+        const result = await DB.prepare(`
           INSERT INTO ordres_mission (centrale_id, sous_traitant_id, technicien_id, date_mission, heure_debut, duree_estimee_heures, statut)
           VALUES (?, ?, ?, ?, '08:00', 7.0, 'PLANIFIE')
         `).bind(centrale_id, sous_traitant_id, technicien_id, date_mission).run()
+        missionId = result.meta.last_row_id as number
+      }
+      
+      // ✅ INITIALISER CHECKLIST AUTOMATIQUEMENT (54 points)
+      const checklistStructure = [
+        { cat: 'DOC', items: ['Plaques signalétiques modules', 'Plan installation (as-built)', 'Schémas électriques (DC/AC)', 'Attestation Consuel', 'Certificats conformité onduleurs', 'Rapport mise en service', 'Contrat maintenance O&M', 'Notice technique modules'] },
+        { cat: 'ELEC', items: ['Mesure tension Voc strings (à vide)', 'Mesure courant Isc strings (court-circuit)', 'Test isolement DC (> 1 MΩ)', 'Mesure continuité terres', 'Polarité strings (+ et -)', 'Protection différentielle 30mA', 'Disjoncteurs calibrage correct', 'Parafoudres DC/AC état', 'Test fonctionnel onduleurs', 'Monitoring production réel vs théorique', 'Équilibrage phases AC', 'Cos φ (facteur puissance)'] },
+        { cat: 'TABLEAUX', items: ['État général coffrets DC', 'Étanchéité IP65 boîtiers', 'Serrage bornes électriques', 'Signalétique circuits', 'Ventilation coffrets', 'Absence corrosion/oxydation', 'Échauffement anormal (thermographie)', 'Accessibilité maintenance'] },
+        { cat: 'CABLAGE', items: ['Connecteurs MC4 serrés/étanches', 'Gaines ICTA/IRL état', 'Chemins câbles fixations', 'Protection UV câbles DC', 'Rayon courbure respecté', 'Absence points chauds (thermographie)', 'Marquage câbles positif/négatif'] },
+        { cat: 'MODULES', items: ['État visuel face avant (fissures/casse)', 'État cadres (corrosion/déformation)', 'Boîtiers jonction étanches', 'Diodes by-pass fonctionnelles', 'Hotspots thermographie (ΔT > 10°C)', 'Délamination/bulles', 'Snail trails (traces escargot)', 'Salissures importantes', 'Ombres portées permanentes', 'PID (Potential Induced Degradation)'] },
+        { cat: 'STRUCTURES', items: ['Fixations modules (boulons/clips)', 'État rails (corrosion/déformation)', 'Fondations/lestage stable', 'Mise à la terre structures', 'Espacement inter-rangées ventilation'] },
+        { cat: 'TOITURE', items: ['Étanchéité traversées toiture', 'État couverture (tuiles/bac acier)', 'Écrans sous-toiture intacts', 'Zinguerie/gouttières fonctionnelles'] }
+      ]
+      
+      for (const category of checklistStructure) {
+        for (let i = 0; i < category.items.length; i++) {
+          await DB.prepare(`
+            INSERT OR IGNORE INTO checklist_items (ordre_mission_id, categorie, item_numero, item_texte)
+            VALUES (?, ?, ?, ?)
+          `).bind(missionId, category.cat, i + 1, category.items[i]).run()
+        }
       }
       
       await DB.prepare(`UPDATE centrales SET statut = 'EN_COURS' WHERE id = ?`).bind(centrale_id).run()
       
-      return c.json({ success: true, action: existing ? 'updated' : 'created' })
+      return c.json({ 
+        success: true, 
+        action: existing ? 'updated' : 'created',
+        mission_id: missionId,
+        checklist_initialized: true
+      })
     } else {
       return c.json({ success: false, error: 'sous_traitant_id, technicien_id et date_mission requis' }, 400)
     }
