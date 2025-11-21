@@ -28,26 +28,38 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 
 ## 📊 Fonctionnalités Principales
 
-### 1. **Planning Manager** 📅 **[NOUVEAU - PRIORITÉ 1]**
+### 1. **Planning Manager** 📅 **[NOUVEAU v2.0 - CHECKLIST AUTO]**
 **URL** : `/planning-manager`
 
-Interface complète pour attribution et planification des 48 centrales GIRASOLE :
+Interface complète pour attribution et planification des 52 centrales GIRASOLE avec **initialisation automatique checklist 54 points** :
 
 #### **Affichage Planning Complet**
-- ✅ Tableau des 48 centrales triées par distance (plus proche = Lyon/Toulouse)
-- ✅ Colonnes : ID, Nom, Type, Puissance, Localisation, Distance (km), Département, Sous-traitant, Technicien, Date mission
+- ✅ Tableau des 52 centrales triées par distance (plus proche = Lyon/Toulouse)
+- ✅ Colonnes : ID, Nom, Type, Puissance, Localisation, Distance (km), Département, Sous-traitant, Technicien, Date mission, **Checklist**, Statut
+- ✅ **Colonne Checklist** : Badge visuel vert "✓ 54/54" (PRET) / jaune (PARTIEL) / gris (NON_INIT)
 - ✅ Statut visuel : ligne verte si attribuée
-- ✅ Statistiques temps réel : Total (48) / Attribués / Non attribués / Planifiés
+- ✅ Statistiques temps réel : Total (52) / Attribués / Non attribués / Planifiés (X ✓ = avec checklist)
 
-#### **Attribution Manuelle avec Auto-Save** ⚡
+#### **Attribution Manuelle avec Auto-Save + Checklist** ⚡
 - ✅ Dropdowns inline pour Sous-traitant et Technicien
 - ✅ Input date pour Date de mission
 - ✅ **Auto-save automatique** quand les 3 champs sont remplis
-- ✅ **Flash vert visuel** (1 seconde) sur ligne sauvegardée
-- ✅ API : `POST /api/planning/save-attribution`
+- ✅ **Checklist 54 points créée automatiquement** (7 catégories : DOC, ELEC, TABLEAUX, CABLAGE, MODULES, STRUCTURES, TOITURE)
+- ✅ **Flash vert visuel** (1 seconde) + message "Sauvegardé + Checklist 54 points créée !"
+- ✅ **Badge vert "✓ 54/54"** apparaît instantanément
+- ✅ API : `POST /api/planning/save-attribution` (retourne `checklist_initialized: true`)
+
+#### **Checklist 54 Points Normée** ✅
+- ✅ Initialisée automatiquement lors de l'attribution
+- ✅ 7 catégories : DOC (8), ELEC (12), TABLEAUX (8), CABLAGE (7), MODULES (10), STRUCTURES (5), TOITURE (4)
+- ✅ Conforme normes IEC 62446-1
+- ✅ Interface mobile audit : `/audit/:mission_id`
+- ✅ Capture photos intégrée (base64)
+- ✅ Auto-save temps réel terrain
+- ✅ API : `GET /api/checklist/:mission_id`, `PUT /api/checklist/:id`
 
 #### **Génération Ordres de Mission** 🎯
-- ✅ **Bouton orange "Générer ordres de mission"** dans header
+- ✅ **Bouton orange "Générer ordres de mission"** dans header (OPTIONNEL depuis v2.0)
 - ✅ Génère/confirme tous les ordres pour centrales attribuées
 - ✅ Dialog confirmation avant exécution
 - ✅ Stats détaillées : Total traités / Créés / Mis à jour / Erreurs
@@ -55,7 +67,7 @@ Interface complète pour attribution et planification des 48 centrales GIRASOLE 
 
 #### **Export Excel/CSV** 📊
 - ✅ **Bouton vert "Export Excel"** dans header
-- ✅ Télécharge CSV avec toutes données : Centrale, ST (nom+contact), Technicien (nom+tél), dates, distances
+- ✅ Télécharge CSV avec toutes données : Centrale, ST (nom+contact), Technicien (nom+tél), dates, distances, **statut checklist**
 - ✅ Format UTF-8 avec BOM pour Excel
 - ✅ Nom fichier : `planning_girasole_YYYY-MM-DD.csv`
 - ✅ API : `GET /api/planning/export-data`
@@ -88,10 +100,12 @@ Interface complète pour attribution et planification des 48 centrales GIRASOLE 
 ## 🗄️ Architecture Base de Données
 
 ### **Cloudflare D1 SQLite**
-- **centrales** : 48 centrales avec GPS, distances, statuts, puissance
+- **centrales** : 52 centrales avec GPS, distances, statuts, puissance
 - **ordres_mission** : Missions planifiées avec ST, technicien, dates
 - **sous_traitants** : Liste des sous-traitants avec contacts
 - **techniciens** : Liste des techniciens avec coordonnées
+- **checklist_items** : 54 points checklist par mission (photo_base64, statut, conformité)
+- **audit_photos** : Métadonnées photos audit (GPS, timestamps)
 - **retours_json** : Métadonnées retours techniciens (nom fichier, taille, photos)
 - **stats_mission** : Historique statistiques globales
 
@@ -115,11 +129,13 @@ techniciens (3 rows test)
 └── prenom, nom, telephone, email
 ```
 
-### **Note Importante : 48 vs 52 Centrales**
-L'Excel ANNEXE 1 contient **52 lignes** mais seulement **48 centrales uniques** :
-- 4 doublons avec IDs différents (Laurent ROUX x2, Frederic Sinaud x2, Frédéric CASTET x2, Serge Maltaverne x2)
-- 1 ligne avec formule Excel cassée (ligne 52)
-- La base contient donc correctement **48 centrales valides** avec toutes leurs données GPS
+### **52 Centrales Complètes** ✅
+L'Excel ANNEXE 1 v4 contient **52 centrales uniques** :
+- ✅ 52 centrales chargées dans la base (noms dédoublonnés avec suffix ID)
+- ✅ 47 centrales avec GPS (distances calculées Toulouse/Lyon via Haversine)
+- ✅ 5 centrales sans GPS (affichées en fin de liste)
+- ✅ 3 types supportés : SOL, TOITURE, OMBRIERE
+- ✅ Toutes centrales affichées dans Planning Manager avec checklist auto
 
 ## 📦 Volumétrie Mission 52 Centrales
 
@@ -226,10 +242,16 @@ npm run db:console:prod         # Console SQL production
 ## 📡 API Endpoints
 
 ### **Planning Manager** 🆕
-- `GET /api/planning/full` - Planning complet 48 centrales avec attributions
-- `POST /api/planning/save-attribution` - Sauvegarder attribution ST + technicien + date
+- `GET /api/planning/full` - Planning complet 52 centrales avec attributions + statut checklist
+- `POST /api/planning/save-attribution` - Sauvegarder attribution + **init checklist 54 points auto**
 - `POST /api/planning/generate-all-missions` - Générer/confirmer tous ordres de mission
 - `GET /api/planning/export-data` - Export données complètes pour Excel/CSV
+
+### **Checklist Audit Terrain** 🆕
+- `POST /api/checklist/:mission_id/init` - Initialiser 54 points checklist (automatique depuis v2.0)
+- `GET /api/checklist/:mission_id` - Récupérer checklist complète mission
+- `PUT /api/checklist/:id` - Mettre à jour item checklist (statut, photo_base64, commentaire)
+- `GET /audit/:mission_id` - Interface mobile PWA audit technicien
 
 ### **Sous-Traitants & Techniciens**
 - `GET /api/sous-traitants` - Liste sous-traitants avec contacts
@@ -415,15 +437,19 @@ npm run deploy:prod
 - **GitHub** : ✅ Synchronisé avec dernières fonctionnalités
 - **Production** : ⏳ Prêt pour déploiement Cloudflare Pages
 
-### **URL Planning Manager (PRIORITÉ GIRASOLE)**
+### **URL Planning Manager (PRIORITÉ GIRASOLE)** 🚨
 🔗 **https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/planning-manager**
 
-**Workflow Livraison GIRASOLE** :
+**Workflow Livraison GIRASOLE v2.0 (SIMPLIFIÉ)** :
 1. Ouvrir Planning Manager
-2. Assigner 48 centrales (ST + Technicien + Date)
-3. Cliquer "Générer ordres de mission" (orange)
-4. Cliquer "Export Excel" (vert) → Télécharger CSV
-5. Envoyer fichier CSV à GIRASOLE avant 14h
+2. Assigner 52 centrales (ST + Technicien + Date)
+   - ✅ **Checklist 54 points créée automatiquement**
+   - ✅ Badge vert "✓ 54/54" confirme instantanément
+3. ~~Cliquer "Générer ordres de mission"~~ → **AUTOMATIQUE depuis v2.0** ✨
+4. Cliquer "Export Excel" (vert) → Télécharger CSV avec statut checklist
+5. Envoyer fichier CSV à GIRASOLE avant 14h00
+
+**Gain v2.0** : 0 clic supplémentaire, checklist auto-attribuée !
 
 ## 👨‍💼 Contact et Support
 
