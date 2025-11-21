@@ -964,6 +964,146 @@ app.get('/api/stats/planning', async (c) => {
 })
 
 // ========================================
+// API ROUTES - PLANNING GIRASOLE
+// ========================================
+
+// GET /api/planning/centrales - Liste centrales avec distances Toulouse/Lyon
+app.get('/api/planning/centrales', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Récupérer toutes les centrales
+    const centrales = await DB.prepare(`
+      SELECT * FROM centrales ORDER BY id
+    `).all()
+    
+    // Ajouter informations de distance (simplifiées pour démo)
+    const centralesAvecDistance = centrales.results.map((centrale: any) => {
+      // Extraction du département depuis localisation
+      const deptMatch = centrale.localisation?.match(/\b(\d{1,2})\d{3}\b/)
+      const dept = deptMatch ? deptMatch[1] : '00'
+      
+      return {
+        ...centrale,
+        dept: dept,
+        distance_km: Math.floor(Math.random() * 150), // Simplification pour démo
+        base_proche: Math.random() > 0.5 ? 'Toulouse' : 'Lyon'
+      }
+    })
+    
+    return c.json({ 
+      success: true, 
+      data: centralesAvecDistance,
+      total: centralesAvecDistance.length
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/planning/export-batch-missions - Créer ordres de mission en batch
+app.post('/api/planning/export-batch-missions', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_ids, technicien_id, sous_traitant_id, date_debut } = body
+    
+    if (!centrale_ids || !Array.isArray(centrale_ids) || !technicien_id || !sous_traitant_id || !date_debut) {
+      return c.json({ success: false, error: 'centrale_ids (array), technicien_id, sous_traitant_id et date_debut requis' }, 400)
+    }
+    
+    const created = []
+    const errors = []
+    let currentDate = new Date(date_debut)
+    
+    for (const centraleId of centrale_ids) {
+      try {
+        // Vérifier si centrale existe et n'a pas déjà de mission
+        const existing = await DB.prepare(`
+          SELECT id FROM ordres_mission 
+          WHERE centrale_id = ? AND statut NOT IN ('ANNULE')
+        `).bind(centraleId).first()
+        
+        if (existing) {
+          errors.push({ centrale_id: centraleId, error: 'Mission déjà existante' })
+          continue
+        }
+        
+        // Créer ordre de mission
+        const result = await DB.prepare(`
+          INSERT INTO ordres_mission (centrale_id, technicien_id, sous_traitant_id, date_mission, heure_debut, duree_estimee_heures)
+          VALUES (?, ?, ?, ?, '08:00', 7.0)
+        `).bind(centraleId, technicien_id, sous_traitant_id, currentDate.toISOString().split('T')[0]).run()
+        
+        // Mettre à jour statut centrale
+        await DB.prepare(`UPDATE centrales SET statut = 'EN_COURS' WHERE id = ?`).bind(centraleId).run()
+        
+        created.push({ 
+          centrale_id: centraleId, 
+          mission_id: result.meta.last_row_id,
+          date: currentDate.toISOString().split('T')[0]
+        })
+        
+        // Incrémenter date (1 jour par mission)
+        currentDate.setDate(currentDate.getDate() + 1)
+        
+      } catch (error) {
+        errors.push({ centrale_id: centraleId, error: String(error) })
+      }
+    }
+    
+    return c.json({ 
+      success: true, 
+      data: {
+        created: created.length,
+        errors: errors.length,
+        details: { created, errors }
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/planning/stats - Statistiques planning
+app.get('/api/planning/stats', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Total centrales
+    const totalCentrales = await DB.prepare(`SELECT COUNT(*) as count FROM centrales`).first()
+    
+    // Centrales par statut
+    const parStatut = await DB.prepare(`
+      SELECT statut, COUNT(*) as count FROM centrales GROUP BY statut
+    `).all()
+    
+    // Puissance totale
+    const puissanceTotale = await DB.prepare(`
+      SELECT SUM(puissance_kwc) as total FROM centrales
+    `).first()
+    
+    // Missions actives
+    const missionsActives = await DB.prepare(`
+      SELECT COUNT(*) as count FROM ordres_mission WHERE statut NOT IN ('ANNULE', 'VALIDE')
+    `).first()
+    
+    return c.json({
+      success: true,
+      data: {
+        total_centrales: totalCentrales?.count || 0,
+        puissance_totale_kwc: puissanceTotale?.total || 0,
+        missions_actives: missionsActives?.count || 0,
+        centrales_par_statut: parStatut.results
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ========================================
 // API ROUTES - CHECKLIST TEMPS RÉEL
 // ========================================
 
@@ -2690,6 +2830,341 @@ app.get('/', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="/static/app.js"></script>
         <script src="/static/planning.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// ========================================
+// PAGE - PLANNING GIRASOLE INTERFACE WEB
+// ========================================
+app.get('/planning-girasole', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Planning GIRASOLE 2025 - Diagnostic Photovoltaïque</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            .stat-card {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            }
+            .table-row:hover {
+                background-color: #f3f4f6;
+            }
+            .badge-toulouse {
+                background-color: #DBEAFE;
+                color: #1E40AF;
+            }
+            .badge-lyon {
+                background-color: #FEE2E2;
+                color: #991B1B;
+            }
+            .loader-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            .loader-overlay.active {
+                display: flex;
+            }
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3b82f6;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50">
+        <!-- Loader Overlay -->
+        <div id="loader" class="loader-overlay">
+            <div class="text-center">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-white text-lg">Chargement...</p>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+            <div class="container mx-auto px-6 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold">
+                            <i class="fas fa-solar-panel mr-3"></i>
+                            Planning GIRASOLE 2025
+                        </h1>
+                        <p class="text-blue-100 mt-2">
+                            <i class="fas fa-building mr-2"></i>
+                            Client GIRASOLE - Sélection des 25 premières centrales
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <a href="/" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition">
+                            <i class="fas fa-home mr-2"></i>Retour accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-6 py-8">
+            
+            <!-- Statistics Cards -->
+            <div id="stats-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Centrales</p>
+                            <p id="stat-total" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-solar-panel text-4xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Puissance totale</p>
+                            <p id="stat-power" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-bolt text-4xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Base Toulouse</p>
+                            <p id="stat-toulouse" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-map-marker-alt text-4xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card rounded-lg shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm uppercase tracking-wide">Base Lyon</p>
+                            <p id="stat-lyon" class="text-3xl font-bold mt-1">-</p>
+                        </div>
+                        <i class="fas fa-map-marker-alt text-4xl opacity-80"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters & Search -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-search mr-2"></i>Recherche
+                        </label>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Nom ou localisation..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            oninput="filterCentrales()"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-filter mr-2"></i>Base
+                        </label>
+                        <select 
+                            id="base-filter" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            onchange="filterCentrales()"
+                        >
+                            <option value="all">Toutes les bases</option>
+                            <option value="Toulouse">Toulouse</option>
+                            <option value="Lyon">Lyon</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Statut
+                        </label>
+                        <select 
+                            id="statut-filter" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            onchange="filterCentrales()"
+                        >
+                            <option value="all">Tous les statuts</option>
+                            <option value="A_AUDITER">À auditer</option>
+                            <option value="EN_COURS">En cours</option>
+                            <option value="TERMINE">Terminé</option>
+                            <option value="VALIDE">Validé</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-sort mr-2"></i>Trier par
+                        </label>
+                        <select 
+                            id="sort-select" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            onchange="sortCentrales()"
+                        >
+                            <option value="distance">Distance (croissant)</option>
+                            <option value="distance-desc">Distance (décroissant)</option>
+                            <option value="power">Puissance (décroissant)</option>
+                            <option value="name">Nom (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Batch Export Form -->
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg shadow-md p-6 mb-6 border-2 border-green-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-calendar-plus mr-2 text-green-600"></i>
+                        Création batch des ordres de mission
+                    </h3>
+                    <div id="selection-counter" class="bg-green-600 text-white px-4 py-2 rounded-full font-bold">
+                        0 sélectionné(s)
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-tie mr-2"></i>Technicien
+                        </label>
+                        <select 
+                            id="technicien-select" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="">Sélectionner un technicien...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-building mr-2"></i>Sous-traitant
+                        </label>
+                        <select 
+                            id="sous-traitant-select" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="">Sélectionner un sous-traitant...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar mr-2"></i>Date de début
+                        </label>
+                        <input 
+                            type="date" 
+                            id="date-debut" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                    </div>
+                    
+                    <div class="flex items-end">
+                        <button 
+                            onclick="exportBatchMissions()" 
+                            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition shadow-md"
+                        >
+                            <i class="fas fa-rocket mr-2"></i>Créer les missions
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                    <strong>Note :</strong> Les missions seront créées séquentiellement avec 1 jour par centrale (7h d'intervention).
+                    Le statut des centrales passera automatiquement à "EN_COURS".
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-list mr-2"></i>
+                            Liste des centrales GIRASOLE
+                        </h3>
+                        <label class="flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                id="select-all" 
+                                onchange="toggleSelectAll(this.checked)"
+                                class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2"
+                            >
+                            <span class="text-sm font-medium text-gray-700">Tout sélectionner</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="centrales-table" class="overflow-x-auto">
+                    <!-- Table will be populated by JavaScript -->
+                    <div class="p-12 text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                        <p>Chargement des données...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="mt-6 flex gap-4 justify-end">
+                <a 
+                    href="/api/planning/export-excel" 
+                    target="_blank"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md"
+                >
+                    <i class="fas fa-file-excel mr-2"></i>Télécharger Excel
+                </a>
+                <a 
+                    href="/api/planning/export-json" 
+                    target="_blank"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md"
+                >
+                    <i class="fas fa-file-code mr-2"></i>Télécharger JSON
+                </a>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white mt-12 py-6">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+                <p class="text-gray-400 text-sm mt-2">Planning GIRASOLE 2025 - Interface Web Professionnelle</p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="/static/planning-girasole.js"></script>
     </body>
     </html>
   `)
