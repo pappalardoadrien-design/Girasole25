@@ -3457,6 +3457,9 @@ app.get('/planning-manager', (c) => {
                             <button onclick="exportPlanningExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
                                 <i class="fas fa-file-excel mr-2"></i>Export Excel
                             </button>
+                            <button onclick="exportAnnexe1Enrichie()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition shadow-lg font-semibold">
+                                <i class="fas fa-file-download mr-2"></i>Exporter ANNEXE 1 Enrichie
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -3937,6 +3940,106 @@ app.get('/api/planning/export-data', async (c) => {
         total: planningAvecDistance.length,
         avec_mission: planningAvecDistance.filter((p: any) => p.mission_id !== null).length,
         sans_mission: planningAvecDistance.filter((p: any) => p.mission_id === null).length
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/planning/export-annexe1 - Export ANNEXE 1 enrichie avec planning
+app.get('/api/planning/export-annexe1', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const planning = await DB.prepare(`
+      SELECT 
+        c.id,
+        c.id_ref,
+        c.nom as centrale_nom,
+        c.type,
+        c.puissance_kwc,
+        c.localisation,
+        c.dept,
+        c.latitude,
+        c.longitude,
+        c.distance_toulouse_km,
+        c.distance_lyon_km,
+        c.base_proche,
+        c.statut as centrale_statut,
+        om.id as mission_id,
+        om.date_mission,
+        om.heure_debut,
+        om.duree_estimee_heures,
+        om.statut as mission_statut,
+        st.nom_entreprise as sous_traitant_nom,
+        st.contact_principal as sous_traitant_contact,
+        st.telephone as sous_traitant_tel,
+        t.prenom || ' ' || t.nom as technicien_nom,
+        t.telephone as technicien_tel,
+        t.email as technicien_email,
+        (SELECT COUNT(*) FROM checklist_items WHERE ordre_mission_id = om.id) as checklist_count
+      FROM centrales c
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id AND om.statut != 'ANNULE'
+      LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      LEFT JOIN techniciens t ON om.technicien_id = t.id
+      ORDER BY c.id_ref
+    `).all()
+    
+    // Formater données pour export Excel
+    const dataExport = planning.results.map((row: any) => {
+      const distToulouse = row.distance_toulouse_km || 999999
+      const distLyon = row.distance_lyon_km || 999999
+      const distanceKm = Math.min(distToulouse, distLyon)
+      
+      // Statut checklist
+      let checklistStatus = 'NON ATTRIBUÉ'
+      if (row.checklist_count === 54) {
+        checklistStatus = 'PRÊT (54/54)'
+      } else if (row.checklist_count > 0) {
+        checklistStatus = `EN COURS (${row.checklist_count}/54)`
+      } else if (row.mission_id) {
+        checklistStatus = 'À INITIALISER'
+      }
+      
+      return {
+        // Colonnes ANNEXE 1 originales
+        id_ref: row.id_ref || '',
+        centrale: row.centrale_nom || '',
+        type: row.type || '',
+        puissance_kwc: row.puissance_kwc || 0,
+        localisation: row.localisation || '',
+        departement: row.dept || '',
+        latitude: row.latitude || '',
+        longitude: row.longitude || '',
+        distance_toulouse_km: row.distance_toulouse_km ? row.distance_toulouse_km.toFixed(1) : 'N/A',
+        distance_lyon_km: row.distance_lyon_km ? row.distance_lyon_km.toFixed(1) : 'N/A',
+        distance_km: distanceKm < 999999 ? distanceKm.toFixed(1) : 'N/A',
+        base_proche: row.base_proche || 'N/A',
+        
+        // Colonnes PLANNING ajoutées
+        date_audit: row.date_mission || 'NON PLANIFIÉ',
+        heure_debut: row.heure_debut || '',
+        duree_heures: row.duree_estimee_heures || '',
+        sous_traitant: row.sous_traitant_nom || 'NON ATTRIBUÉ',
+        contact_st: row.sous_traitant_contact || '',
+        tel_st: row.sous_traitant_tel || '',
+        technicien: row.technicien_nom || 'NON ATTRIBUÉ',
+        tel_technicien: row.technicien_tel || '',
+        email_technicien: row.technicien_email || '',
+        statut_mission: row.mission_statut || 'NON CRÉÉ',
+        checklist: checklistStatus,
+        statut_centrale: row.centrale_statut || 'A_AUDITER'
+      }
+    })
+    
+    return c.json({
+      success: true,
+      data: dataExport,
+      stats: {
+        total: dataExport.length,
+        planifiees: dataExport.filter((d: any) => d.date_audit !== 'NON PLANIFIÉ').length,
+        avec_checklist: dataExport.filter((d: any) => d.checklist.includes('PRÊT')).length
       }
     })
   } catch (error) {

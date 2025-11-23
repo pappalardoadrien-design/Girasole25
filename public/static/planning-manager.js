@@ -525,6 +525,87 @@ async function exportPlanningExcel() {
   }
 }
 
+// Export ANNEXE 1 enrichie avec planning
+async function exportAnnexe1Enrichie() {
+  try {
+    showLoader();
+    
+    const response = await axios.get('/api/planning/export-annexe1');
+    
+    if (!response.data.success) {
+      throw new Error(response.data.error);
+    }
+    
+    const data = response.data.data;
+    
+    // Construire CSV avec TOUTES les colonnes
+    let csv = '';
+    
+    // Headers ANNEXE 1 + Planning
+    csv += 'ID,Centrale,Type,Puissance (kWc),Localisation,Département,';
+    csv += 'Latitude,Longitude,Distance Toulouse (km),Distance Lyon (km),Distance (km),Base Proche,';
+    csv += 'Date Audit,Heure Début,Durée (h),Sous-Traitant,Contact ST,Tél ST,';
+    csv += 'Technicien,Tél Technicien,Email Technicien,Statut Mission,Checklist,Statut Centrale\n';
+    
+    // Données
+    data.forEach(row => {
+      const line = [
+        row.id_ref,
+        `"${row.centrale}"`,
+        row.type,
+        row.puissance_kwc,
+        `"${row.localisation}"`,
+        row.departement,
+        row.latitude,
+        row.longitude,
+        row.distance_toulouse_km,
+        row.distance_lyon_km,
+        row.distance_km,
+        row.base_proche,
+        row.date_audit,
+        row.heure_debut,
+        row.duree_heures,
+        `"${row.sous_traitant}"`,
+        `"${row.contact_st}"`,
+        row.tel_st,
+        `"${row.technicien}"`,
+        row.tel_technicien,
+        `"${row.email_technicien}"`,
+        row.statut_mission,
+        `"${row.checklist}"`,
+        row.statut_centrale
+      ];
+      csv += line.join(',') + '\n';
+    });
+    
+    // BOM UTF-8 pour Excel
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    
+    const today = new Date().toISOString().split('T')[0];
+    link.download = `ANNEXE_1_ENRICHIE_GIRASOLE_${today}.csv`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    hideLoader();
+    
+    // Afficher stats
+    const stats = response.data.stats;
+    alert(`✅ ANNEXE 1 Enrichie exportée !\n\n` +
+          `📊 Total : ${stats.total} centrales\n` +
+          `📅 Planifiées : ${stats.planifiees}\n` +
+          `✓ Avec checklist : ${stats.avec_checklist}\n\n` +
+          `📁 Fichier : ANNEXE_1_ENRICHIE_GIRASOLE_${today}.csv`);
+    
+  } catch (error) {
+    hideLoader();
+    showError('Erreur export ANNEXE 1: ' + error.message);
+  }
+}
+
 // Init au chargement
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadPlanningData);
