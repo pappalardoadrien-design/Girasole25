@@ -1016,14 +1016,7 @@ app.get('/api/ordres-mission/:id/document', async (c) => {
               <div class="info-label">Date Mission</div>
               <div class="info-value">${dateFormatee}</div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Heure Début</div>
-              <div class="info-value">${mission.heure_debut || '08:00'}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Durée Estimée</div>
-              <div class="info-value">${mission.duree_estimee_heures}h</div>
-            </div>
+
             <div class="info-item">
               <div class="info-label">Statut</div>
               <div class="info-value">${mission.statut}</div>
@@ -1623,84 +1616,97 @@ app.post('/api/checklist/:mission_id/init', async (c) => {
   const missionId = parseInt(c.req.param('mission_id'))
   
   try {
-    // Structure checklist V4 (54 points)
+    // Récupérer type centrale pour checklist conditionnelle
+    const mission = await DB.prepare(`
+      SELECT c.type FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      WHERE om.id = ?
+    `).bind(missionId).first()
+    
+    const isToiture = mission?.type === 'TOITURE'
+    
+    // Structure checklist CDC GIRASOLE 2025 (40 points AUDIT VISUEL + 12 TOITURE)
     const checklistStructure = [
-      // DOC (8 points)
-      { cat: 'DOC', items: [
-        'Plaques signalétiques modules',
-        'Plan installation (as-built)',
-        'Schémas électriques (DC/AC)',
-        'Attestation Consuel',
-        'Certificats conformité onduleurs',
-        'Rapport mise en service',
-        'Contrat maintenance O&M',
-        'Notice technique modules'
+      // 1. DOCUMENTATION (6 points)
+      { cat: 'DOCUMENTATION', items: [
+        'Présence autocontrôle renseigné installateur',
+        'PV réception lot PV signé (GIRASOLE + installateur)',
+        'CR visite chantier lot PV (GIRASOLE)',
+        'Plans TQC présents sur place',
+        'Attestation DRE bureau contrôle',
+        'Plans électriques tel que construit'
       ]},
-      // ELEC (12 points)
-      { cat: 'ELEC', items: [
-        'Mesure tension Voc strings (à vide)',
-        'Mesure courant Isc strings (court-circuit)',
-        'Test isolement DC (> 1 MΩ)',
-        'Mesure continuité terres',
-        'Polarité strings (+ et -)',
-        'Protection différentielle 30mA',
+      // 2. NORMES NF C 15-100 + UTE C 15-712 (10 points)
+      { cat: 'NORMES_ELEC', items: [
+        'Réglages AGCP conformes aux plans',
+        'Protection différentielle 30mA fonctionnelle',
         'Disjoncteurs calibrage correct',
-        'Parafoudres DC/AC état',
-        'Test fonctionnel onduleurs',
-        'Monitoring production réel vs théorique',
-        'Équilibrage phases AC',
-        'Cos φ (facteur puissance)'
+        'Parafoudres DC/AC en bon état',
+        'Signalétique circuits présente et conforme',
+        'Repérage équipements (inscrit sur équipement)',
+        'Mesure continuité terres conforme',
+        'Polarité strings (+ et -) correcte',
+        'Couleurs câbles DC -/+ différentes',
+        'Test isolement DC (> 1 MΩ)'
       ]},
-      // TABLEAUX (8 points)
-      { cat: 'TABLEAUX', items: [
+      // 3. BONNES PRATIQUES CABLAGE (8 points)
+      { cat: 'CABLAGE', items: [
+        'Fixations chemin câbles (qualité + méthode)',
+        'Type cheminement câbles (galvanisé chaud/froid)',
+        'Protections mécaniques câbles (contacts saillants)',
+        'Rayons courbure câbles AC/DC respectés',
+        'Qualité brassage câbles',
+        'Repérage serrage connexions AC',
+        'Type repérage câbles (sérigraphié/manuscrit/tenant-aboutissant)',
+        'Cheminement terre (crapauds/bornier laiton)'
+      ]},
+      // 4. TRANCHEES (5 points)
+      { cat: 'TRANCHEES', items: [
+        'Respect préconisations tranchée AC (Shelter → PDL)',
+        'Cahier charges tranchées bailleur respecté',
+        'Rebouchage entrée/sortie fourreaux (TPC)',
+        'Matériaux rebouchage conformes',
+        'Profondeur tranchées conforme'
+      ]},
+      // 5. INSTALLATIONS ELECTRIQUES (6 points)
+      { cat: 'INSTALL_ELEC', items: [
+        'Cosses bimétal jonctions cuivre/alu présentes',
+        'Connecteurs MC4 serrés/étanches',
         'État général coffrets DC',
         'Étanchéité IP65 boîtiers',
         'Serrage bornes électriques',
-        'Signalétique circuits',
-        'Ventilation coffrets',
-        'Absence corrosion/oxydation',
-        'Échauffement anormal (thermographie)',
-        'Accessibilité maintenance'
+        'Ventilation coffrets adéquate'
       ]},
-      // CABLAGE (7 points)
-      { cat: 'CABLAGE', items: [
-        'Connecteurs MC4 serrés/étanches',
-        'Gaines ICTA/IRL état',
-        'Chemins câbles fixations',
-        'Protection UV câbles DC',
-        'Rayon courbure respecté',
-        'Absence points chauds (thermographie)',
-        'Marquage câbles positif/négatif'
-      ]},
-      // MODULES (10 points)
-      { cat: 'MODULES', items: [
-        'État visuel face avant (fissures/casse)',
-        'État cadres (corrosion/déformation)',
+      // 6. INSPECTIONS VISUELLES (5 points)
+      { cat: 'INSPECTIONS_VISUELLES', items: [
+        'Alignement modules PV conforme',
+        'État visuel modules (fissures/casse)',
+        'État cadres modules (corrosion/déformation)',
         'Boîtiers jonction étanches',
-        'Diodes by-pass fonctionnelles',
-        'Hotspots thermographie (ΔT > 10°C)',
-        'Délamination/bulles',
-        'Snail trails (traces escargot)',
-        'Salissures importantes',
-        'Ombres portées permanentes',
-        'PID (Potential Induced Degradation)'
-      ]},
-      // STRUCTURES (5 points)
-      { cat: 'STRUCTURES', items: [
-        'Fixations modules (boulons/clips)',
-        'État rails (corrosion/déformation)',
-        'Fondations/lestage stable',
-        'Mise à la terre structures',
-        'Espacement inter-rangées ventilation'
-      ]},
-      // TOITURE (4 points)
-      { cat: 'TOITURE', items: [
-        'Étanchéité traversées toiture',
-        'État couverture (tuiles/bac acier)',
-        'Écrans sous-toiture intacts',
-        'Zinguerie/gouttières fonctionnelles'
+        'Absence corrosion/oxydation générale'
       ]}
     ]
+    
+    // TOITURE uniquement si centrale TOITURE (12 points DTU 40.35)
+    if (isToiture) {
+      checklistStructure.push({
+        cat: 'TOITURE_DTU_40_35',
+        items: [
+          'Qualité/conformité montage SI sur support',
+          'Qualité/conformité montage panneau sur SI',
+          'Fixation cheminement câbles (supports + étanchéité)',
+          'Compatibilité connecteurs mâle/femelle (PVZH202B)',
+          'Serrages connecteurs toiture',
+          'Étanchéité connecteurs toiture',
+          'Exposition ruissellement connecteurs',
+          'Qualité cheminement câbles DC (chemin câbles)',
+          'Pas de câbles directement sur couverture',
+          'Raccordement terres toiture conforme',
+          'Étiquettes réglementaires tension DC présentes',
+          'Démontage 25 panneaux (1er/dernier chaîne)'
+        ]
+      })
+    }
     
     // Insérer tous les items
     for (const category of checklistStructure) {
@@ -1712,7 +1718,13 @@ app.post('/api/checklist/:mission_id/init', async (c) => {
       }
     }
     
-    return c.json({ success: true, message: 'Checklist initialisée (54 points)' })
+    const totalPoints = isToiture ? 52 : 40
+    return c.json({ 
+      success: true, 
+      message: `Checklist initialisée (${totalPoints} points CDC GIRASOLE 2025)`,
+      type: isToiture ? 'AUDIT_VISUEL_TOITURE' : 'AUDIT_VISUEL',
+      points: totalPoints
+    })
   } catch (error) {
     return c.json({ success: false, error: String(error) }, 500)
   }
@@ -2138,10 +2150,6 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
             <div class="info-item">
               <div class="info-label">Sous-Traitant</div>
               <div class="info-value">${mission.nom_entreprise}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Durée Audit</div>
-              <div class="info-value">${mission.duree_estimee_heures || 7}h</div>
             </div>
           </div>
         </div>
@@ -2614,10 +2622,7 @@ app.get('/', (c) => {
                             <p class="text-gray-500 text-sm">Missions Planifiées</p>
                             <p id="vol-photos" class="text-2xl font-bold text-green-600">-</p>
                         </div>
-                        <div class="border-l-4 border-purple-500 pl-4">
-                            <p class="text-gray-500 text-sm">Heures Terrain</p>
-                            <p id="vol-heures" class="text-2xl font-bold text-purple-600">360h</p>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -2861,14 +2866,10 @@ app.get('/', (c) => {
                                     <div id="analytics-progress-bar" class="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="grid grid-cols-1 gap-4 mt-6">
                                 <div class="bg-gray-50 p-4 rounded-lg">
                                     <p class="text-sm text-gray-600">Restant à auditer</p>
                                     <p id="analytics-remaining" class="text-2xl font-bold text-gray-800">52</p>
-                                </div>
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <p class="text-sm text-gray-600">Temps estimé restant</p>
-                                    <p id="analytics-time-remaining" class="text-2xl font-bold text-gray-800">360h</p>
                                 </div>
                             </div>
                         </div>
@@ -3094,9 +3095,9 @@ app.get('/', (c) => {
                         </div>
 
                         <div class="border-l-4 border-red-500 pl-6">
-                            <h4 class="font-bold text-lg mb-2">⏱️ Timeline Estimée</h4>
-                            <p class="text-gray-600"><strong>360 heures</strong> de terrain total pour 52 centrales</p>
-                            <p class="text-gray-600"><strong>3-4 semaines intensives</strong> avec équipe de 2-3 techniciens</p>
+                            <h4 class="font-bold text-lg mb-2">📅 Planning</h4>
+                            <p class="text-gray-600"><strong>52 centrales</strong> réparties sur 3-4 semaines</p>
+                            <p class="text-gray-600"><strong>5 sous-traitants</strong> mobilisés pour la mission</p>
                         </div>
                     </div>
                 </div>
@@ -5661,10 +5662,6 @@ app.get('/om/:mission_id', async (c) => {
                 <div class="info-item">
                     <div class="info-label">Date Audit</div>
                     <div class="info-value">${new Date(dateAudit).toLocaleDateString('fr-FR')}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Durée Estimée</div>
-                    <div class="info-value">${mission.duree_estimee_heures || 7}h</div>
                 </div>
             </div>
             
