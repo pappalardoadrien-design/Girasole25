@@ -75,16 +75,18 @@ async function loadChecklist() {
     const localData = safeLocalStorageGet(STORAGE_KEY);
     
     if (isOnline) {
-      // Mode online : charger depuis serveur
-      const response = await axios.get(`/api/checklist/${missionId}`);
+      // Mode online : charger depuis serveur avec fetch natif
+      const response = await fetch(`/api/checklist/${missionId}`);
+      const data = await response.json();
       
-      if (!response.data.success || response.data.data.length === 0) {
+      if (!data.success || !data.data || data.data.length === 0) {
         // Initialiser checklist si vide
-        await axios.post(`/api/checklist/${missionId}/init`);
-        const retry = await axios.get(`/api/checklist/${missionId}`);
-        checklistItems = retry.data.data;
+        await fetch(`/api/checklist/${missionId}/init`, { method: 'POST' });
+        const retryResponse = await fetch(`/api/checklist/${missionId}`);
+        const retryData = await retryResponse.json();
+        checklistItems = retryData.data || [];
       } else {
-        checklistItems = response.data.data;
+        checklistItems = data.data || [];
       }
       
       // Sauvegarder en local pour backup offline
@@ -340,7 +342,11 @@ async function saveItem(itemId) {
   if (isOnline) {
     // Mode online : envoyer au serveur
     try {
-      await axios.put(`/api/checklist/${itemId}`, updateData);
+      await fetch(`/api/checklist/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
       showSaveIndicator('✅ Sauvegardé');
     } catch (error) {
       console.error('Erreur sauvegarde online:', error);
@@ -385,7 +391,11 @@ async function syncPendingChanges() {
   
   for (const change of queue) {
     try {
-      await axios.put(`/api/checklist/${change.itemId}`, change.data);
+      await fetch(`/api/checklist/${change.itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(change.data)
+      });
       successCount++;
     } catch (error) {
       console.error(`❌ Erreur sync item ${change.itemId}:`, error);
@@ -449,7 +459,11 @@ async function finishAudit() {
   
   if (window.confirm('Marquer la mission comme TERMINÉE ?')) {
     try {
-      await axios.put(`/api/ordres-mission/${missionId}/statut`, { statut: 'TERMINE' });
+      await fetch(`/api/ordres-mission/${missionId}/statut`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statut: 'TERMINE' })
+      });
       alert('✅ Mission terminée ! Retour à l\'interface planning...');
       window.location.href = '/';
     } catch (error) {

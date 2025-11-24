@@ -3022,9 +3022,11 @@ app.get('/', (c) => {
                         selectedTab.classList.remove('hidden');
                     }
                     
-                    // Marquer le bouton comme actif
-                    event?.target?.classList.add('active', 'border-blue-600', 'text-blue-600');
-                    event?.target?.classList.remove('border-transparent', 'text-gray-600');
+                    // Marquer le bouton comme actif (si appelé depuis un clic)
+                    if (typeof event !== 'undefined' && event?.target) {
+                        event.target.classList.add('active', 'border-blue-600', 'text-blue-600');
+                        event.target.classList.remove('border-transparent', 'text-gray-600');
+                    }
                     
                     // Si onglet Missions, déclencher chargement
                     if (tabName === 'missions') {
