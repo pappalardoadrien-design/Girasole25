@@ -1830,8 +1830,8 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
       LIMIT 1
     `).bind(id).first()
     
-    // Grouper checklist par catégorie
-    const categories = ['DOC', 'ELEC', 'TABLEAUX', 'CABLAGE', 'MODULES', 'STRUCTURES', 'TOITURE']
+    // Grouper checklist par catégorie CDC GIRASOLE 2025
+    const categories = ['DOCUMENTATION', 'INSTALL_ELEC', 'NORMES_ELEC', 'TRANCHEES', 'CABLAGE', 'INSPECTIONS_VISUELLES']
     const checklistGrouped: any = {}
     
     categories.forEach(cat => {
