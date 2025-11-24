@@ -2756,6 +2756,9 @@ app.get('/', (c) => {
                     <button onclick="showTab('centrales')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-list mr-2"></i>Centrales
                     </button>
+                    <button onclick="showTab('missions')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-tasks mr-2"></i>Missions
+                    </button>
                     <button onclick="showTab('upload')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-upload mr-2"></i>Upload JSON
                     </button>
@@ -2886,6 +2889,204 @@ app.get('/', (c) => {
                         <p class="text-center text-gray-500">Chargement...</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Missions Tab -->
+            <div id="tab-missions" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-tasks text-blue-600 mr-3"></i>
+                        Suivi Missions - Checklists & Photos
+                    </h2>
+                    
+                    <!-- Filtres -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-building mr-2"></i>Sous-Traitant
+                            </label>
+                            <select id="filter-st-missions" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Tous les sous-traitants</option>
+                                <option value="ARTEMIS">ARTEMIS</option>
+                                <option value="CADENET">CADENET</option>
+                                <option value="DIAGPV">DIAGPV - Adrien & Fabien</option>
+                                <option value="EDOUARD">EDOUARD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-filter mr-2"></i>Statut
+                            </label>
+                            <select id="filter-statut-missions" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Tous les statuts</option>
+                                <option value="0">Non commencée</option>
+                                <option value="en-cours">En cours</option>
+                                <option value="100">Terminée</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-search mr-2"></i>Recherche
+                            </label>
+                            <input 
+                                type="text" 
+                                id="search-centrale-missions" 
+                                placeholder="Nom centrale..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Liste Missions -->
+                <div id="missions-container" class="space-y-4">
+                    <div class="text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i>
+                        <p class="text-gray-600 mt-4">Chargement des missions...</p>
+                    </div>
+                </div>
+                
+                <script>
+                    // Charger missions
+                    async function loadMissions() {
+                        try {
+                            const response = await axios.get('/api/suivi-missions');
+                            const missions = response.data.data;
+                            
+                            const container = document.getElementById('missions-container');
+                            
+                            if (!missions || missions.length === 0) {
+                                container.innerHTML = '<div class="text-center py-12 text-gray-500">Aucune mission trouvée</div>';
+                                return;
+                            }
+                            
+                            container.innerHTML = missions.map(m => {
+                                const progression = m.nb_points_total > 0 
+                                    ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
+                                    : 0;
+                                
+                                let statutBadge = '';
+                                if (progression === 0) {
+                                    statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-800">Non commencée</span>';
+                                } else if (progression === 100) {
+                                    statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">✅ Terminée</span>';
+                                } else {
+                                    statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">🔄 En cours</span>';
+                                }
+                                
+                                return \`
+                                    <div class="mission-card bg-white rounded-lg shadow-md p-6" data-st="\${m.sous_traitant}" data-centrale="\${m.centrale_nom}" data-progression="\${progression}">
+                                        <div class="flex items-start justify-between mb-4">
+                                            <div class="flex-1">
+                                                <h3 class="text-xl font-bold text-gray-800 mb-1">\${m.centrale_nom}</h3>
+                                                <p class="text-sm text-gray-600">ID Ref: \${m.id_ref || 'N/A'} | \${m.puissance_kwc || 0} kWc</p>
+                                            </div>
+                                            \${statutBadge}
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-gray-500 mb-1">Sous-Traitant</p>
+                                                <p class="font-semibold text-gray-800">\${m.sous_traitant}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 mb-1">Technicien</p>
+                                                <p class="font-semibold text-gray-800">\${m.technicien_nom}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 mb-1">Date Mission</p>
+                                                <p class="font-semibold text-gray-800">\${new Date(m.date_mission).toLocaleDateString('fr-FR')}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 mb-1">Photos</p>
+                                                <p class="font-semibold text-gray-800">\${m.nb_photos || 0} photos</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-sm font-medium text-gray-700">Progression</span>
+                                                <span class="text-sm font-bold text-blue-600">\${progression}%</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                                <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all" style="width: \${progression}%"></div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                \${m.nb_points_completes || 0} / \${m.nb_points_total || 0} points complétés
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="flex gap-2">
+                                            <a href="/audit/\${m.mission_id}" target="_blank" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm font-semibold">
+                                                <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
+                                            </a>
+                                            <a href="/photos-audit/\${m.mission_id}" target="_blank" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm font-semibold">
+                                                <i class="fas fa-images mr-2"></i>Photos (\${m.nb_photos || 0})
+                                            </a>
+                                            <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm font-semibold">
+                                                <i class="fas fa-file-pdf mr-2"></i>OM
+                                            </a>
+                                        </div>
+                                    </div>
+                                \`;
+                            }).join('');
+                            
+                        } catch (error) {
+                            console.error('Erreur chargement missions:', error);
+                            document.getElementById('missions-container').innerHTML = 
+                                '<div class="text-center py-12 text-red-500">Erreur chargement missions</div>';
+                        }
+                    }
+                    
+                    // Filtres
+                    document.getElementById('filter-st-missions')?.addEventListener('change', filterMissions);
+                    document.getElementById('filter-statut-missions')?.addEventListener('change', filterMissions);
+                    document.getElementById('search-centrale-missions')?.addEventListener('input', filterMissions);
+                    
+                    function filterMissions() {
+                        const st = document.getElementById('filter-st-missions')?.value.toLowerCase() || '';
+                        const statut = document.getElementById('filter-statut-missions')?.value || '';
+                        const search = document.getElementById('search-centrale-missions')?.value.toLowerCase() || '';
+                        
+                        document.querySelectorAll('.mission-card').forEach(card => {
+                            const cardSt = card.dataset.st.toLowerCase();
+                            const cardCentrale = card.dataset.centrale.toLowerCase();
+                            const cardProgression = parseInt(card.dataset.progression);
+                            
+                            const matchSt = !st || cardSt.includes(st);
+                            const matchSearch = !search || cardCentrale.includes(search);
+                            
+                            let matchStatut = true;
+                            if (statut === '0') {
+                                matchStatut = cardProgression === 0;
+                            } else if (statut === 'en-cours') {
+                                matchStatut = cardProgression > 0 && cardProgression < 100;
+                            } else if (statut === '100') {
+                                matchStatut = cardProgression === 100;
+                            }
+                            
+                            card.style.display = matchSt && matchSearch && matchStatut ? 'block' : 'none';
+                        });
+                    }
+                    
+                    // Charger au démarrage si onglet actif
+                    if (document.getElementById('tab-missions')?.classList.contains('active')) {
+                        loadMissions();
+                    }
+                    
+                    // Charger quand onglet devient actif
+                    const originalShowTab = window.showTab;
+                    window.showTab = function(tabName) {
+                        originalShowTab(tabName);
+                        if (tabName === 'missions') {
+                            loadMissions();
+                            // Actualiser toutes les 30 secondes
+                            if (!window.missionsInterval) {
+                                window.missionsInterval = setInterval(loadMissions, 30000);
+                            }
+                        }
+                    };
+                </script>
             </div>
 
             <!-- Upload Tab -->
@@ -6260,13 +6461,12 @@ app.get('/api/suivi-missions', async (c) => {
         t.nom || ' ' || t.prenom as technicien_nom,
         COUNT(DISTINCT ci.id) as nb_points_total,
         COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME') THEN ci.id END) as nb_points_completes,
-        COUNT(DISTINCT ap.id) as nb_photos
+        COUNT(DISTINCT CASE WHEN ci.photo_base64 IS NOT NULL THEN ci.id END) as nb_photos
       FROM ordres_mission om
       JOIN centrales c ON om.centrale_id = c.id
       JOIN sous_traitants st ON om.sous_traitant_id = st.id
       JOIN techniciens t ON om.technicien_id = t.id
       LEFT JOIN checklist_items ci ON om.id = ci.ordre_mission_id
-      LEFT JOIN audit_photos ap ON om.id = ap.ordre_mission_id
       GROUP BY om.id
       ORDER BY om.date_mission, c.nom
     `).all()
