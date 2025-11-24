@@ -35,11 +35,44 @@ function showOfflineIndicator() {
   document.body.appendChild(indicator);
 }
 
+// Vérifier si localStorage est disponible (Tracking Prevention)
+function isLocalStorageAvailable() {
+  try {
+    const test = '__localStorage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    console.warn('⚠️ localStorage non disponible (Tracking Prevention activé)');
+    return false;
+  }
+}
+
+// Safe localStorage operations
+function safeLocalStorageGet(key) {
+  if (!isLocalStorageAvailable()) return null;
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    return null;
+  }
+}
+
+function safeLocalStorageSet(key, value) {
+  if (!isLocalStorageAvailable()) return false;
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 // Charger checklist au démarrage
 async function loadChecklist() {
   try {
     // Essayer de charger depuis localStorage d'abord (mode offline)
-    const localData = localStorage.getItem(STORAGE_KEY);
+    const localData = safeLocalStorageGet(STORAGE_KEY);
     
     if (isOnline) {
       // Mode online : charger depuis serveur
@@ -55,7 +88,7 @@ async function loadChecklist() {
       }
       
       // Sauvegarder en local pour backup offline
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(checklistItems));
+      safeLocalStorageSet(STORAGE_KEY, JSON.stringify(checklistItems));
       
     } else if (localData) {
       // Mode offline : charger depuis localStorage
@@ -302,7 +335,7 @@ async function saveItem(itemId) {
   };
   
   // Sauvegarder TOUJOURS en localStorage (backup offline)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(checklistItems));
+  safeLocalStorageSet(STORAGE_KEY, JSON.stringify(checklistItems));
   
   if (isOnline) {
     // Mode online : envoyer au serveur
@@ -324,7 +357,7 @@ async function saveItem(itemId) {
 
 // Ajouter changement à la queue de sync
 function addToSyncQueue(itemId, data) {
-  const queue = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || '[]');
+  const queue = JSON.parse(safeLocalStorageGet(SYNC_QUEUE_KEY) || '[]');
   
   // Remplacer si item déjà dans queue
   const existingIndex = queue.findIndex(q => q.itemId === itemId);
@@ -334,13 +367,13 @@ function addToSyncQueue(itemId, data) {
     queue.push({ itemId, data, timestamp: Date.now() });
   }
   
-  localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+  safeLocalStorageSet(SYNC_QUEUE_KEY, JSON.stringify(queue));
   console.log(`📦 Item ${itemId} ajouté à la queue de sync (${queue.length} en attente)`);
 }
 
 // Synchroniser changements en attente
 async function syncPendingChanges() {
-  const queue = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || '[]');
+  const queue = JSON.parse(safeLocalStorageGet(SYNC_QUEUE_KEY) || '[]');
   
   if (queue.length === 0) {
     console.log('✅ Aucun changement en attente');
@@ -364,7 +397,7 @@ async function syncPendingChanges() {
   // Retirer items synchronisés de la queue
   if (successCount > 0) {
     const remainingQueue = queue.slice(successCount);
-    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(remainingQueue));
+    safeLocalStorageSet(SYNC_QUEUE_KEY, JSON.stringify(remainingQueue));
     console.log(`✅ ${successCount}/${queue.length} changements synchronisés`);
     
     if (remainingQueue.length === 0) {

@@ -6478,4 +6478,9 @@ app.get('/api/suivi-missions', async (c) => {
   }
 })
 
+// Route favicon pour éviter erreur 500
+app.get('/favicon.ico', (c) => {
+  return new Response(null, { status: 204 })
+})
+
 export default app
