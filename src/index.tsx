@@ -2892,6 +2892,117 @@ app.get('/', (c) => {
             </div>
 
             <script>
+                // Fonction globale pour charger les missions
+                window.loadMissionsGlobal = async function() {
+                    console.log('🚀 loadMissionsGlobal() appelée');
+                    try {
+                        console.log('📡 Fetching /api/suivi-missions...');
+                        const response = await fetch('/api/suivi-missions');
+                        console.log('✅ Response:', response.status, response.ok);
+                        
+                        const data = await response.json();
+                        console.log('📦 Data:', data.success, 'missions:', data.data?.length);
+                        
+                        const missions = data.data;
+                        const container = document.getElementById('missions-container');
+                        console.log('📍 Container:', container ? 'trouvé' : 'INTROUVABLE');
+                        
+                        if (!container) {
+                            console.error('❌ Container missions-container INTROUVABLE');
+                            return;
+                        }
+                        
+                        if (!missions || missions.length === 0) {
+                            console.warn('⚠️ Aucune mission dans la réponse');
+                            container.innerHTML = '<div class="text-center py-12 text-gray-500">Aucune mission trouvée</div>';
+                            return;
+                        }
+                        
+                        console.log('✅ Génération HTML pour', missions.length, 'missions');
+                        
+                        container.innerHTML = missions.map(m => {
+                            const progression = m.nb_points_total > 0 
+                                ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
+                                : 0;
+                            
+                            let statutBadge = '';
+                            if (progression === 0) {
+                                statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-800">Non commencée</span>';
+                            } else if (progression === 100) {
+                                statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">✅ Terminée</span>';
+                            } else {
+                                statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">🔄 En cours</span>';
+                            }
+                            
+                            return \`
+                                <div class="mission-card bg-white rounded-lg shadow-md p-6" data-st="\${m.sous_traitant}" data-centrale="\${m.centrale_nom}" data-progression="\${progression}">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-gray-800 mb-1">\${m.centrale_nom}</h3>
+                                            <p class="text-sm text-gray-600">ID Ref: \${m.id_ref || 'N/A'} | \${m.puissance_kwc || 0} kWc</p>
+                                        </div>
+                                        \${statutBadge}
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                        <div>
+                                            <p class="text-xs text-gray-500 mb-1">Sous-Traitant</p>
+                                            <p class="font-semibold text-gray-800">\${m.sous_traitant}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 mb-1">Technicien</p>
+                                            <p class="font-semibold text-gray-800">\${m.technicien_nom}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 mb-1">Date Mission</p>
+                                            <p class="font-semibold text-gray-800">\${new Date(m.date_mission).toLocaleDateString('fr-FR')}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 mb-1">Photos</p>
+                                            <p class="font-semibold text-gray-800">\${m.nb_photos || 0} photos</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-sm font-medium text-gray-700">Progression</span>
+                                            <span class="text-sm font-bold text-blue-600">\${progression}%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-3">
+                                            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all" style="width: \${progression}%"></div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            \${m.nb_points_completes || 0} / \${m.nb_points_total || 0} points complétés
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="flex gap-2">
+                                        <a href="/audit/\${m.mission_id}" target="_blank" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm font-semibold">
+                                            <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
+                                        </a>
+                                        <a href="/photos-audit/\${m.mission_id}" target="_blank" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm font-semibold">
+                                            <i class="fas fa-images mr-2"></i>Photos (\${m.nb_photos || 0})
+                                        </a>
+                                        <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm font-semibold">
+                                            <i class="fas fa-file-pdf mr-2"></i>OM
+                                        </a>
+                                    </div>
+                                </div>
+                            \`;
+                        }).join('');
+                        
+                        console.log('✅ HTML généré, longueur:', container.innerHTML.length, 'caractères');
+                        console.log('🎉 loadMissionsGlobal() terminée avec succès');
+                        
+                    } catch (error) {
+                        console.error('❌ Erreur chargement missions:', error);
+                        const container = document.getElementById('missions-container');
+                        if (container) {
+                            container.innerHTML = '<div class="text-center py-12 text-red-500">❌ Erreur: ' + error.message + '</div>';
+                        }
+                    }
+                };
+                
                 // Fonction globale pour gérer les onglets
                 function showTab(tabName) {
                     // Masquer tous les contenus d'onglets
@@ -2916,8 +3027,13 @@ app.get('/', (c) => {
                     event?.target?.classList.remove('border-transparent', 'text-gray-600');
                     
                     // Si onglet Missions, déclencher chargement
-                    if (tabName === 'missions' && typeof window.loadMissionsTab === 'function') {
-                        window.loadMissionsTab();
+                    if (tabName === 'missions') {
+                        console.log('🔄 showTab(missions) - Appel loadMissionsGlobal()');
+                        window.loadMissionsGlobal();
+                        // Auto-refresh toutes les 30s
+                        if (!window.missionsInterval) {
+                            window.missionsInterval = setInterval(window.loadMissionsGlobal, 30000);
+                        }
                     }
                 }
             </script>
@@ -2978,113 +3094,7 @@ app.get('/', (c) => {
                 </div>
                 
                 <script>
-                    // Charger missions
-                    async function loadMissions() {
-                        console.log('🚀 loadMissions() appelée');
-                        try {
-                            console.log('📡 Fetching /api/suivi-missions...');
-                            const response = await fetch('/api/suivi-missions');
-                            console.log('✅ Response:', response.status, response.ok);
-                            
-                            const data = await response.json();
-                            console.log('📦 Data:', data.success, 'missions:', data.data?.length);
-                            
-                            const missions = data.data;
-                            const container = document.getElementById('missions-container');
-                            console.log('📍 Container:', container ? 'trouvé' : 'INTROUVABLE');
-                            
-                            if (!missions || missions.length === 0) {
-                                console.warn('⚠️ Aucune mission dans la réponse');
-                                container.innerHTML = '<div class="text-center py-12 text-gray-500">Aucune mission trouvée</div>';
-                                return;
-                            }
-                            
-                            console.log('✅ Génération HTML pour', missions.length, 'missions');
-                            
-                            container.innerHTML = missions.map(m => {
-                                const progression = m.nb_points_total > 0 
-                                    ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
-                                    : 0;
-                                
-                                let statutBadge = '';
-                                if (progression === 0) {
-                                    statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-800">Non commencée</span>';
-                                } else if (progression === 100) {
-                                    statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">✅ Terminée</span>';
-                                } else {
-                                    statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">🔄 En cours</span>';
-                                }
-                                
-                                return \`
-                                    <div class="mission-card bg-white rounded-lg shadow-md p-6" data-st="\${m.sous_traitant}" data-centrale="\${m.centrale_nom}" data-progression="\${progression}">
-                                        <div class="flex items-start justify-between mb-4">
-                                            <div class="flex-1">
-                                                <h3 class="text-xl font-bold text-gray-800 mb-1">\${m.centrale_nom}</h3>
-                                                <p class="text-sm text-gray-600">ID Ref: \${m.id_ref || 'N/A'} | \${m.puissance_kwc || 0} kWc</p>
-                                            </div>
-                                            \${statutBadge}
-                                        </div>
-                                        
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                            <div>
-                                                <p class="text-xs text-gray-500 mb-1">Sous-Traitant</p>
-                                                <p class="font-semibold text-gray-800">\${m.sous_traitant}</p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-gray-500 mb-1">Technicien</p>
-                                                <p class="font-semibold text-gray-800">\${m.technicien_nom}</p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-gray-500 mb-1">Date Mission</p>
-                                                <p class="font-semibold text-gray-800">\${new Date(m.date_mission).toLocaleDateString('fr-FR')}</p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-gray-500 mb-1">Photos</p>
-                                                <p class="font-semibold text-gray-800">\${m.nb_photos || 0} photos</p>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mb-4">
-                                            <div class="flex justify-between items-center mb-2">
-                                                <span class="text-sm font-medium text-gray-700">Progression</span>
-                                                <span class="text-sm font-bold text-blue-600">\${progression}%</span>
-                                            </div>
-                                            <div class="w-full bg-gray-200 rounded-full h-3">
-                                                <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all" style="width: \${progression}%"></div>
-                                            </div>
-                                            <p class="text-xs text-gray-500 mt-1">
-                                                \${m.nb_points_completes || 0} / \${m.nb_points_total || 0} points complétés
-                                            </p>
-                                        </div>
-                                        
-                                        <div class="flex gap-2">
-                                            <a href="/audit/\${m.mission_id}" target="_blank" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm font-semibold">
-                                                <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
-                                            </a>
-                                            <a href="/photos-audit/\${m.mission_id}" target="_blank" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm font-semibold">
-                                                <i class="fas fa-images mr-2"></i>Photos (\${m.nb_photos || 0})
-                                            </a>
-                                            <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm font-semibold">
-                                                <i class="fas fa-file-pdf mr-2"></i>OM
-                                            </a>
-                                        </div>
-                                    </div>
-                                \`;
-                            }).join('');
-                            
-                            console.log('✅ HTML généré, longueur:', container.innerHTML.length, 'caractères');
-                            console.log('🎉 loadMissions() terminée avec succès');
-                            
-                        } catch (error) {
-                            console.error('❌ Erreur chargement missions:', error);
-                            const container = document.getElementById('missions-container');
-                            if (container) {
-                                container.innerHTML = '<div class="text-center py-12 text-red-500">❌ Erreur: ' + error.message + '</div>';
-                            }
-                        }
-                    }
-                    
-                    // Filtres
+                    // Filtres missions (la fonction loadMissionsGlobal est définie en haut de page)
                     document.getElementById('filter-st-missions')?.addEventListener('change', filterMissions);
                     document.getElementById('filter-statut-missions')?.addEventListener('change', filterMissions);
                     document.getElementById('search-centrale-missions')?.addEventListener('input', filterMissions);
@@ -3114,15 +3124,6 @@ app.get('/', (c) => {
                             card.style.display = matchSt && matchSearch && matchStatut ? 'block' : 'none';
                         });
                     }
-                    
-                    // Exposer la fonction globalement pour showTab()
-                    window.loadMissionsTab = function() {
-                        loadMissions();
-                        // Actualiser toutes les 30 secondes
-                        if (!window.missionsInterval) {
-                            window.missionsInterval = setInterval(loadMissions, 30000);
-                        }
-                    };
                 </script>
             </div>
 
