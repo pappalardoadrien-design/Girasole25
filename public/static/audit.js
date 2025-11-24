@@ -117,15 +117,15 @@ async function loadChecklist() {
 
 // Render checklist groupée par catégorie
 function renderChecklist() {
-  const categories = ['DOC', 'ELEC', 'TABLEAUX', 'CABLAGE', 'MODULES', 'STRUCTURES', 'TOITURE'];
+  // Catégories CDC GIRASOLE 2025 (40 points)
+  const categories = ['DOCUMENTATION', 'INSTALL_ELEC', 'NORMES_ELEC', 'TRANCHEES', 'CABLAGE', 'INSPECTIONS_VISUELLES'];
   const categoryIcons = {
-    'DOC': '📄',
-    'ELEC': '⚡',
-    'TABLEAUX': '🔌',
+    'DOCUMENTATION': '📄',
+    'INSTALL_ELEC': '🔌',
+    'NORMES_ELEC': '⚡',
+    'TRANCHEES': '🏗️',
     'CABLAGE': '🔌',
-    'MODULES': '☀️',
-    'STRUCTURES': '🏗️',
-    'TOITURE': '🏠'
+    'INSPECTIONS_VISUELLES': '👁️'
   };
   
   const grouped = {};
