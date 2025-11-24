@@ -401,11 +401,11 @@ app.get('/api/ordres-mission', async (c) => {
         t.prenom as technicien_prenom,
         t.nom as technicien_nom,
         t.email as technicien_email,
-        st.nom_entreprise
+        st.nom_entreprise as sous_traitant_nom
       FROM ordres_mission om
       JOIN centrales c ON om.centrale_id = c.id
       JOIN techniciens t ON om.technicien_id = t.id
-      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
       ORDER BY om.date_mission DESC, om.id DESC
     `).all()
     
@@ -538,6 +538,74 @@ app.put('/api/ordres-mission/:id/date', async (c) => {
     ).run()
     
     return c.json({ success: true })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/ordres-mission/:id/subcontractor - Attribuer sous-traitant
+app.put('/api/ordres-mission/:id/subcontractor', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    const { sous_traitant_id } = await c.req.json()
+    
+    if (!sous_traitant_id) {
+      return c.json({ success: false, error: 'sous_traitant_id requis' }, 400)
+    }
+    
+    // Vérifier que le sous-traitant existe
+    const st = await DB.prepare(`SELECT id, nom_entreprise FROM sous_traitants WHERE id = ?`)
+      .bind(sous_traitant_id).first()
+    
+    if (!st) {
+      return c.json({ success: false, error: 'Sous-traitant non trouvé' }, 404)
+    }
+    
+    // Mettre à jour ordre de mission
+    await DB.prepare(`
+      UPDATE ordres_mission 
+      SET sous_traitant_id = ?
+      WHERE id = ?
+    `).bind(sous_traitant_id, id).run()
+    
+    return c.json({ 
+      success: true,
+      message: `Mission ${id} attribuée à ${st.nom_entreprise}`,
+      data: { mission_id: id, sous_traitant: st.nom_entreprise }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/ordres-mission/batch-assign - Attribution en masse
+app.post('/api/ordres-mission/batch-assign', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const { assignments } = await c.req.json()
+    
+    if (!assignments || !Array.isArray(assignments)) {
+      return c.json({ success: false, error: 'Format invalide' }, 400)
+    }
+    
+    let updated = 0
+    for (const { mission_id, sous_traitant_id } of assignments) {
+      await DB.prepare(`
+        UPDATE ordres_mission 
+        SET sous_traitant_id = ?
+        WHERE id = ?
+      `).bind(sous_traitant_id, mission_id).run()
+      updated++
+    }
+    
+    return c.json({ 
+      success: true,
+      message: `${updated} missions attribuées`,
+      count: updated
+    })
   } catch (error) {
     return c.json({ success: false, error: String(error) }, 500)
   }
