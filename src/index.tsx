@@ -2950,8 +2950,9 @@ app.get('/', (c) => {
                     // Charger missions
                     async function loadMissions() {
                         try {
-                            const response = await axios.get('/api/suivi-missions');
-                            const missions = response.data.data;
+                            const response = await fetch('/api/suivi-missions');
+                            const data = await response.json();
+                            const missions = data.data;
                             
                             const container = document.getElementById('missions-container');
                             
