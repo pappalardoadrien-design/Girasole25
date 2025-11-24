@@ -9,41 +9,8 @@ let chartType = null;
 // ======================
 // TAB NAVIGATION
 // ======================
-function showTab(tabName) {
-  // Hide all tabs
-  document.querySelectorAll('.tab-content').forEach(tab => {
-    tab.classList.add('hidden');
-  });
-  
-  // Remove active class from all buttons
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('active', 'border-blue-600', 'text-blue-600');
-    btn.classList.add('border-transparent', 'text-gray-600');
-  });
-  
-  // Show selected tab
-  const selectedTab = document.getElementById(`tab-${tabName}`);
-  if (selectedTab) {
-    selectedTab.classList.remove('hidden');
-  }
-  
-  // Add active class to clicked button
-  event.target.closest('.tab-btn').classList.add('active', 'border-blue-600', 'text-blue-600');
-  event.target.closest('.tab-btn').classList.remove('border-transparent', 'text-gray-600');
-  
-  // Load tab content
-  if (tabName === 'dashboard') {
-    loadDashboard();
-  } else if (tabName === 'centrales') {
-    loadCentrales();
-  } else if (tabName === 'upload') {
-    loadUploadForm();
-  } else if (tabName === 'planning') {
-    loadPlanningData();
-  } else if (tabName === 'analytics') {
-    loadAnalytics();
-  }
-}
+// Note: showTab() est maintenant définie dans index.tsx (page principale)
+// Cette fonction est supprimée pour éviter les conflits
 
 // ======================
 // DASHBOARD

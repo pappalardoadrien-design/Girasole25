@@ -3028,14 +3028,24 @@ app.get('/', (c) => {
                         event.target.classList.remove('border-transparent', 'text-gray-600');
                     }
                     
-                    // Si onglet Missions, déclencher chargement
-                    if (tabName === 'missions') {
+                    // Charger le contenu de l'onglet
+                    if (tabName === 'dashboard' && typeof loadDashboard === 'function') {
+                        loadDashboard();
+                    } else if (tabName === 'centrales' && typeof loadCentrales === 'function') {
+                        loadCentrales();
+                    } else if (tabName === 'missions') {
                         console.log('🔄 showTab(missions) - Appel loadMissionsGlobal()');
                         window.loadMissionsGlobal();
                         // Auto-refresh toutes les 30s
                         if (!window.missionsInterval) {
                             window.missionsInterval = setInterval(window.loadMissionsGlobal, 30000);
                         }
+                    } else if (tabName === 'upload' && typeof loadUploadForm === 'function') {
+                        loadUploadForm();
+                    } else if (tabName === 'planning' && typeof loadPlanningData === 'function') {
+                        loadPlanningData();
+                    } else if (tabName === 'analytics' && typeof loadAnalytics === 'function') {
+                        loadAnalytics();
                     }
                 }
             </script>
