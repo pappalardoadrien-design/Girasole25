@@ -3635,6 +3635,151 @@ app.get('/api/sharepoint/status', async (c) => {
   }
 })
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// ROUTES API - GESTION AUDITS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// POST /api/audit/upload-checklist - Upload checklist remplie
+app.post('/api/audit/upload-checklist', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_id, checklist } = body
+    
+    if (!centrale_id || !checklist) {
+      return c.json({ success: false, error: 'Missing centrale_id or checklist' }, 400)
+    }
+    
+    // Import dynamique audit-manager
+    const { createAuditManager } = await import('./audit-manager')
+    const { createSharePointConnector } = await import('./sharepoint-connector')
+    
+    const sharepoint = createSharePointConnector(c.env)
+    const auditManager = createAuditManager(DB, sharepoint)
+    
+    // Upload checklist
+    const sharepoint_url = await auditManager.uploadChecklist(centrale_id, checklist)
+    
+    return c.json({
+      success: true,
+      sharepoint_url,
+      message: 'Checklist uploaded successfully'
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
+// POST /api/audit/upload-photos - Upload photos géolocalisées (batch)
+app.post('/api/audit/upload-photos', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_id, photos } = body
+    
+    if (!centrale_id || !photos || !Array.isArray(photos)) {
+      return c.json({ success: false, error: 'Missing centrale_id or photos array' }, 400)
+    }
+    
+    // Import dynamique audit-manager
+    const { createAuditManager } = await import('./audit-manager')
+    const { createSharePointConnector } = await import('./sharepoint-connector')
+    
+    const sharepoint = createSharePointConnector(c.env)
+    const auditManager = createAuditManager(DB, sharepoint)
+    
+    // Upload photos
+    const sharepoint_urls = await auditManager.uploadPhotos(centrale_id, photos)
+    
+    return c.json({
+      success: true,
+      sharepoint_urls,
+      nb_photos: sharepoint_urls.length,
+      message: `${sharepoint_urls.length} photos uploaded successfully`
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
+// POST /api/audit/generate-annexe2 - Génération automatique ANNEXE 2
+app.post('/api/audit/generate-annexe2', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_id } = body
+    
+    if (!centrale_id) {
+      return c.json({ success: false, error: 'Missing centrale_id' }, 400)
+    }
+    
+    // Import dynamique audit-manager
+    const { createAuditManager } = await import('./audit-manager')
+    const { createSharePointConnector } = await import('./sharepoint-connector')
+    
+    const sharepoint = createSharePointConnector(c.env)
+    const auditManager = createAuditManager(DB, sharepoint)
+    
+    // Générer ANNEXE 2
+    const sharepoint_url = await auditManager.generateAnnexe2(centrale_id)
+    
+    return c.json({
+      success: true,
+      sharepoint_url,
+      message: 'ANNEXE 2 generated successfully'
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
+// POST /api/audit/generate-rapport-final - Génération rapport PDF final
+app.post('/api/audit/generate-rapport-final', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_id } = body
+    
+    if (!centrale_id) {
+      return c.json({ success: false, error: 'Missing centrale_id' }, 400)
+    }
+    
+    // Import dynamique audit-manager
+    const { createAuditManager } = await import('./audit-manager')
+    const { createSharePointConnector } = await import('./sharepoint-connector')
+    
+    const sharepoint = createSharePointConnector(c.env)
+    const auditManager = createAuditManager(DB, sharepoint)
+    
+    // Générer rapport final PDF
+    const sharepoint_url = await auditManager.generateRapportFinal(centrale_id)
+    
+    return c.json({
+      success: true,
+      sharepoint_url,
+      message: 'Rapport final PDF generated successfully'
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
 // GET /documents - Page de téléchargement des documents
 // GET /api/planning/full - Planning complet des 52 centrales avec attributions
 app.get('/api/planning/full', async (c) => {

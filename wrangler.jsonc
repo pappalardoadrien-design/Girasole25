@@ -11,4 +11,9 @@
       "database_id": "c61e8357-c601-4f78-a807-56e32202b6c4"
     }
   ]
+  // NOTE: Pour activer la synchronisation automatique SharePoint toutes les 6 heures,
+  // configurer un Cloudflare Cron Trigger manuellement dans le dashboard Cloudflare :
+  // Workers & Pages > girasole-diagpv > Settings > Triggers > Add Cron Trigger
+  // Cron: "0 */6 * * *"
+  // Route: GET https://votre-url.pages.dev/api/sharepoint/sync
 }

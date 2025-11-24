@@ -122,9 +122,128 @@ export class SharePointConnector {
       await this.authenticate();
     }
 
-    // TODO: Implémenter récupération via Graph API
-    // Endpoint: GET https://graph.microsoft.com/v1.0/sites/{site-id}/drive/items/{item-id}/content
-    throw new Error('Récupération via Graph API non encore implémentée. Utiliser fileUrl pour le moment.');
+    // Recherche du fichier ANNEXE 1 dans SharePoint
+    const searchEndpoint = `https://graph.microsoft.com/v1.0/sites/${this.config.siteUrl}/drive/root/search(q='ANNEXE 1')`;
+    
+    const searchResponse = await fetch(searchEndpoint, {
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`
+      }
+    });
+
+    if (!searchResponse.ok) {
+      throw new Error(`Échec recherche fichier: ${searchResponse.statusText}`);
+    }
+
+    const searchData: any = await searchResponse.json();
+    if (!searchData.value || searchData.value.length === 0) {
+      throw new Error('Fichier ANNEXE 1 non trouvé dans SharePoint');
+    }
+
+    // Prendre le premier résultat
+    const fileId = searchData.value[0].id;
+
+    // Télécharger le contenu du fichier
+    const downloadEndpoint = `https://graph.microsoft.com/v1.0/sites/${this.config.siteUrl}/drive/items/${fileId}/content`;
+    
+    const downloadResponse = await fetch(downloadEndpoint, {
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`
+      }
+    });
+
+    if (!downloadResponse.ok) {
+      throw new Error(`Échec téléchargement fichier: ${downloadResponse.statusText}`);
+    }
+
+    return await downloadResponse.text();
+  }
+
+  /**
+   * Upload d'un fichier vers SharePoint
+   * 
+   * @param folderPath Chemin du dossier cible (ex: /AUDITS_2025/ARTEMIS/CENTRALE_3251)
+   * @param fileName Nom du fichier
+   * @param fileContent Contenu du fichier (Buffer ou string)
+   * @param contentType Type MIME du fichier
+   * @returns ID du fichier uploadé
+   */
+  async uploadFile(folderPath: string, fileName: string, fileContent: ArrayBuffer | string, contentType: string): Promise<string> {
+    if (!this.accessToken) {
+      await this.authenticate();
+    }
+
+    // Créer le dossier si nécessaire
+    await this.createFolder(folderPath);
+
+    // Upload du fichier
+    const uploadEndpoint = `https://graph.microsoft.com/v1.0/sites/${this.config.siteUrl}/drive/root:${folderPath}/${fileName}:/content`;
+    
+    const response = await fetch(uploadEndpoint, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': contentType
+      },
+      body: fileContent
+    });
+
+    if (!response.ok) {
+      throw new Error(`Échec upload fichier ${fileName}: ${response.statusText}`);
+    }
+
+    const data: any = await response.json();
+    return data.id;
+  }
+
+  /**
+   * Création d'un dossier dans SharePoint (récursif)
+   * 
+   * @param folderPath Chemin complet du dossier (ex: /AUDITS_2025/ARTEMIS/CENTRALE_3251)
+   */
+  private async createFolder(folderPath: string): Promise<void> {
+    if (!this.accessToken) {
+      await this.authenticate();
+    }
+
+    const pathParts = folderPath.split('/').filter(p => p);
+    let currentPath = '';
+
+    for (const part of pathParts) {
+      currentPath += `/${part}`;
+      
+      // Vérifier si le dossier existe
+      const checkEndpoint = `https://graph.microsoft.com/v1.0/sites/${this.config.siteUrl}/drive/root:${currentPath}`;
+      
+      const checkResponse = await fetch(checkEndpoint, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`
+        }
+      });
+
+      if (checkResponse.status === 404) {
+        // Créer le dossier
+        const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/')) || '/';
+        const createEndpoint = `https://graph.microsoft.com/v1.0/sites/${this.config.siteUrl}/drive/root:${parentPath}:/children`;
+        
+        const createResponse = await fetch(createEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: part,
+            folder: {},
+            '@microsoft.graph.conflictBehavior': 'rename'
+          })
+        });
+
+        if (!createResponse.ok) {
+          throw new Error(`Échec création dossier ${part}: ${createResponse.statusText}`);
+        }
+      }
+    }
   }
 
   /**
