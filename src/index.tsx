@@ -579,6 +579,137 @@ app.get('/api/planning', async (c) => {
   }
 })
 
+// GET /api/annexe2/export-csv - Export ANNEXE 2 GIRASOLE (CSV)
+app.get('/api/annexe2/export-csv', async (c) => {
+  const { DB } = c.env
+  const { sous_traitant, statut } = c.req.query()
+  
+  try {
+    // Query complexe pour récupérer toutes les données ANNEXE 2
+    let query = `
+      SELECT 
+        c.id_ref as "ID référent",
+        c.nom as "Nom des projets",
+        c.puissance_kwc as "Puissance EXE",
+        c.spv as "SPV",
+        c.latitude as "Latitude",
+        c.longitude as "Longitude",
+        c.adresse as "Adresse",
+        c.dept as "Dept",
+        c.type_centrale as "Type de chantier",
+        c.installateur as "Installateur",
+        om.date_mission as "Date réelle démarrage centrale PV",
+        om.date_validation as "Date réelle fin centrale PV",
+        '' as "Entreprise",
+        '' as "Date de réception réelle des DRE 155/162",
+        c.date_mes as "Date MES",
+        c.si as "SI",
+        c.panneaux as "Panneaux",
+        CASE WHEN c.audit_toiture = 'X' THEN 'OUI' ELSE 'NON' END as "Audit en toiture",
+        CASE WHEN c.audit_hors_toiture = 'X' THEN 'NON' ELSE 'OUI' END as "Audit hors toiture",
+        '' as "Sous performance non identifié",
+        st.nom_entreprise as "Sous-traitant"
+      FROM centrales c
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id
+      LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      WHERE 1=1
+    `
+    
+    if (sous_traitant) {
+      query += ` AND st.nom_entreprise = '${sous_traitant}'`
+    }
+    
+    if (statut) {
+      query += ` AND om.statut = '${statut}'`
+    } else {
+      query += ` AND om.statut IN ('TERMINE', 'VALIDE')`
+    }
+    
+    query += ` ORDER BY c.nom ASC`
+    
+    const result = await DB.prepare(query).all()
+    
+    if (!result.results || result.results.length === 0) {
+      return c.text('Aucune mission complétée trouvée.', 404)
+    }
+    
+    // Générer CSV avec en-têtes
+    const headers = [
+      'ID référent', 'Nom des projets', 'Puissance EXE', 'SPV', 'Latitude', 'Longitude',
+      'Adresse', 'Dept', 'Type de chantier', 'Installateur',
+      'Date réelle démarrage centrale PV', 'Date réelle fin centrale PV',
+      'Entreprise', 'Date de réception réelle des DRE 155/162', 'Date MES',
+      'SI', 'Panneaux', 'Audit en toiture', 'Audit hors toiture',
+      'Sous performance non identifié', 'Sous-traitant',
+      'NF C 15-100 (O/N)', 'NF C 15-100 Description',
+      'UTE C 15-712 (O/N)', 'UTE C 15-712 Description',
+      'DTU 40.35 (O/N)', 'DTU 40.35 Description',
+      'Respect ETN', 'Respect ETN Description',
+      'Respect notice montage panneaux', 'Respect notice montage Description',
+      'Bonnes pratiques constatées (O/N)', 'Bonnes pratiques Description',
+      'Mauvaises pratiques constatées (O/N)', 'Mauvaises pratiques Description',
+      'Autocontrôle présent (O/N)', 'Autocontrôle complet (O/N)', 'Autocontrôle Description',
+      'PV réception lot PV présent (O/N)', 'PV réception lot PV correct (O/N)', 'PV réception Description',
+      'CR visite chantier présent (O/N)',
+      'Tranchées respectent CDC GIRASOLE (O/N)', 'Tranchées Description',
+      'Documents GIRASOLE signalent écarts (O/N)', 'Écarts Description',
+      'Documents GIRASOLE signalent pratiques (O/N)', 'Pratiques Description'
+    ]
+    
+    let csv = headers.join(';') + '\n'
+    
+    // Ajouter les données (pour l'instant sans analyse checklist détaillée)
+    for (const row of result.results) {
+      const values = [
+        row['ID référent'] || '',
+        row['Nom des projets'] || '',
+        row['Puissance EXE'] || '',
+        row['SPV'] || '',
+        row['Latitude'] || '',
+        row['Longitude'] || '',
+        row['Adresse'] || '',
+        row['Dept'] || '',
+        row['Type de chantier'] || '',
+        row['Installateur'] || '',
+        row['Date réelle démarrage centrale PV'] || '',
+        row['Date réelle fin centrale PV'] || '',
+        row['Entreprise'] || '',
+        row['Date de réception réelle des DRE 155/162'] || '',
+        row['Date MES'] || '',
+        row['SI'] || '',
+        row['Panneaux'] || '',
+        row['Audit en toiture'] || 'NON',
+        row['Audit hors toiture'] || 'OUI',
+        row['Sous performance non identifié'] || '',
+        row['Sous-traitant'] || '',
+        // Colonnes à compléter depuis checklist_items (à développer)
+        '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+        '', '', '', '', '', '', '', '', '', '', '', ''
+      ]
+      
+      // Échapper les guillemets et virgules dans CSV
+      const escapedValues = values.map(v => {
+        const str = String(v || '')
+        if (str.includes(';') || str.includes('"') || str.includes('\n')) {
+          return '"' + str.replace(/"/g, '""') + '"'
+        }
+        return str
+      })
+      
+      csv += escapedValues.join(';') + '\n'
+    }
+    
+    // Retourner CSV avec bon content-type
+    const date = new Date().toISOString().split('T')[0]
+    return c.text(csv, 200, {
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="ANNEXE2_GIRASOLE_${date}.csv"`
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 // GET /api/ordres-mission/:id/document - Générer ordre de mission PDF/HTML
 app.get('/api/ordres-mission/:id/document', async (c) => {
   const { DB } = c.env
@@ -2685,6 +2816,36 @@ app.get('/', (c) => {
                     </div>
                 </div>
                 
+                <!-- Export & Livrables GIRASOLE -->
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 mb-6">
+                    <div class="flex items-center justify-between text-white">
+                        <div>
+                            <h3 class="text-xl font-bold mb-2 flex items-center">
+                                <i class="fas fa-file-excel mr-3 text-2xl"></i>
+                                Export ANNEXE 2 GIRASOLE
+                            </h3>
+                            <p class="text-orange-100 text-sm">Télécharger le fichier Excel requis pour livraison à GIRASOLE</p>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <select id="annexe2-filter-subcontractor" class="px-4 py-2 rounded-lg text-gray-800 font-medium">
+                                <option value="">Tous les sous-traitants</option>
+                                <option value="ARTEMIS">ARTEMIS uniquement</option>
+                                <option value="CADENET">CADENET uniquement</option>
+                                <option value="DIAGPV - Adrien & Fabien">DIAGPV uniquement</option>
+                            </select>
+                            <button onclick="downloadAnnexe2CSV()" class="bg-white hover:bg-gray-100 text-orange-600 font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger CSV
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-orange-400 bg-opacity-30 rounded-lg p-3 text-white text-sm">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Instructions :</strong> Le fichier CSV généré contient toutes les missions complétées (statut TERMINE ou VALIDE). 
+                        Ouvrir dans Excel → Enregistrer sous .xlsx → Envoyer à GIRASOLE.
+                    </div>
+                </div>
+                
                 <!-- KPI Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
@@ -3791,6 +3952,65 @@ app.get('/planning-manager', (c) => {
         // Ouvrir modal ajout événement (à développer si besoin)
         function openAddEventModal() {
             alert('Fonctionnalité "Ajouter intervention" - À développer si besoin\\n\\nPour l\'instant, utilisez l\'onglet "Ordres de Mission" pour créer des missions.');
+        }
+        
+        // ========================================
+        // EXPORT ANNEXE 2 CSV
+        // ========================================
+        function downloadAnnexe2CSV() {
+            const sousTraitant = document.getElementById('annexe2-filter-subcontractor')?.value || '';
+            
+            // Construire URL avec paramètres
+            let url = '/api/annexe2/export-csv';
+            const params = [];
+            
+            if (sousTraitant) {
+                params.push('sous_traitant=' + encodeURIComponent(sousTraitant));
+            }
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            // Afficher message de chargement
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Génération en cours...';
+            btn.disabled = true;
+            
+            // Télécharger le fichier
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur lors de la génération du CSV');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Créer un lien de téléchargement temporaire
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const date = new Date().toISOString().split('T')[0];
+                    a.download = 'ANNEXE2_GIRASOLE_' + date + '.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    // Restaurer bouton
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    // Message succès
+                    alert('✅ ANNEXE 2 téléchargé !\\n\\nOuvrez le fichier CSV dans Excel et enregistrez-le au format .xlsx avant envoi à GIRASOLE.');
+                })
+                .catch(error => {
+                    console.error('Erreur export ANNEXE 2:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert('❌ Erreur lors de l\\'export ANNEXE 2.\\n\\nVérifiez qu\\'il existe des missions complétées (statut TERMINE ou VALIDE).');
+                });
         }
         
         // Initialiser le calendrier quand l'onglet planning est affiché
