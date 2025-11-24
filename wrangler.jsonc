@@ -3,14 +3,5 @@
   "name": "girasole-webapp",
   "compatibility_date": "2024-01-01",
   "pages_build_output_dir": "./dist",
-  "compatibility_flags": ["nodejs_compat"],
-  
-  // Cloudflare D1 Database pour métadonnées missions
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "girasole-db-production",
-      "database_id": "TBD"  // À remplir après création de la DB
-    }
-  ]
+  "compatibility_flags": ["nodejs_compat"]
 }
