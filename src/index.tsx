@@ -2914,6 +2914,11 @@ app.get('/', (c) => {
                     // Marquer le bouton comme actif
                     event?.target?.classList.add('active', 'border-blue-600', 'text-blue-600');
                     event?.target?.classList.remove('border-transparent', 'text-gray-600');
+                    
+                    // Si onglet Missions, déclencher chargement
+                    if (tabName === 'missions' && typeof window.loadMissionsTab === 'function') {
+                        window.loadMissionsTab();
+                    }
                 }
             </script>
 
@@ -3096,24 +3101,14 @@ app.get('/', (c) => {
                         });
                     }
                     
-                    // Intercepter les clics sur le bouton Missions
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Trouver le bouton Missions et ajouter un listener
-                        const missionButtons = document.querySelectorAll('[onclick*="missions"]');
-                        missionButtons.forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                setTimeout(() => {
-                                    if (!document.getElementById('tab-missions').classList.contains('hidden')) {
-                                        loadMissions();
-                                        // Actualiser toutes les 30 secondes
-                                        if (!window.missionsInterval) {
-                                            window.missionsInterval = setInterval(loadMissions, 30000);
-                                        }
-                                    }
-                                }, 100);
-                            });
-                        });
-                    });
+                    // Exposer la fonction globalement pour showTab()
+                    window.loadMissionsTab = function() {
+                        loadMissions();
+                        // Actualiser toutes les 30 secondes
+                        if (!window.missionsInterval) {
+                            window.missionsInterval = setInterval(loadMissions, 30000);
+                        }
+                    };
                 </script>
             </div>
 
