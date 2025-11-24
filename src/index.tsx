@@ -2980,17 +2980,26 @@ app.get('/', (c) => {
                 <script>
                     // Charger missions
                     async function loadMissions() {
+                        console.log('🚀 loadMissions() appelée');
                         try {
+                            console.log('📡 Fetching /api/suivi-missions...');
                             const response = await fetch('/api/suivi-missions');
-                            const data = await response.json();
-                            const missions = data.data;
+                            console.log('✅ Response:', response.status, response.ok);
                             
+                            const data = await response.json();
+                            console.log('📦 Data:', data.success, 'missions:', data.data?.length);
+                            
+                            const missions = data.data;
                             const container = document.getElementById('missions-container');
+                            console.log('📍 Container:', container ? 'trouvé' : 'INTROUVABLE');
                             
                             if (!missions || missions.length === 0) {
+                                console.warn('⚠️ Aucune mission dans la réponse');
                                 container.innerHTML = '<div class="text-center py-12 text-gray-500">Aucune mission trouvée</div>';
                                 return;
                             }
+                            
+                            console.log('✅ Génération HTML pour', missions.length, 'missions');
                             
                             container.innerHTML = missions.map(m => {
                                 const progression = m.nb_points_total > 0 
@@ -3063,10 +3072,15 @@ app.get('/', (c) => {
                                 \`;
                             }).join('');
                             
+                            console.log('✅ HTML généré, longueur:', container.innerHTML.length, 'caractères');
+                            console.log('🎉 loadMissions() terminée avec succès');
+                            
                         } catch (error) {
-                            console.error('Erreur chargement missions:', error);
-                            document.getElementById('missions-container').innerHTML = 
-                                '<div class="text-center py-12 text-red-500">Erreur chargement missions</div>';
+                            console.error('❌ Erreur chargement missions:', error);
+                            const container = document.getElementById('missions-container');
+                            if (container) {
+                                container.innerHTML = '<div class="text-center py-12 text-red-500">❌ Erreur: ' + error.message + '</div>';
+                            }
                         }
                     }
                     
