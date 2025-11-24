@@ -2891,6 +2891,32 @@ app.get('/', (c) => {
                 </div>
             </div>
 
+            <script>
+                // Fonction globale pour gérer les onglets
+                function showTab(tabName) {
+                    // Masquer tous les contenus d'onglets
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.add('hidden');
+                    });
+                    
+                    // Retirer la classe active de tous les boutons d'onglets
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active', 'border-blue-600', 'text-blue-600');
+                        btn.classList.add('border-transparent', 'text-gray-600');
+                    });
+                    
+                    // Afficher l'onglet sélectionné
+                    const selectedTab = document.getElementById('tab-' + tabName);
+                    if (selectedTab) {
+                        selectedTab.classList.remove('hidden');
+                    }
+                    
+                    // Marquer le bouton comme actif
+                    event?.target?.classList.add('active', 'border-blue-600', 'text-blue-600');
+                    event?.target?.classList.remove('border-transparent', 'text-gray-600');
+                }
+            </script>
+
             <!-- Missions Tab -->
             <div id="tab-missions" class="tab-content hidden">
                 <div class="bg-white rounded-lg shadow p-6 mb-6">
@@ -3070,23 +3096,24 @@ app.get('/', (c) => {
                         });
                     }
                     
-                    // Charger au démarrage si onglet actif
-                    if (document.getElementById('tab-missions')?.classList.contains('active')) {
-                        loadMissions();
-                    }
-                    
-                    // Charger quand onglet devient actif
-                    const originalShowTab = window.showTab;
-                    window.showTab = function(tabName) {
-                        originalShowTab(tabName);
-                        if (tabName === 'missions') {
-                            loadMissions();
-                            // Actualiser toutes les 30 secondes
-                            if (!window.missionsInterval) {
-                                window.missionsInterval = setInterval(loadMissions, 30000);
-                            }
-                        }
-                    };
+                    // Intercepter les clics sur le bouton Missions
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Trouver le bouton Missions et ajouter un listener
+                        const missionButtons = document.querySelectorAll('[onclick*="missions"]');
+                        missionButtons.forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                setTimeout(() => {
+                                    if (!document.getElementById('tab-missions').classList.contains('hidden')) {
+                                        loadMissions();
+                                        // Actualiser toutes les 30 secondes
+                                        if (!window.missionsInterval) {
+                                            window.missionsInterval = setInterval(loadMissions, 30000);
+                                        }
+                                    }
+                                }, 100);
+                            });
+                        });
+                    });
                 </script>
             </div>
 
@@ -6316,126 +6343,6 @@ app.get('/suivi-audits', async (c) => {
             </div>
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-    <script>
-        // Charger missions
-        async function loadMissions() {
-            try {
-                const response = await axios.get('/api/suivi-missions');
-                const missions = response.data.data;
-                
-                const container = document.getElementById('missions-container');
-                
-                if (!missions || missions.length === 0) {
-                    container.innerHTML = '<div class="text-center py-12 text-gray-500">Aucune mission trouvée</div>';
-                    return;
-                }
-                
-                container.innerHTML = missions.map(m => {
-                    const progression = m.nb_points_total > 0 
-                        ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
-                        : 0;
-                    
-                    let statutBadge = '';
-                    if (progression === 0) {
-                        statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-800">Non commencée</span>';
-                    } else if (progression === 100) {
-                        statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">✅ Terminée</span>';
-                    } else {
-                        statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">🔄 En cours</span>';
-                    }
-                    
-                    return \`
-                        <div class="mission-card bg-white rounded-lg shadow-md p-6" data-st="\${m.sous_traitant}" data-centrale="\${m.centrale_nom}">
-                            <div class="flex items-start justify-between mb-4">
-                                <div class="flex-1">
-                                    <h3 class="text-xl font-bold text-gray-800 mb-1">\${m.centrale_nom}</h3>
-                                    <p class="text-sm text-gray-600">ID Ref: \${m.id_ref || 'N/A'} | \${m.puissance_kwc || 0} kWc</p>
-                                </div>
-                                \${statutBadge}
-                            </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                <div>
-                                    <p class="text-xs text-gray-500 mb-1">Sous-Traitant</p>
-                                    <p class="font-semibold text-gray-800">\${m.sous_traitant}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 mb-1">Technicien</p>
-                                    <p class="font-semibold text-gray-800">\${m.technicien_nom}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 mb-1">Date Mission</p>
-                                    <p class="font-semibold text-gray-800">\${new Date(m.date_mission).toLocaleDateString('fr-FR')}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 mb-1">Photos</p>
-                                    <p class="font-semibold text-gray-800">\${m.nb_photos || 0} photos</p>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm font-medium text-gray-700">Progression</span>
-                                    <span class="text-sm font-bold text-blue-600">\${progression}%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-3">
-                                    <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all" style="width: \${progression}%"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    \${m.nb_points_completes || 0} / \${m.nb_points_total || 0} points complétés
-                                </p>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <a href="/audit/\${m.mission_id}" target="_blank" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm">
-                                    <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
-                                </a>
-                                <a href="/photos-audit/\${m.mission_id}" target="_blank" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm">
-                                    <i class="fas fa-images mr-2"></i>Photos (\${m.nb_photos || 0})
-                                </a>
-                                <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm">
-                                    <i class="fas fa-file-pdf mr-2"></i>OM
-                                </a>
-                            </div>
-                        </div>
-                    \`;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Erreur chargement missions:', error);
-                document.getElementById('missions-container').innerHTML = 
-                    '<div class="text-center py-12 text-red-500">Erreur chargement missions</div>';
-            }
-        }
-        
-        // Filtres
-        document.getElementById('filter-st').addEventListener('change', filterMissions);
-        document.getElementById('filter-statut').addEventListener('change', filterMissions);
-        document.getElementById('search-centrale').addEventListener('input', filterMissions);
-        
-        function filterMissions() {
-            const st = document.getElementById('filter-st').value.toLowerCase();
-            const search = document.getElementById('search-centrale').value.toLowerCase();
-            
-            document.querySelectorAll('.mission-card').forEach(card => {
-                const cardSt = card.dataset.st.toLowerCase();
-                const cardCentrale = card.dataset.centrale.toLowerCase();
-                
-                const matchSt = !st || cardSt.includes(st);
-                const matchSearch = !search || cardCentrale.includes(search);
-                
-                card.style.display = matchSt && matchSearch ? 'block' : 'none';
-            });
-        }
-        
-        // Charger au démarrage
-        loadMissions();
-        
-        // Actualiser toutes les 30 secondes
-        setInterval(loadMissions, 30000);
-    </script>
 </body>
 </html>
     `)
