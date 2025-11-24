@@ -504,6 +504,45 @@ app.put('/api/ordres-mission/:id/statut', async (c) => {
   }
 })
 
+// PUT /api/ordres-mission/:id/date - Mettre à jour date intervention
+app.put('/api/ordres-mission/:id/date', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    const { date_mission, heure_debut, heure_fin } = await c.req.json()
+    
+    if (!date_mission) {
+      return c.json({ success: false, error: 'Date mission requise' }, 400)
+    }
+    
+    // Mettre à jour ordre de mission
+    await DB.prepare(`
+      UPDATE ordres_mission 
+      SET date_mission = ?,
+          heure_debut = ?,
+          heure_fin = ?
+      WHERE id = ?
+    `).bind(date_mission, heure_debut || '08:00', heure_fin || '16:00', id).run()
+    
+    // Mettre à jour planning event
+    await DB.prepare(`
+      UPDATE planning_events 
+      SET date_debut = ?,
+          date_fin = ?
+      WHERE ordre_mission_id = ?
+    `).bind(
+      `${date_mission} ${heure_debut || '08:00'}`,
+      `${date_mission} ${heure_fin || '16:00'}`,
+      id
+    ).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 // GET /api/planning - Événements planning (vue calendrier)
 app.get('/api/planning', async (c) => {
   const { DB } = c.env
@@ -2253,6 +2292,11 @@ app.get('/', (c) => {
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
+        <!-- FullCalendar CSS + JS -->
+        <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+        
         <link href="/static/styles.css" rel="stylesheet">
     </head>
     <body class="bg-gray-50">
@@ -2577,17 +2621,24 @@ app.get('/', (c) => {
 
                     <!-- Calendrier -->
                     <div id="planning-subtab-calendrier" class="planning-subtab-content p-6 hidden">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-bold">Vue Calendrier</h3>
-                            <p class="text-gray-600 text-sm">Planning des missions par date</p>
-                        </div>
-                        <div id="calendrier-view">
-                            <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-                                <i class="fas fa-calendar-alt text-6xl text-gray-400 mb-4"></i>
-                                <p class="text-gray-600">Vue calendrier en cours de développement</p>
-                                <p class="text-gray-500 text-sm mt-2">Utilisez pour l'instant l'onglet "Ordres de Mission"</p>
+                        <div class="mb-4 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold">Vue Calendrier</h3>
+                                <p class="text-gray-600 text-sm">Planning des missions GIRASOLE 2025</p>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <select id="calendar-filter-subcontractor" class="px-4 py-2 border rounded-lg" onchange="reloadCalendar()">
+                                    <option value="">Tous les sous-traitants</option>
+                                    <option value="ARTEMIS">ARTEMIS</option>
+                                    <option value="CADENET">CADENET</option>
+                                    <option value="DIAGPV - Adrien & Fabien">DIAGPV - Adrien & Fabien</option>
+                                </select>
+                                <button onclick="openAddEventModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                    <i class="fas fa-plus mr-2"></i>Ajouter intervention
+                                </button>
                             </div>
                         </div>
+                        <div id="calendrier-view" class="bg-white rounded-lg shadow-lg"></div>
                     </div>
                 </div>
             </div>
@@ -3590,6 +3641,184 @@ app.get('/planning-manager', (c) => {
                 \`;
             }
         }
+
+        // ========================================
+        // FULLCALENDAR - VUE CALENDRIER
+        // ========================================
+        let calendar = null;
+        
+        // Initialiser FullCalendar
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendrier-view');
+            if (!calendarEl || calendar) return; // Déjà initialisé
+            
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                height: 'auto',
+                firstDay: 1, // Lundi
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                buttonText: {
+                    today: "Aujourd'hui",
+                    month: 'Mois',
+                    week: 'Semaine',
+                    list: 'Liste'
+                },
+                events: function(info, successCallback, failureCallback) {
+                    // Charger les événements depuis l'API /api/planning
+                    const filter = document.getElementById('calendar-filter-subcontractor')?.value || '';
+                    
+                    fetch('/api/planning')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const events = data.data
+                                    .filter(event => !filter || event.nom_entreprise === filter)
+                                    .map(event => {
+                                        // Déterminer la couleur selon le sous-traitant
+                                        let color = '#3b82f6'; // Bleu par défaut
+                                        if (event.nom_entreprise === 'ARTEMIS') color = '#8b5cf6'; // Violet
+                                        if (event.nom_entreprise === 'CADENET') color = '#10b981'; // Vert
+                                        if (event.nom_entreprise?.includes('DIAGPV')) color = '#f59e0b'; // Orange
+                                        
+                                        return {
+                                            id: event.id,
+                                            title: event.centrale_nom || event.titre,
+                                            start: event.date_debut,
+                                            end: event.date_fin,
+                                            backgroundColor: color,
+                                            borderColor: color,
+                                            extendedProps: {
+                                                centrale_nom: event.centrale_nom,
+                                                centrale_type: event.centrale_type,
+                                                puissance_kwc: event.puissance_kwc,
+                                                technicien: event.technicien_prenom + ' ' + event.technicien_nom,
+                                                sous_traitant: event.nom_entreprise,
+                                                statut: event.statut,
+                                                ordre_mission_id: event.ordre_mission_id
+                                            }
+                                        };
+                                    });
+                                successCallback(events);
+                            } else {
+                                failureCallback(new Error(data.error));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur chargement planning:', error);
+                            failureCallback(error);
+                        });
+                },
+                eventClick: function(info) {
+                    // Afficher les détails de l'événement
+                    const event = info.event;
+                    const props = event.extendedProps;
+                    
+                    const modal = \`
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="event-detail-modal" onclick="closeEventModal(event)">
+                            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6" onclick="event.stopPropagation()">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-gray-800">\${props.centrale_nom}</h3>
+                                        <p class="text-sm text-gray-500 mt-1">\${props.centrale_type}</p>
+                                    </div>
+                                    <button onclick="closeEventModal(event)" class="text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-times text-2xl"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-blue-50 p-4 rounded-lg">
+                                            <p class="text-sm text-gray-600 mb-1">Puissance</p>
+                                            <p class="text-lg font-bold text-blue-600">\${props.puissance_kwc} kWc</p>
+                                        </div>
+                                        <div class="bg-purple-50 p-4 rounded-lg">
+                                            <p class="text-sm text-gray-600 mb-1">Statut</p>
+                                            <p class="text-lg font-bold text-purple-600">\${props.statut}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="border-t pt-4">
+                                        <p class="text-sm text-gray-600 mb-2"><i class="fas fa-calendar mr-2"></i><strong>Date:</strong> \${new Date(event.start).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                                        <p class="text-sm text-gray-600 mb-2"><i class="fas fa-user mr-2"></i><strong>Technicien:</strong> \${props.technicien}</p>
+                                        <p class="text-sm text-gray-600 mb-2"><i class="fas fa-building mr-2"></i><strong>Sous-traitant:</strong> \${props.sous_traitant}</p>
+                                    </div>
+                                    
+                                    <div class="flex space-x-3 pt-4 border-t">
+                                        <a href="/audit/\${props.ordre_mission_id}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-center">
+                                            <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
+                                        </a>
+                                        <a href="/om/\${props.ordre_mission_id}" target="_blank" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-center">
+                                            <i class="fas fa-file-pdf mr-2"></i>Voir OM PDF
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    
+                    document.body.insertAdjacentHTML('beforeend', modal);
+                },
+                eventDidMount: function(info) {
+                    // Ajouter un tooltip
+                    info.el.title = info.event.title + ' - ' + info.event.extendedProps.sous_traitant;
+                }
+            });
+            
+            calendar.render();
+        }
+        
+        // Recharger le calendrier (après changement de filtre)
+        function reloadCalendar() {
+            if (calendar) {
+                calendar.refetchEvents();
+            }
+        }
+        
+        // Fermer la modal détail événement
+        function closeEventModal(event) {
+            const modal = document.getElementById('event-detail-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Ouvrir modal ajout événement (à développer si besoin)
+        function openAddEventModal() {
+            alert('Fonctionnalité "Ajouter intervention" - À développer si besoin\\n\\nPour l\'instant, utilisez l\'onglet "Ordres de Mission" pour créer des missions.');
+        }
+        
+        // Initialiser le calendrier quand l'onglet planning est affiché
+        const originalShowTab = window.showTab;
+        window.showTab = function(tabName) {
+            originalShowTab(tabName);
+            if (tabName === 'planning') {
+                setTimeout(() => {
+                    if (!calendar) {
+                        initCalendar();
+                    }
+                }, 100);
+            }
+        };
+        
+        const originalShowPlanningSubTab = window.showPlanningSubTab;
+        window.showPlanningSubTab = function(subTabName) {
+            originalShowPlanningSubTab(subTabName);
+            if (subTabName === 'calendrier') {
+                setTimeout(() => {
+                    if (!calendar) {
+                        initCalendar();
+                    } else {
+                        calendar.render(); // Re-render si déjà initialisé
+                    }
+                }, 100);
+            }
+        };
         </script>
         <script src="/static/planning-manager.js"></script>
     </body>
@@ -5343,6 +5572,7 @@ app.get('/suivi-audits', async (c) => {
                             <option value="">Tous</option>
                             <option value="ARTEMIS">ARTEMIS</option>
                             <option value="CADENET">CADENET</option>
+                            <option value="DIAGPV">DIAGPV - Adrien & Fabien</option>
                         </select>
                     </div>
                     
