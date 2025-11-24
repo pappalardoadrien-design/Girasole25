@@ -3565,6 +3565,76 @@ app.delete('/api/centrales/:id/unassign', async (c) => {
   }
 })
 
+// =======================
+// API ROUTES - SHAREPOINT
+// =======================
+
+// GET /api/sharepoint/sync - Synchronisation manuelle SharePoint → D1
+app.get('/api/sharepoint/sync', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Import du connecteur SharePoint
+    const { createSharePointConnector } = await import('./sharepoint-connector')
+    
+    // Configuration du connecteur (URL publique du fichier)
+    const connector = createSharePointConnector({
+      siteUrl: 'https://lenergiededemain.sharepoint.com/sites/DiagnosticPhotovoltaique',
+      fileUrl: 'https://www.genspark.ai/api/files/s/sIz00RkB' // URL temporaire du fichier ANNEXE 1
+    })
+    
+    // Synchronisation SharePoint → D1
+    const updated = await connector.syncSharePointToD1(DB)
+    
+    return c.json({
+      success: true,
+      message: `Synchronisation réussie: ${updated} centrales mises à jour`,
+      updated_count: updated
+    })
+  } catch (error) {
+    console.error('Erreur synchronisation SharePoint:', error)
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
+// GET /api/sharepoint/status - Statut de la dernière synchronisation
+app.get('/api/sharepoint/status', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Vérifier le nombre de centrales avec données SharePoint enrichies
+    const result = await DB.prepare(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN contact_exploitation IS NOT NULL AND contact_exploitation != '' THEN 1 END) as avec_contact,
+        COUNT(CASE WHEN panneaux IS NOT NULL AND panneaux != '' THEN 1 END) as avec_panneaux,
+        COUNT(CASE WHEN date_mes IS NOT NULL AND date_mes != '' THEN 1 END) as avec_date_mes,
+        MAX(date_creation) as derniere_sync
+      FROM centrales
+    `).first()
+    
+    return c.json({
+      success: true,
+      status: {
+        total_centrales: result?.total || 0,
+        avec_contact_exploitation: result?.avec_contact || 0,
+        avec_panneaux: result?.avec_panneaux || 0,
+        avec_date_mes: result?.avec_date_mes || 0,
+        derniere_synchronisation: result?.derniere_sync || null,
+        pourcentage_enrichi: result ? Math.round((result.avec_contact / result.total) * 100) : 0
+      }
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
 // GET /documents - Page de téléchargement des documents
 // GET /api/planning/full - Planning complet des 52 centrales avec attributions
 app.get('/api/planning/full', async (c) => {
