@@ -3312,6 +3312,36 @@ app.get('/planning-manager', (c) => {
                 </div>
             </div>
 
+            <!-- Synchronisation CSV SharePoint (SANS OAUTH2) -->
+            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg shadow-md p-6 mb-6 border-2 border-yellow-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-cloud-upload-alt mr-2 text-orange-600"></i>
+                    Synchronisation SharePoint (Upload CSV Manuel)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-file-csv mr-2"></i>
+                            Fichier CSV ANNEXE 1 (depuis SharePoint)
+                        </label>
+                        <input type="file" id="csv-file-input" accept=".csv" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Téléchargez ANNEXE 1 depuis SharePoint, puis uploadez-le ici pour synchroniser les données
+                        </p>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="uploadCSV()" 
+                                class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-3 rounded-lg hover:from-orange-600 hover:to-yellow-600 transition font-semibold shadow-lg">
+                            <i class="fas fa-sync mr-2"></i>
+                            Synchroniser D1
+                        </button>
+                    </div>
+                </div>
+                <div id="csv-sync-result" class="mt-4 hidden"></div>
+            </div>
+
             <!-- Attribution automatique batch -->
             <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg shadow-md p-6 mb-6 border-2 border-green-200">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">
@@ -3489,6 +3519,78 @@ app.get('/planning-manager', (c) => {
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script>
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // FONCTION UPLOAD CSV SHAREPOINT (SANS OAUTH2)
+        // ═══════════════════════════════════════════════════════════════════════════════
+        
+        async function uploadCSV() {
+            const fileInput = document.getElementById('csv-file-input');
+            const resultDiv = document.getElementById('csv-sync-result');
+            
+            if (!fileInput.files || !fileInput.files[0]) {
+                resultDiv.className = 'mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Veuillez sélectionner un fichier CSV';
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            
+            // Vérifier extension
+            if (!file.name.endsWith('.csv')) {
+                resultDiv.className = 'mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Le fichier doit être au format CSV';
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Afficher loader
+            resultDiv.className = 'mt-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded';
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Synchronisation en cours...';
+            resultDiv.classList.remove('hidden');
+            
+            try {
+                // Lire le contenu du fichier
+                const csvContent = await file.text();
+                
+                // Envoyer au serveur
+                const response = await axios.post('/api/sharepoint/upload-csv', {
+                    csv_content: csvContent
+                });
+                
+                if (response.data.success) {
+                    resultDiv.className = 'mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+                    resultDiv.innerHTML = \`
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-2xl mr-3"></i>
+                            <div>
+                                <p class="font-bold">Synchronisation réussie !</p>
+                                <p class="text-sm mt-1">
+                                    <i class="fas fa-database mr-1"></i>
+                                    \${response.data.centrales_synchronisees} centrales synchronisées dans D1
+                                </p>
+                                \${response.data.erreurs ? \`<p class="text-sm text-orange-600 mt-1"><i class="fas fa-exclamation-triangle mr-1"></i>Quelques erreurs mineures détectées</p>\` : ''}
+                            </div>
+                        </div>
+                    \`;
+                    
+                    // Recharger les statistiques après 2 secondes
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    throw new Error(response.data.error || 'Erreur inconnue');
+                }
+            } catch (error) {
+                resultDiv.className = 'mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+                resultDiv.innerHTML = \`
+                    <i class="fas fa-times-circle mr-2"></i>
+                    <strong>Erreur:</strong> \${error.response?.data?.error || error.message}
+                \`;
+            }
+        }
+        </script>
         <script src="/static/planning-manager.js"></script>
     </body>
     </html>
@@ -3771,6 +3873,146 @@ app.post('/api/audit/generate-rapport-final', async (c) => {
       success: true,
       sharepoint_url,
       message: 'Rapport final PDF generated successfully'
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ROUTE API - SYNCHRONISATION MANUELLE CSV (SANS OAUTH2)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// POST /api/sharepoint/upload-csv - Upload fichier CSV ANNEXE 1 depuis SharePoint
+app.post('/api/sharepoint/upload-csv', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { csv_content } = body
+    
+    if (!csv_content) {
+      return c.json({ success: false, error: 'Missing csv_content' }, 400)
+    }
+    
+    // Parser le CSV
+    const lines = csv_content.split('\n').filter((line: string) => line.trim())
+    if (lines.length < 2) {
+      return c.json({ success: false, error: 'CSV vide ou invalide' }, 400)
+    }
+    
+    // Ignorer la première ligne (header)
+    const dataLines = lines.slice(1)
+    let centralesSynchronisees = 0
+    let erreurs: string[] = []
+    
+    for (const line of dataLines) {
+      try {
+        // Split par point-virgule (CSV français)
+        const cols = line.split(';').map((col: string) => col.trim().replace(/^"|"$/g, ''))
+        
+        if (cols.length < 10) continue // Ignorer lignes incomplètes
+        
+        // Extraction des colonnes (basé sur ANNEXE 1 structure)
+        const [
+          spv,
+          nom,
+          puissance_kwc_str,
+          latitude_str,
+          longitude_str,
+          adresse,
+          cp_ville,
+          dept,
+          type_centrale,
+          installateur,
+          // ... autres colonnes
+        ] = cols
+        
+        const puissance_kwc = parseFloat(puissance_kwc_str?.replace(',', '.') || '0')
+        const latitude = parseFloat(latitude_str?.replace(',', '.') || '0')
+        const longitude = parseFloat(longitude_str?.replace(',', '.') || '0')
+        
+        if (!nom || puissance_kwc === 0) continue
+        
+        // Vérifier si la centrale existe déjà
+        const existing = await DB.prepare(`
+          SELECT id FROM centrales WHERE nom = ? OR (latitude = ? AND longitude = ?)
+        `).bind(nom, latitude, longitude).first()
+        
+        if (existing) {
+          // Mise à jour centrale existante
+          await DB.prepare(`
+            UPDATE centrales SET
+              spv = ?,
+              latitude = ?,
+              longitude = ?,
+              adresse = ?,
+              dept = ?,
+              type_centrale = ?,
+              installateur = ?,
+              puissance_kwc = ?
+            WHERE id = ?
+          `).bind(
+            spv || null,
+            latitude || null,
+            longitude || null,
+            adresse || null,
+            dept || null,
+            type_centrale || null,
+            installateur || null,
+            puissance_kwc || null,
+            existing.id
+          ).run()
+          
+          centralesSynchronisees++
+        } else {
+          // Insertion nouvelle centrale
+          await DB.prepare(`
+            INSERT INTO centrales (
+              nom, type, puissance_kwc, localisation, statut,
+              spv, latitude, longitude, adresse, dept, type_centrale, installateur
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            nom,
+            'PV',
+            puissance_kwc,
+            cp_ville || adresse || null,
+            'A_AUDITER',
+            spv || null,
+            latitude || null,
+            longitude || null,
+            adresse || null,
+            dept || null,
+            type_centrale || null,
+            installateur || null
+          ).run()
+          
+          centralesSynchronisees++
+        }
+      } catch (err) {
+        erreurs.push(`Erreur ligne: ${String(err)}`)
+      }
+    }
+    
+    // Log de synchronisation
+    await DB.prepare(`
+      INSERT INTO sharepoint_sync_logs (direction, statut, nb_elements, data_summary)
+      VALUES (?, ?, ?, ?)
+    `).bind(
+      'CSV->D1',
+      'SUCCESS',
+      centralesSynchronisees,
+      JSON.stringify({ erreurs: erreurs.length })
+    ).run()
+    
+    return c.json({
+      success: true,
+      message: 'Synchronisation CSV terminée',
+      centrales_synchronisees: centralesSynchronisees,
+      erreurs: erreurs.length > 0 ? erreurs : undefined
     })
   } catch (error) {
     return c.json({
