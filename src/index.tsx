@@ -4819,4 +4819,730 @@ app.get('/api/documents', async (c) => {
   return c.json({ success: true, data: documents })
 })
 
+// =======================
+// ORDRE DE MISSION HTML/PDF
+// =======================
+
+// GET /om/:mission_id - Générer Ordre de Mission HTML (à imprimer en PDF)
+app.get('/om/:mission_id', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  
+  try {
+    // Récupérer données complètes mission
+    const mission = await DB.prepare(`
+      SELECT 
+        om.*,
+        c.nom as centrale_nom,
+        c.id_ref,
+        c.type_centrale,
+        c.puissance_kwc,
+        c.adresse,
+        c.dept,
+        c.audit_toiture,
+        c.contact_exploitation,
+        c.tel_exploitation,
+        c.installateur,
+        c.panneaux,
+        c.date_mes,
+        st.nom_entreprise as sous_traitant,
+        st.email_contact as st_email,
+        st.telephone as st_tel,
+        t.prenom as tech_prenom,
+        t.nom as tech_nom,
+        t.email as tech_email,
+        t.telephone as tech_tel,
+        COUNT(DISTINCT ci.id) as nb_checklist
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      LEFT JOIN checklist_items ci ON om.id = ci.ordre_mission_id
+      WHERE om.id = ?
+      GROUP BY om.id
+    `).bind(missionId).first()
+    
+    if (!mission) {
+      return c.html('<h1>Mission non trouvée</h1>', 404)
+    }
+    
+    const dateAudit = mission.date_mission || new Date().toISOString().split('T')[0]
+    const auditToiture = mission.audit_toiture === 'X'
+    
+    return c.html(`
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordre de Mission ${mission.id_ref || mission.centrale_nom}</title>
+    <style>
+        @media print {
+            @page { margin: 1.5cm; size: A4; }
+            body { margin: 0; }
+            .no-print { display: none; }
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            border-bottom: 4px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2563eb;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header .ref {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9fafb;
+            border-left: 4px solid #2563eb;
+        }
+        
+        .section h2 {
+            color: #1e40af;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 15px;
+            color: #111827;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .checklist-summary {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .checklist-count {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .important-box {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .important-box h3 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .print-button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">
+        🖨️ Imprimer / Enregistrer en PDF
+    </button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📋 ORDRE DE MISSION</h1>
+            <div class="ref">
+                Mission #${mission.id} | ${mission.id_ref || 'N/A'} | 
+                Date : ${new Date(dateAudit).toLocaleDateString('fr-FR')}
+            </div>
+        </div>
+        
+        <!-- CENTRALE -->
+        <div class="section">
+            <h2>🏭 Centrale Photovoltaïque</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Nom Centrale</div>
+                    <div class="info-value">${mission.centrale_nom}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Référence SPV</div>
+                    <div class="info-value">${mission.id_ref || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Type Installation</div>
+                    <div class="info-value">${mission.type_centrale || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Puissance</div>
+                    <div class="info-value">${mission.puissance_kwc || 0} kWc</div>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <div class="info-label">Adresse</div>
+                    <div class="info-value">${mission.adresse || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Département</div>
+                    <div class="info-value">${mission.dept || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Installateur</div>
+                    <div class="info-value">${mission.installateur || 'N/A'}</div>
+                </div>
+            </div>
+            
+            ${auditToiture ? `
+            <div class="badge badge-warning" style="margin-top: 15px;">
+                ⚠️ AUDIT TOITURE - Démontage ≥25 panneaux requis
+            </div>
+            ` : `
+            <div class="badge badge-success" style="margin-top: 15px;">
+                ✅ AUDIT STANDARD (Sol / Ombrière)
+            </div>
+            `}
+        </div>
+        
+        <!-- SOUS-TRAITANT -->
+        <div class="section">
+            <h2>👷 Sous-Traitant & Technicien</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Sous-Traitant</div>
+                    <div class="info-value">${mission.sous_traitant}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">${mission.st_email || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Technicien</div>
+                    <div class="info-value">${mission.tech_prenom} ${mission.tech_nom}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Contact</div>
+                    <div class="info-value">${mission.tech_tel || mission.tech_email || 'N/A'}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTACT EXPLOITATION -->
+        <div class="section">
+            <h2>📞 Contact Exploitation Site</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Contact</div>
+                    <div class="info-value">${mission.contact_exploitation || 'Non renseigné'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Téléphone</div>
+                    <div class="info-value">${mission.tel_exploitation || 'Non renseigné'}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MISSION -->
+        <div class="section">
+            <h2>📋 Détails Mission</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Date Audit</div>
+                    <div class="info-value">${new Date(dateAudit).toLocaleDateString('fr-FR')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Durée Estimée</div>
+                    <div class="info-value">${mission.duree_estimee_heures || 7}h</div>
+                </div>
+            </div>
+            
+            <div class="checklist-summary">
+                <div class="info-label">Checklist Qualité</div>
+                <div class="checklist-count">${mission.nb_checklist} points</div>
+                <div style="color: #4b5563; font-size: 14px; margin-top: 5px;">
+                    Conforme NF C 15-100 + UTE C 15-712${auditToiture ? ' + DTU 40.35' : ''}
+                </div>
+                <div style="margin-top: 10px; font-weight: 600; color: #2563eb;">
+                    🔗 Checklist mobile : 
+                    <span style="font-family: monospace; background: white; padding: 4px 8px; border-radius: 4px;">
+                        https://63d55586.girasole-diagpv.pages.dev/audit/${mission.id}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        ${auditToiture ? `
+        <!-- CONSIGNES TOITURE -->
+        <div class="important-box">
+            <h3>⚠️ CONSIGNES SPÉCIFIQUES AUDIT TOITURE</h3>
+            <ul>
+                <li><strong>Démontage MINIMUM 25 PANNEAUX</strong> (choix pertinent : 1er et dernier de chaîne)</li>
+                <li>Remontage sans atteindre intégrité modules/supports</li>
+                <li>Respecter notices montage (si impossible, indiquer à GIRASOLE avant intervention)</li>
+                <li><strong>INTERDIT :</strong> Marcher sur panneaux</li>
+                <li>Moyens accès : nacelle, harnais, ligne de vie (selon site)</li>
+            </ul>
+        </div>
+        ` : ''}
+        
+        <!-- SÉCURITÉ -->
+        <div class="section">
+            <h2>🛡️ Sécurité & Prérequis</h2>
+            <ul>
+                <li>Plan de prévention GIRASOLE signé par sous-traitant</li>
+                <li>Analyse des risques fournie</li>
+                <li>Habilitations électriques valides</li>
+                ${auditToiture ? '<li>Habilitations travail en hauteur + permis nacelle si applicable</li>' : ''}
+                <li>EPI complets (casque, chaussures sécurité, gants isolants, etc.)</li>
+            </ul>
+        </div>
+        
+        <!-- LIVRABLES -->
+        <div class="section">
+            <h2>📦 Livrables Attendus</h2>
+            <ul>
+                <li>Checklist ${mission.nb_checklist} points complétée (via interface mobile)</li>
+                <li>Reportage photo géolocalisé pour chaque point de contrôle</li>
+                <li>Photos haute définition des non-conformités identifiées</li>
+                <li>Commentaires techniques détaillés</li>
+            </ul>
+            <div style="margin-top: 15px; padding: 10px; background: #fef3c7; border-radius: 4px;">
+                <strong>⏰ Délai :</strong> Remise J+5 maximum après intervention
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>DiagPV - Diagnostic Photovoltaïque</strong></p>
+            <p>Document généré le ${new Date().toLocaleString('fr-FR')}</p>
+            <p>Mission #${mission.id} | ${mission.centrale_nom}</p>
+        </div>
+    </div>
+</body>
+</html>
+    `)
+    
+  } catch (error) {
+    console.error('Erreur génération OM:', error)
+    return c.html(`<h1>Erreur génération OM</h1><p>${String(error)}</p>`, 500)
+  }
+})
+
+// =======================
+// SUIVI AUDITS SOUS-TRAITANTS
+// =======================
+
+// GET /suivi-audits - Dashboard suivi temps réel
+app.get('/suivi-audits', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Récupérer stats globales
+    const stats = await DB.prepare(`
+      SELECT 
+        COUNT(DISTINCT om.id) as total_missions,
+        COUNT(DISTINCT CASE WHEN ci.statut != 'NON_VERIFIE' THEN om.id END) as missions_commencees,
+        COUNT(DISTINCT CASE WHEN ci.statut = 'CONFORME' OR ci.statut = 'NON_CONFORME' THEN om.id END) as missions_progress,
+        SUM(CASE WHEN ci.statut = 'CONFORME' OR ci.statut = 'NON_CONFORME' THEN 1 ELSE 0 END) as points_completes,
+        COUNT(ci.id) as points_total,
+        COUNT(DISTINCT ap.id) as photos_total
+      FROM ordres_mission om
+      LEFT JOIN checklist_items ci ON om.id = ci.ordre_mission_id
+      LEFT JOIN audit_photos ap ON om.id = ap.ordre_mission_id
+    `).first()
+    
+    return c.html(`
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Audits - GIRASOLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .mission-card { transition: all 0.3s; }
+        .mission-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .progress-ring { transform: rotate(-90deg); }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+            <div class="container mx-auto px-6 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold">
+                            <i class="fas fa-chart-line mr-3"></i>
+                            Suivi Audits GIRASOLE
+                        </h1>
+                        <p class="text-blue-100 mt-2">
+                            <i class="fas fa-users mr-2"></i>
+                            Dashboard temps réel - Sous-traitants ARTEMIS & CADENET
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <a href="/" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition mr-2">
+                            <i class="fas fa-home mr-2"></i>Accueil
+                        </a>
+                        <a href="/planning-manager" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-400 transition">
+                            <i class="fas fa-calendar mr-2"></i>Planning
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Stats Cards -->
+        <div class="container mx-auto px-6 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm uppercase">Total Missions</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-1">${stats.total_missions || 0}</p>
+                        </div>
+                        <i class="fas fa-clipboard-list text-4xl text-blue-500"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm uppercase">Commencées</p>
+                            <p class="text-3xl font-bold text-yellow-600 mt-1">${stats.missions_commencees || 0}</p>
+                        </div>
+                        <i class="fas fa-play-circle text-4xl text-yellow-500"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm uppercase">Points Complétés</p>
+                            <p class="text-3xl font-bold text-green-600 mt-1">${stats.points_completes || 0} / ${stats.points_total || 0}</p>
+                        </div>
+                        <i class="fas fa-check-circle text-4xl text-green-500"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm uppercase">Photos</p>
+                            <p class="text-3xl font-bold text-purple-600 mt-1">${stats.photos_total || 0}</p>
+                        </div>
+                        <i class="fas fa-camera text-4xl text-purple-500"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtres -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-building mr-2"></i>Sous-Traitant
+                        </label>
+                        <select id="filter-st" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tous</option>
+                            <option value="ARTEMIS">ARTEMIS</option>
+                            <option value="CADENET">CADENET</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-filter mr-2"></i>Statut
+                        </label>
+                        <select id="filter-statut" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tous</option>
+                            <option value="NON_COMMENCEE">Non commencée</option>
+                            <option value="EN_COURS">En cours</option>
+                            <option value="TERMINEE">Terminée</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-search mr-2"></i>Recherche
+                        </label>
+                        <input 
+                            type="text" 
+                            id="search-centrale" 
+                            placeholder="Nom centrale..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste Missions -->
+            <div id="missions-container" class="space-y-4">
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i>
+                    <p class="text-gray-600 mt-4">Chargement des missions...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Charger missions
+        async function loadMissions() {
+            try {
+                const response = await axios.get('/api/suivi-missions');
+                const missions = response.data.data;
+                
+                const container = document.getElementById('missions-container');
+                
+                if (!missions || missions.length === 0) {
+                    container.innerHTML = '<div class="text-center py-12 text-gray-500">Aucune mission trouvée</div>';
+                    return;
+                }
+                
+                container.innerHTML = missions.map(m => {
+                    const progression = m.nb_points_total > 0 
+                        ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
+                        : 0;
+                    
+                    let statutBadge = '';
+                    if (progression === 0) {
+                        statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-800">Non commencée</span>';
+                    } else if (progression === 100) {
+                        statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">✅ Terminée</span>';
+                    } else {
+                        statutBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">🔄 En cours</span>';
+                    }
+                    
+                    return \`
+                        <div class="mission-card bg-white rounded-lg shadow-md p-6" data-st="\${m.sous_traitant}" data-centrale="\${m.centrale_nom}">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-800 mb-1">\${m.centrale_nom}</h3>
+                                    <p class="text-sm text-gray-600">ID Ref: \${m.id_ref || 'N/A'} | \${m.puissance_kwc || 0} kWc</p>
+                                </div>
+                                \${statutBadge}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-1">Sous-Traitant</p>
+                                    <p class="font-semibold text-gray-800">\${m.sous_traitant}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-1">Technicien</p>
+                                    <p class="font-semibold text-gray-800">\${m.technicien_nom}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-1">Date Mission</p>
+                                    <p class="font-semibold text-gray-800">\${new Date(m.date_mission).toLocaleDateString('fr-FR')}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-1">Photos</p>
+                                    <p class="font-semibold text-gray-800">\${m.nb_photos || 0} photos</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Progression</span>
+                                    <span class="text-sm font-bold text-blue-600">\${progression}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all" style="width: \${progression}%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    \${m.nb_points_completes || 0} / \${m.nb_points_total || 0} points complétés
+                                </p>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <a href="/audit/\${m.mission_id}" target="_blank" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm">
+                                    <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
+                                </a>
+                                <a href="/photos-audit/\${m.mission_id}" target="_blank" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm">
+                                    <i class="fas fa-images mr-2"></i>Photos (\${m.nb_photos || 0})
+                                </a>
+                                <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm">
+                                    <i class="fas fa-file-pdf mr-2"></i>OM
+                                </a>
+                            </div>
+                        </div>
+                    \`;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Erreur chargement missions:', error);
+                document.getElementById('missions-container').innerHTML = 
+                    '<div class="text-center py-12 text-red-500">Erreur chargement missions</div>';
+            }
+        }
+        
+        // Filtres
+        document.getElementById('filter-st').addEventListener('change', filterMissions);
+        document.getElementById('filter-statut').addEventListener('change', filterMissions);
+        document.getElementById('search-centrale').addEventListener('input', filterMissions);
+        
+        function filterMissions() {
+            const st = document.getElementById('filter-st').value.toLowerCase();
+            const search = document.getElementById('search-centrale').value.toLowerCase();
+            
+            document.querySelectorAll('.mission-card').forEach(card => {
+                const cardSt = card.dataset.st.toLowerCase();
+                const cardCentrale = card.dataset.centrale.toLowerCase();
+                
+                const matchSt = !st || cardSt.includes(st);
+                const matchSearch = !search || cardCentrale.includes(search);
+                
+                card.style.display = matchSt && matchSearch ? 'block' : 'none';
+            });
+        }
+        
+        // Charger au démarrage
+        loadMissions();
+        
+        // Actualiser toutes les 30 secondes
+        setInterval(loadMissions, 30000);
+    </script>
+</body>
+</html>
+    `)
+  } catch (error) {
+    console.error('Erreur suivi audits:', error)
+    return c.html(`<h1>Erreur</h1><p>${String(error)}</p>`, 500)
+  }
+})
+
+// GET /api/suivi-missions - API données missions pour dashboard
+app.get('/api/suivi-missions', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const missions = await DB.prepare(`
+      SELECT 
+        om.id as mission_id,
+        om.date_mission,
+        c.id as centrale_id,
+        c.nom as centrale_nom,
+        c.id_ref,
+        c.puissance_kwc,
+        st.nom_entreprise as sous_traitant,
+        t.nom || ' ' || t.prenom as technicien_nom,
+        COUNT(DISTINCT ci.id) as nb_points_total,
+        COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME') THEN ci.id END) as nb_points_completes,
+        COUNT(DISTINCT ap.id) as nb_photos
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN sous_traitants st ON om.sous_traitant_id = st.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      LEFT JOIN checklist_items ci ON om.id = ci.ordre_mission_id
+      LEFT JOIN audit_photos ap ON om.id = ap.ordre_mission_id
+      GROUP BY om.id
+      ORDER BY om.date_mission, c.nom
+    `).all()
+    
+    return c.json({ success: true, data: missions.results })
+  } catch (error) {
+    console.error('Erreur API suivi:', error)
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 export default app
