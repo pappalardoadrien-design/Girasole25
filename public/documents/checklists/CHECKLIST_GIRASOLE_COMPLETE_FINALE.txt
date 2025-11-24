@@ -1,0 +1,339 @@
+================================================================================
+CHECKLIST AUDIT QUALITÉ INSTALLATIONS PHOTOVOLTAÏQUES
+CONFORME CAHIER DES CHARGES GIRASOLE - VERSION EXHAUSTIVE
+Normes : NF C 15-100, UTE C 15-712, DTU 40.35 (toitures)
+================================================================================
+
+PÉRIMÈTRE AUDIT :
+✅ Vérifier conformité NF C 15-100 + UTE C 15-712 (toutes centrales)
+✅ Vérifier conformité DTU 40.35 + ETN + Notice montage (audit toiture uniquement)
+✅ Vérifier prescriptions GIRASOLE (§2.4)
+✅ Relever bonnes et mauvaises pratiques
+✅ Vérifier si écarts apparaissent dans CR chantier GIRASOLE
+
+================================================================================
+SECTION 1 : PRESCRIPTIONS DOCUMENTAIRES GIRASOLE (obligatoire)
+================================================================================
+
+1.1 [ ] Présence autocontrôle correctement renseigné par installateur
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+1.2 [ ] Présence PV réception lot PV signé GIRASOLE + installateur
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+1.3 [ ] Présence ≥1 CR visite chantier lot PV rédigé GIRASOLE
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+1.4 [ ] Respect cahier des charges tranchées fourni au bailleur
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+================================================================================
+SECTION 2 : CONSTATS TOUTES CENTRALES (liste non exhaustive)
+NF C 15-100 + UTE C 15-712
+================================================================================
+
+CHEMINS DE CÂBLES & FIXATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.1 [ ] Méthode et qualité fixations du chemin de câbles
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.2 [ ] Type de cheminement câbles utilisé (galvanisé chaud, froid, etc.)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.3 [ ] Protections mécaniques câbles (protection contact bord saillant, etc.)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.4 [ ] Contrôle rayons courbure câbles AC et DC
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.5 [ ] Qualité brassage des câbles
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+REPÉRAGE & IDENTIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.6 [ ] Type repérage câble ou filerie (sérigraphié, manuscrit, etc.)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.7 [ ] Type repérage câbles (tenant-aboutissant, etc.)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.8 [ ] Repérage équipements (présence, inscrit sur équipement lui-même)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.9 [ ] Repérage serrage connexions câbles AC
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+CÂBLAGE DC & AC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.10 [ ] Couleurs câbles DC -/+ différents
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.11 [ ] Présence cosses bimétal jonction cuivre/alu (raccordement + accroche terre nu)
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+MISE À LA TERRE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.12 [ ] Cheminement terre le long chemins câbles (crapaud, bornier laiton, etc.)
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+PROTECTION & DISJONCTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.13 [ ] Réglages AGCP conforme aux plans
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+TRANCHÉES AC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.14 [ ] Respect préconisations tranchée AC (Shelter vers PDL)
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+2.15 [ ] Rebouchage entrée/sortie fourreaux (TPC, etc.) et matériaux utilisés
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+DOCUMENTATION SUR SITE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.16 [ ] Plans TQC (Tel Que Construits) présents sur place
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+MODULES PHOTOVOLTAÏQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2.17 [ ] Constat visuel alignement modules PV
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+================================================================================
+SECTION 3 : CONSTATS AUDIT TOITURE (si applicable)
+DTU 40.35 + ETN + Notice montage panneau
+================================================================================
+
+IMPORTANT :
+• Démontage MINIMUM 25 PANNEAUX (choix pertinent : 1er et dernier chaîne)
+• Remontage sans atteindre intégrité modules/supports
+• Respecter notices montage (si impossible, indiquer à GIRASOLE jour intervention)
+• INTERDIT : marcher sur panneaux
+
+
+STRUCTURES & FIXATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.1 [ ] Qualité et conformité montage/serrage SI sur son support
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.2 [ ] Qualité et conformité montage/serrage panneau sur SI
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+CÂBLAGE & RACCORDEMENTS TOITURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.3 [ ] Contrôle fixation cheminement câbles (pertinence supports, maintien étanchéité)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.4 [ ] Contrôle raccordements : compatibilité connecteurs mâle/femelle (type PVZH202B)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.5 [ ] Serrages connecteurs
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.6 [ ] Étanchéités connecteurs
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.7 [ ] Exposition ruissellement connecteurs
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.8 [ ] Qualité cheminement câbles DC dans chemin de câbles
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.9 [ ] Qualité cheminement câbles (pas de cheminement directement sur couverture)
+     Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.10 [ ] Qualité raccordement terres
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+3.11 [ ] Type repérage câbles (tenant-aboutissant, sérigraphié, manuscrit, etc.)
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+SIGNALISATION SÉCURITÉ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.12 [ ] Présence étiquettes réglementaires indiquant présence tension DC
+      Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+================================================================================
+SECTION 4 : BONNES PRATIQUES (impactant positivement qualité/longévité/exploitation)
+================================================================================
+
+Réalisations techniques/documentaires NON IMPOSÉES par normes/réglementation/GIRASOLE
+
+4.1 Bonne pratique identifiée n°1 :
+    Description : __________________________________________________________
+    Photo : ______ | Impact : __________________________________________
+
+4.2 Bonne pratique identifiée n°2 :
+    Description : __________________________________________________________
+    Photo : ______ | Impact : __________________________________________
+
+4.3 Bonne pratique identifiée n°3 :
+    Description : __________________________________________________________
+    Photo : ______ | Impact : __________________________________________
+
+(Ajouter lignes si nécessaire)
+
+
+================================================================================
+SECTION 5 : MAUVAISES PRATIQUES (impactant négativement qualité/longévité/exploitation)
+================================================================================
+
+Réalisations techniques/documentaires NON IMPOSÉES par normes/réglementation/GIRASOLE
+
+5.1 Mauvaise pratique identifiée n°1 :
+    Description : __________________________________________________________
+    Photo : ______ | Impact négatif : ___________________________________
+    Constat déjà présent dans CR chantier GIRASOLE : [ ] OUI  [ ] NON
+
+5.2 Mauvaise pratique identifiée n°2 :
+    Description : __________________________________________________________
+    Photo : ______ | Impact négatif : ___________________________________
+    Constat déjà présent dans CR chantier GIRASOLE : [ ] OUI  [ ] NON
+
+5.3 Mauvaise pratique identifiée n°3 :
+    Description : __________________________________________________________
+    Photo : ______ | Impact négatif : ___________________________________
+    Constat déjà présent dans CR chantier GIRASOLE : [ ] OUI  [ ] NON
+
+(Ajouter lignes si nécessaire)
+
+
+================================================================================
+SECTION 6 : AUTRES CONSTATS PERTINENTS (expertise prestataire)
+================================================================================
+
+Le Prestataire mettra à profit son expertise pour compléter les listes ci-dessus 
+s'il juge que d'autres constats pertinents peuvent être réalisés.
+
+6.1 Constat complémentaire n°1 :
+    Description : __________________________________________________________
+    Photo : ______ | Conforme : O/N | Commentaire : __________
+
+6.2 Constat complémentaire n°2 :
+    Description : __________________________________________________________
+    Photo : ______ | Conforme : O/N | Commentaire : __________
+
+6.3 Constat complémentaire n°3 :
+    Description : __________________________________________________________
+    Photo : ______ | Conforme : O/N | Commentaire : __________
+
+
+================================================================================
+SYNTHÈSE AUDIT
+================================================================================
+
+Centrale auditée : _____________________________________________________
+Date audit : _______________
+Auditeur : _______________________________________________________________
+Puissance : ____________ kWc
+Type : [ ] Toiture  [ ] Ombrière  [ ] Sol
+Audit toiture : [ ] OUI (démontage ≥25 panneaux)  [ ] NON
+
+CONFORMITÉ GLOBALE :
+[ ] CONFORME (tous points OK)
+[ ] NON-CONFORME MINEUR (≤5 écarts mineurs)
+[ ] NON-CONFORME MAJEUR (>5 écarts ou ≥1 écart majeur)
+
+PRINCIPAUX ÉCARTS CONSTATÉS :
+1. ________________________________________________________________________
+2. ________________________________________________________________________
+3. ________________________________________________________________________
+
+CONSTATS PRÉSENTS DANS CR CHANTIER GIRASOLE :
+[ ] OUI, certains écarts déjà relevés dans CR visite chantier
+[ ] NON, écarts non détectés lors visite chantier
+Détails : __________________________________________________________________
+
+
+================================================================================
+LIVRABLES ATTENDUS PAR GIRASOLE
+================================================================================
+
+1. [ ] Rapport d'audit par centrale (cette checklist complétée)
+
+2. [ ] Fichier Excel listant tous constats (ANNEXE 2 GIRASOLE)
+        - Sous-totaux constats par centrale
+        - Totaux généraux constats
+        - Libellés homogénéisés colonne "Descriptions"
+        - Fichier proposé en validation à GIRASOLE avant utilisation
+
+3. [ ] Reportage photo pour chaque constat
+        - Nommage/numérotation écarts et photos
+        - Hyperliens facilitant rapprochement constat écrit/photo
+        - Photos géolocalisées
+
+4. [ ] Rapport synthèse général indiquant :
+        - Principaux écarts constatés
+        - Bonnes pratiques à prescrire
+        - Mauvaises pratiques à proscrire
+        - Synthèse globale par installateur PV
+        - Synthèse globale par Bureau de contrôle
+
+DÉLAI : Remise J+5 maximum après intervention
+
+
+================================================================================
+SÉCURITÉ INTERVENTION
+================================================================================
+
+AVANT INTERVENTION (obligatoire) :
+• Plan de prévention GIRASOLE signé par Prestataire
+• Fournir analyse des risques
+• Fournir habilitations électriques
+
+ACCÈS TOITURE :
+• Moyens : nacelle, harnais, ligne de vie, etc.
+• Habilitations : travail en hauteur, permis nacelle, etc.
+• Fournir justificatifs avant intervention
+
+INTERDICTIONS :
+• ❌ Marcher sur panneaux lors démontage/remontage
+• ❌ Atteindre intégrité modules ou supports lors remontage
+
+
+================================================================================
+PRIX DEMANDÉ (décomposition attendue)
+================================================================================
+
+Poste 1 : Prestation SANS audit toiture (par site, hors déplacement)
+          Prix unitaire : __________ € HT
+
+Poste 2 : Supplément prestation AVEC audit toiture (par site, hors déplacement)
+          Prix unitaire : __________ € HT
+
+Poste 3 : Forfait déplacement (trajet A/R, valable 1 ou plusieurs sites)
+          Par département ou autre logique : __________
+          Prix : __________ € HT
+
+Poste 4 : Forfait déplacement si > 1 jour (par jour supplémentaire sur place)
+          Prix : __________ € HT
+
+
+================================================================================
+Document conforme Cahier des Charges GIRASOLE
+PERF-CDC-001-CDC_AUDIT_QUALITE_2025_INSTALLATIONS_PV-001
+Révision 001 du 02/10/2025
+================================================================================

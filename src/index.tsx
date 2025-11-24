@@ -14,6 +14,9 @@ app.use('/api/*', cors())
 // Serve static files
 app.use('/static/*', serveStatic({ root: './public' }))
 
+// Serve documents files
+app.use('/documents/*', serveStatic({ root: './public' }))
+
 // ======================
 // API ROUTES - CENTRALES
 // ======================
@@ -3252,6 +3255,9 @@ app.get('/planning-manager', (c) => {
                         <a href="/" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition mr-2">
                             <i class="fas fa-home mr-2"></i>Accueil
                         </a>
+                        <a href="/documents" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-400 transition mr-2">
+                            <i class="fas fa-folder-open mr-2"></i>Documents
+                        </a>
                         <a href="/planning-girasole" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-400 transition">
                             <i class="fas fa-eye mr-2"></i>Vue simple
                         </a>
@@ -3557,6 +3563,11 @@ app.delete('/api/centrales/:id/unassign', async (c) => {
   } catch (error) {
     return c.json({ success: false, error: String(error) }, 500)
   }
+})
+
+// GET /documents - Page de téléchargement des documents
+app.get('/documents', (c) => {
+  return c.redirect('/static/documents.html')
 })
 
 // GET /api/planning/full - Planning complet des 52 centrales avec attributions
@@ -4045,6 +4056,131 @@ app.get('/api/planning/export-annexe1', async (c) => {
   } catch (error) {
     return c.json({ success: false, error: String(error) }, 500)
   }
+})
+
+// ==============================
+// API ROUTES - DOCUMENTS
+// ==============================
+
+// GET /api/documents - Liste tous les documents disponibles
+app.get('/api/documents', async (c) => {
+  const documents = {
+    ordres_mission: {
+      titre: "Ordres de Mission (27 centrales)",
+      description: "Ordres de Mission individuels ARTEMIS (OM_001 à OM_017) et CADENET (OM_018 à OM_027)",
+      fichiers: [
+        {
+          nom: "ORDRES_MISSION_GIRASOLE_27_CENTRALES.zip",
+          url: "/documents/ordres_mission/ORDRES_MISSION_GIRASOLE_27_CENTRALES.zip",
+          taille: "60 Ko",
+          type: "ZIP",
+          description: "Archive complète des 27 Ordres de Mission"
+        },
+        // Ordres ARTEMIS
+        ...Array.from({ length: 17 }, (_, i) => {
+          const num = String(i + 1).padStart(3, '0')
+          const noms = [
+            "SCI_KILJOR", "Mathieu_Montet", "HANGAR_Benoit_BERTELOOT", "HANGAR_Angelina_SIMMONET",
+            "Hangar_LAMIOT", "Didier_-_PRIEUR", "Hangar_Patrick_BLANCHET", "GAYET_42",
+            "DUMONT_GUY", "Serge_Maltaverne", "Maymat", "Hangar_Julien_Vaudin",
+            "EARL_CADOT", "HARAS_DE_LA_MAJORIE_MANOHA", "Serge_Maltaverne", 
+            "Hangar_Eric_LOGNON", "Hangar_Benjamin_CHASSON"
+          ]
+          return {
+            nom: `OM_${num}_ARTEMIS_${noms[i]}.txt`,
+            url: `/documents/ordres_mission/OM_${num}_ARTEMIS_${noms[i]}.txt`,
+            taille: "~4 Ko",
+            type: "TXT",
+            description: `Ordre de Mission ${num} - ARTEMIS`
+          }
+        }),
+        // Ordres CADENET
+        ...Array.from({ length: 10 }, (_, i) => {
+          const num = String(i + 18).padStart(3, '0')
+          const noms = [
+            "Hangar_Laurent_ROUX", "Hangar_Laurent_ROUX", "Hangar_Bernard_MAGE",
+            "Hangar_Frederic_Sinaud", "Hangar_Frederic_Sinaud", "MARTEL_184_Construction",
+            "BOUCHARDY_203_LOC", "BOULOIR_206_LOC", "MARTEL_183_LOC", "Hangar_Fabrice_COMBY"
+          ]
+          return {
+            nom: `OM_${num}_CADENET_${noms[i]}.txt`,
+            url: `/documents/ordres_mission/OM_${num}_CADENET_${noms[i]}.txt`,
+            taille: "~4 Ko",
+            type: "TXT",
+            description: `Ordre de Mission ${num} - CADENET`
+          }
+        })
+      ]
+    },
+    dossiers_chiffrage: {
+      titre: "Dossiers Chiffrage Sous-Traitants",
+      description: "Dossiers complets pour demandes de chiffrage ARTEMIS et CADENET",
+      fichiers: [
+        {
+          nom: "ARTEMIS_Chiffrage_DEFINITIF.txt",
+          url: "/documents/dossiers_chiffrage/ARTEMIS_Chiffrage_DEFINITIF.txt",
+          taille: "34 Ko",
+          type: "TXT",
+          description: "Dossier complet ARTEMIS - 17 centrales (5056.65 kWc)"
+        },
+        {
+          nom: "CADENET_Chiffrage_DEFINITIF.txt",
+          url: "/documents/dossiers_chiffrage/CADENET_Chiffrage_DEFINITIF.txt",
+          taille: "30 Ko",
+          type: "TXT",
+          description: "Dossier complet CADENET - 10 centrales (3910.35 kWc)"
+        }
+      ]
+    },
+    checklists: {
+      titre: "Checklist Audit GIRASOLE",
+      description: "Checklist 70 points conforme CDC PERF-CDC-001",
+      fichiers: [
+        {
+          nom: "CHECKLIST_GIRASOLE_COMPLETE_FINALE.txt",
+          url: "/documents/checklists/CHECKLIST_GIRASOLE_COMPLETE_FINALE.txt",
+          taille: "16 Ko",
+          type: "TXT",
+          description: "Checklist qualité 70 points - Conforme GIRASOLE"
+        }
+      ]
+    },
+    donnees: {
+      titre: "Données Brutes CSV",
+      description: "Fichiers CSV pour import/export des centrales",
+      fichiers: [
+        {
+          nom: "centrales_artemis.csv",
+          url: "/documents/csv/centrales_artemis.csv",
+          taille: "6.9 Ko",
+          type: "CSV",
+          description: "Données brutes 17 centrales ARTEMIS"
+        },
+        {
+          nom: "centrales_cadenet.csv",
+          url: "/documents/csv/centrales_cadenet.csv",
+          taille: "4.4 Ko",
+          type: "CSV",
+          description: "Données brutes 10 centrales CADENET"
+        }
+      ]
+    },
+    guides: {
+      titre: "Guides & Documentation",
+      description: "Documentation complète pour Adrien et Fabien",
+      fichiers: [
+        {
+          nom: "RECAP_FINAL_ADRIEN_SOUS_TRAITANTS.txt",
+          url: "/documents/RECAP_FINAL_ADRIEN_SOUS_TRAITANTS.txt",
+          taille: "8.7 Ko",
+          type: "TXT",
+          description: "Guide complet - Envoi emails + Planning Manager"
+        }
+      ]
+    }
+  }
+  
+  return c.json({ success: true, data: documents })
 })
 
 export default app

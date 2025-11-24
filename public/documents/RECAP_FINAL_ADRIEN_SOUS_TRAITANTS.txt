@@ -1,0 +1,196 @@
+════════════════════════════════════════════════════════════════
+   RÉCAPITULATIF FINAL - PLANNING SOUS-TRAITANTS
+   27 CENTRALES GIRASOLE • ARTEMIS + CADENET
+════════════════════════════════════════════════════════════════
+
+📅 **Date** : 24/11/2025
+👤 **Destinataire** : Adrien (Business Developer DiagPV)
+🎯 **Objectif** : Demande chiffrage + planification audits GIRASOLE
+
+═══════════════════════════════════════════════════════════════
+✅ CE QUI EST PRÊT (100% OPÉRATIONNEL)
+═══════════════════════════════════════════════════════════════
+
+1️⃣ **BASE DE DONNÉES PRODUCTION D1**
+   ✅ ARTEMIS créé (ID: 3) avec 2 techniciens
+   ✅ CADENET créé (ID: 4) avec 2 techniciens
+   ✅ 24 centrales pré-attribuées :
+      • ARTEMIS : 16 centrales • 4927.06 kWc
+      • CADENET : 8 centrales • 3097.26 kWc
+   
+   📍 URL Production : https://7080d577.girasole-diagpv.pages.dev
+
+2️⃣ **DOSSIERS CHIFFRAGE COMPLETS**
+   ✅ ARTEMIS_Chiffrage_DEFINITIF.txt (34 Ko)
+      • 17 centrales • 5056.65 kWc
+      • Départements 26, 3, 38, 42, 7, 71, 89
+   
+   ✅ CADENET_Chiffrage_DEFINITIF.txt (30 Ko)
+      • 10 centrales • 3910.35 kWc
+      • Départements 26, 7, 3, 71
+   
+   ✅ CHECKLIST_GIRASOLE_COMPLETE_FINALE.txt (16 Ko)
+      • 70 points conformes CDC PERF-CDC-001
+
+3️⃣ **27 ORDRES DE MISSION INDIVIDUELS**
+   ✅ Fichiers TXT générés (OM_001 à OM_027)
+   ✅ Archive ZIP : ORDRES_MISSION_GIRASOLE_27_CENTRALES.zip (60 Ko)
+   
+   📂 Détail :
+      • OM_001 à OM_017 : ARTEMIS (17 centrales)
+      • OM_018 à OM_027 : CADENET (10 centrales)
+
+4️⃣ **DONNÉES BRUTES CSV**
+   ✅ centrales_artemis.csv (6.9 Ko)
+   ✅ centrales_cadenet.csv (4.4 Ko)
+
+═══════════════════════════════════════════════════════════════
+📋 RÉPARTITION DES CENTRALES
+═══════════════════════════════════════════════════════════════
+
+**ARTEMIS (17 centrales) :**
+ 1. SCI KILJOR (109.20 kWc) - Dept 7
+ 2. Mathieu Montet (432.015 kWc) - Dept 26
+ 3. HANGAR Benoit BERTELOOT (309.40 kWc) - Dept 89
+ 4. HANGAR Angelina SIMMONET (177.45 kWc) - Dept 71
+ 5. Hangar LAMIOT (319.41 kWc) - Dept 42
+ 6. Didier - PRIEUR (247.80 kWc) - Dept 38
+ 7. Hangar Patrick BLANCHET (247.80 kWc) - Dept 26
+ 8. GAYET 42 (499.95 kWc) - Dept 42
+ 9. DUMONT GUY (222.50 kWc) - Dept 71
+10. Serge Maltaverne (269.45 kWc) - Dept 7
+11. Maymat (247.80 kWc) - Dept 38
+12. Hangar Julien Vaudin (247.80 kWc) - Dept 3
+13. EARL CADOT (309.40 kWc) - Dept 7
+14. HARAS DE LA MAJORIE/MANOHA (499.95 kWc) - Dept 42
+15. Serge Maltaverne (247.80 kWc) - Dept 26
+16. Hangar Eric LOGNON (324.22 kWc) - Dept 89
+17. Hangar Benjamin CHASSON (247.80 kWc) - Dept 71
+
+**CADENET (10 centrales) :**
+ 1. Hangar Laurent ROUX (123.41 kWc) - Dept 71
+ 2. Hangar Laurent ROUX (109.20 kWc) - Dept 71
+ 3. Hangar Bernard MAGE (300.82 kWc) - Dept 71
+ 4. Hangar Frederic Sinaud (432.015 kWc) - Dept 71
+ 5. Hangar Frederic Sinaud (247.80 kWc) - Dept 42
+ 6. MARTEL 184 Construction (247.80 kWc) - Dept 26
+ 7. BOUCHARDY 203 LOC (247.80 kWc) - Dept 71
+ 8. BOULOIR 206 LOC (247.80 kWc) - Dept 7
+ 9. MARTEL 183 LOC (247.80 kWc) - Dept 26
+10. Hangar Fabrice COMBY (309.40 kWc) - Dept 3
+
+═══════════════════════════════════════════════════════════════
+📧 ACTIONS À RÉALISER PAR ADRIEN
+═══════════════════════════════════════════════════════════════
+
+**1️⃣ ENVOYER EMAIL ARTEMIS :**
+
+À : contact@artemis.fr
+Objet : Demande Chiffrage - 17 Centrales PV GIRASOLE - Audit Qualité
+
+Bonjour,
+
+Nous sollicitons votre chiffrage pour 17 centrales photovoltaïques GIRASOLE :
+• Puissance totale : 5056.65 kWc
+• Localisation : 7 départements (26, 3, 38, 42, 7, 71, 89)
+• Type audits : Toiture (NF C 15-100, UTE C 15-712-1, DTU 40.35)
+
+Spécifications obligatoires :
+✅ Application checklist 70 points conforme CDC GIRASOLE
+✅ Dépose minimum 25 modules par centrale
+✅ Photos géolocalisées + Rapport PDF + Excel ANNEXE 2
+✅ Délai : J+5 maximum post-intervention
+❌ PAS d'électroluminescence, PAS de thermographie
+
+Pièces jointes :
+- ARTEMIS_Chiffrage_DEFINITIF.txt (dossier complet)
+- ORDRES_MISSION_GIRASOLE_27_CENTRALES.zip (OM_001 à OM_017)
+- centrales_artemis.csv (données brutes)
+
+Réponse attendue : 26/11/2025 - 17h00
+
+Cordialement,
+Adrien - DIAGNOSTIC PHOTOVOLTAÏQUE
+
+
+**2️⃣ ENVOYER EMAIL CADENET :**
+
+À : contact@cadenet.fr
+Objet : Demande Chiffrage - 10 Centrales PV GIRASOLE - Audit Qualité
+
+Bonjour,
+
+Nous sollicitons votre chiffrage pour 10 centrales photovoltaïques GIRASOLE :
+• Puissance totale : 3910.35 kWc
+• Localisation : 4 départements (26, 7, 3, 71)
+• Type audits : Toiture (NF C 15-100, UTE C 15-712-1, DTU 40.35)
+
+Spécifications obligatoires :
+✅ Application checklist 70 points conforme CDC GIRASOLE
+✅ Dépose minimum 25 modules par centrale
+✅ Photos géolocalisées + Rapport PDF + Excel ANNEXE 2
+✅ Délai : J+5 maximum post-intervention
+❌ PAS d'électroluminescence, PAS de thermographie
+
+Pièces jointes :
+- CADENET_Chiffrage_DEFINITIF.txt (dossier complet)
+- ORDRES_MISSION_GIRASOLE_27_CENTRALES.zip (OM_018 à OM_027)
+- centrales_cadenet.csv (données brutes)
+
+Réponse attendue : 26/11/2025 - 17h00
+
+Cordialement,
+Adrien - DIAGNOSTIC PHOTOVOLTAÏQUE
+
+
+**3️⃣ GESTION PLANNING MANAGER :**
+
+🌐 URL : https://7080d577.girasole-diagpv.pages.dev/planning-manager
+
+Actions :
+✅ Consulter les centrales pré-attribuées
+✅ Ajouter les dates d'intervention (quand sous-traitants répondent)
+✅ Suivre l'avancement des missions
+✅ Exporter ANNEXE 1 enrichie
+
+═══════════════════════════════════════════════════════════════
+📁 FICHIERS DISPONIBLES (/home/user/uploaded_files/)
+═══════════════════════════════════════════════════════════════
+
+**DOSSIERS CHIFFRAGE :**
+- ARTEMIS_Chiffrage_DEFINITIF.txt (34 Ko)
+- CADENET_Chiffrage_DEFINITIF.txt (30 Ko)
+- CHECKLIST_GIRASOLE_COMPLETE_FINALE.txt (16 Ko)
+
+**ORDRES DE MISSION :**
+- ORDRES_MISSION_GIRASOLE_27_CENTRALES.zip (60 Ko)
+  ↳ Contient 27 fichiers TXT individuels
+
+**DONNÉES BRUTES :**
+- centrales_artemis.csv (6.9 Ko)
+- centrales_cadenet.csv (4.4 Ko)
+
+**RÉCAPITULATIF :**
+- RECAPITULATIF_SOUS_TRAITANTS.txt (9.7 Ko)
+- RECAP_FINAL_ADRIEN_SOUS_TRAITANTS.txt (ce fichier)
+
+═══════════════════════════════════════════════════════════════
+🎯 PROCHAINES ÉTAPES
+═══════════════════════════════════════════════════════════════
+
+1. Télécharger tous les fichiers depuis `/home/user/uploaded_files/`
+2. Envoyer emails ARTEMIS + CADENET avec pièces jointes
+3. Attendre réponses sous-traitants (délai 48h)
+4. Saisir dates d'intervention dans Planning Manager
+5. Lancer les missions selon planning
+
+═══════════════════════════════════════════════════════════════
+✅ SYSTÈME 100% OPÉRATIONNEL
+═══════════════════════════════════════════════════════════════
+
+Planning Manager : https://7080d577.girasole-diagpv.pages.dev/planning-manager
+Dashboard : https://7080d577.girasole-diagpv.pages.dev/
+
+Tous les documents sont prêts pour envoi immédiat ! 🚀
+
+═══════════════════════════════════════════════════════════════

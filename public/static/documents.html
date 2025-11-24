@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documents GIRASOLE - Diagnostic Photovoltaïque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .download-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-solar-panel text-3xl text-blue-600 mr-3"></i>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">GIRASOLE</h1>
+                        <p class="text-xs text-gray-500">Diagnostic Photovoltaïque</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/planning-manager" class="text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-calendar-alt mr-2"></i>Planning Manager
+                    </a>
+                    <a href="/" class="text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-bold mb-4">
+                <i class="fas fa-folder-open mr-3"></i>
+                Documents & Ordres de Mission
+            </h1>
+            <p class="text-xl text-blue-100">
+                27 centrales GIRASOLE • ARTEMIS (17) + CADENET (10)
+            </p>
+            <p class="text-blue-100 mt-2">
+                <i class="fas fa-info-circle mr-2"></i>
+                Tous les documents pour les demandes de chiffrage et ordres de mission
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
+            <p class="mt-4 text-gray-600">Chargement des documents...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="hidden bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <div class="flex">
+                <i class="fas fa-exclamation-triangle text-red-500 mr-3 mt-1"></i>
+                <div>
+                    <h3 class="text-red-800 font-bold">Erreur</h3>
+                    <p class="text-red-700" id="error-message"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Container -->
+        <div id="documents-container" class="hidden space-y-8">
+            
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <i class="fas fa-file-alt text-3xl text-blue-600 mb-2"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">27</h3>
+                    <p class="text-gray-600">Ordres de Mission</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <i class="fas fa-briefcase text-3xl text-green-600 mb-2"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">2</h3>
+                    <p class="text-gray-600">Dossiers Chiffrage</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <i class="fas fa-tasks text-3xl text-purple-600 mb-2"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">70</h3>
+                    <p class="text-gray-600">Points Checklist</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <i class="fas fa-bolt text-3xl text-yellow-600 mb-2"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">8.97</h3>
+                    <p class="text-gray-600">MWc Total</p>
+                </div>
+            </div>
+
+            <!-- Documents Sections -->
+            <div id="sections-container"></div>
+
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour télécharger un fichier
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Fonction pour afficher une section de documents
+        function renderSection(key, section) {
+            const icons = {
+                ordres_mission: 'fa-file-alt',
+                dossiers_chiffrage: 'fa-briefcase',
+                checklists: 'fa-tasks',
+                donnees: 'fa-database',
+                guides: 'fa-book'
+            };
+
+            const colors = {
+                ordres_mission: 'blue',
+                dossiers_chiffrage: 'green',
+                checklists: 'purple',
+                donnees: 'orange',
+                guides: 'indigo'
+            };
+
+            const icon = icons[key] || 'fa-file';
+            const color = colors[key] || 'gray';
+
+            return `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover transition-all duration-200">
+                    <div class="bg-${color}-600 text-white p-6">
+                        <h2 class="text-2xl font-bold flex items-center">
+                            <i class="fas ${icon} mr-3"></i>
+                            ${section.titre}
+                        </h2>
+                        <p class="text-${color}-100 mt-2">${section.description}</p>
+                        <p class="text-sm text-${color}-200 mt-2">
+                            <i class="fas fa-file mr-1"></i>
+                            ${section.fichiers.length} fichier(s) disponible(s)
+                        </p>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-3">
+                            ${section.fichiers.map(fichier => `
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-900 flex items-center">
+                                            <i class="fas fa-file-${fichier.type.toLowerCase()} text-${color}-600 mr-2"></i>
+                                            ${fichier.nom}
+                                        </h4>
+                                        <p class="text-sm text-gray-600 mt-1">${fichier.description}</p>
+                                        <span class="inline-block mt-2 px-2 py-1 text-xs font-semibold text-${color}-700 bg-${color}-100 rounded">
+                                            ${fichier.taille}
+                                        </span>
+                                    </div>
+                                    <a href="${fichier.url}" 
+                                       download="${fichier.nom}"
+                                       class="download-btn ml-4 px-6 py-3 bg-${color}-600 text-white rounded-lg hover:bg-${color}-700 transition-all flex items-center space-x-2">
+                                        <i class="fas fa-download"></i>
+                                        <span>Télécharger</span>
+                                    </a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Charger les documents
+        async function loadDocuments() {
+            try {
+                const response = await fetch('/api/documents');
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Erreur lors du chargement');
+                }
+
+                const container = document.getElementById('sections-container');
+                const documentsData = result.data;
+
+                // Ordre d'affichage des sections
+                const sectionOrder = ['ordres_mission', 'dossiers_chiffrage', 'checklists', 'donnees', 'guides'];
+
+                container.innerHTML = sectionOrder.map(key => 
+                    renderSection(key, documentsData[key])
+                ).join('');
+
+                // Afficher le contenu
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('documents-container').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        // Charger au démarrage
+        loadDocuments();
+    </script>
+</body>
+</html>

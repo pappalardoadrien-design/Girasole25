@@ -1,0 +1,734 @@
+================================================================================
+DIAGNOSTIC PHOTOVOLTAÏQUE - DOSSIER CHIFFRAGE
+SOUS-TRAITANT : ARTEMIS
+================================================================================
+Date : 24/11/2025
+Référence : DP-ARTEMIS-2025-01
+Contact DiagPV : Adrien - Business Developer
+
+CONFORME CAHIER DES CHARGES GIRASOLE
+PERF-CDC-001-CDC_AUDIT_QUALITE_2025_INSTALLATIONS_PV-001
+Normes : NF C 15-100, UTE C 15-712, DTU 40.35 (toitures)
+
+================================================================================
+RÉCAPITULATIF MISSIONS
+================================================================================
+Nombre de centrales : 17
+Puissance totale : 5056.65 kWc
+Départements : 26, 3, 38, 42, 7, 71, 89
+
+================================================================================
+LISTE DES 17 CENTRALES À AUDITER
+================================================================================
+N°   Centrale                            Puissance    Dept   Toiture 
+--------------------------------------------------------------------------------
+1    SCI KILJOR                          109.20 kWc   7      NON     
+2    Mathieu Montet                      256.06 kWc   38     NON     
+3    HANGAR Benoit BERTELOOT             278.64 kWc   89     OUI     
+4    HANGAR Angelina SIMMONET            173.55 kWc   3      NON     
+5    Hangar LAMIOT                       343.07 kWc   42     OUI     
+6    Didier - PRIEUR                     499.59 kWc   26     OUI     
+7    Hangar Patrick BLANCHET             159.25 kWc   26     NON     
+8    GAYET 42                            309.40 kWc   42     NON     
+9    DUMONT GUY                          232.20 kWc   3      NON     
+10   Serge Maltaverne                    260.26 kWc   71     NON     
+11   Maymat                              345.80 kWc   3      NON     
+12   Hangar Julien Vaudin                348.88 kWc   3      NON     
+13   EARL CADOT                          309.40 kWc   42     OUI     
+14   HARAS DE LA MAJORIE/MANOHA          499.59 kWc   7      NON     
+15   Serge Maltaverne                    218.85 kWc   71     NON     
+16   Hangar Eric LOGNON                  324.87 kWc   3      NON     
+17   Hangar Benjamin CHASSON             388.04 kWc   26     NON     
+
+================================================================================
+DÉTAIL DES 17 ORDRES DE MISSION
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 1/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : SCI KILJOR
+Référence ID : 3251
+Puissance : 109.20 kWc
+Adresse : 6 Rue Albert Camus, 07800 La Voulte-sur-Rhône, France
+Département : 7
+Type : Toiture existante / Rénovation
+GPS : 44.815160, 4.789220
+Audit toiture : NON
+
+Installateur : NEOXOM
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 2/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Mathieu Montet
+Référence ID : 17996
+Puissance : 256.06 kWc
+Adresse : 127 Route de la Tour, 38110 Montagnieu, France
+Département : 38
+Type : Toiture existante / Rénovation
+GPS : 45.535340, 5.452290
+Audit toiture : NON
+
+Installateur : PROSUNFRANCE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM415M10-54HSW-V
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 3/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : HANGAR Benoit BERTELOOT
+Référence ID : 20614
+Puissance : 278.64 kWc
+Adresse : 127 Lieu Dit les Cleris 89150 Vernoy
+Département : 89
+Type : Bâtiment à construire - A1
+GPS : 48.107174, 3.120535
+Audit toiture : OUI (démontage ≥25 panneaux)
+
+Installateur : LE TRIANGLE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM430M10T-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification conformité DTU 40.35 + ETN + Notice montage panneau
+• Démontage minimum 25 panneaux (choix pertinent : 1er et dernier chaîne)
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 4/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : HANGAR Angelina SIMMONET
+Référence ID : 29246
+Puissance : 173.55 kWc
+Adresse : L'Étang Fouché, 03230 Paray-le-Frésil, France
+Département : 3
+Type : Bâtiment à construire - A1
+GPS : 46.633880, 3.582330
+Audit toiture : NON
+
+Installateur : LE TRIANGLE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 5/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Hangar LAMIOT
+Référence ID : 30516
+Puissance : 343.07 kWc
+Adresse : La Gélopière, 42110 Feurs, France
+Département : 42
+Type : Bâtiment à construire - C
+GPS : 45.732470, 4.205300
+Audit toiture : OUI (démontage ≥25 panneaux)
+
+Installateur : PROSUNFRANCE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-B54HSW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification conformité DTU 40.35 + ETN + Notice montage panneau
+• Démontage minimum 25 panneaux (choix pertinent : 1er et dernier chaîne)
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 6/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Didier - PRIEUR
+Référence ID : 32074
+Puissance : 499.59 kWc
+Adresse : Quartier de Montalivet 26120 Montmeyran
+Département : 26
+Type : Bâtiment à construire - C
+GPS : 44.841590, 4.961180
+Audit toiture : OUI (démontage ≥25 panneaux)
+
+Installateur : KEVEL
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification conformité DTU 40.35 + ETN + Notice montage panneau
+• Démontage minimum 25 panneaux (choix pertinent : 1er et dernier chaîne)
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 7/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Hangar Patrick BLANCHET
+Référence ID : 35280
+Puissance : 159.25 kWc
+Adresse : Les Exclis, 26110 Venterol, France
+Département : 26
+Type : Bâtiment à construire - C
+GPS : 44.360590, 5.076190
+Audit toiture : NON
+
+Installateur : KEVEL
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-B54HSW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 8/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : GAYET 42
+Référence ID : 58166
+Puissance : 309.40 kWc
+Adresse : 419 Chemin des Seigles, 42210 Craintilleux, France
+Département : 42
+Type : Bâtiment à construire - C
+GPS : 45.578950, 4.218510
+Audit toiture : NON
+
+Installateur : 3C instal
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-B54HSW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 9/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : DUMONT GUY
+Référence ID : 60830
+Puissance : 232.20 kWc
+Adresse : Les Sabots, 03230 Chevagnes, France
+Département : 3
+Type : Bâtiment à construire - A1
+GPS : 46.628738, 3.585084
+Audit toiture : NON
+
+Installateur : LE TRIANGLE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM430M10T-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 10/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Serge Maltaverne
+Référence ID : 61191
+Puissance : 260.26 kWc
+Adresse : 638  route Chard, 71320 Sainte-Radegonde, France
+Département : 71
+Type : Bâtiment à construire - C
+GPS : 46.694240, 4.103640
+Audit toiture : NON
+
+Installateur : PROSUNFRANCE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-B54HSW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 11/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Maymat
+Référence ID : 76547
+Puissance : 345.80 kWc
+Adresse : Les Sorreaux, 03400 Toulon-sur-Allier, France
+Département : 3
+Type : Bâtiment à construire - C
+GPS : 46.514560, 3.414360
+Audit toiture : NON
+
+Installateur : LE TRIANGLE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 12/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Hangar Julien Vaudin
+Référence ID : 82076
+Puissance : 348.88 kWc
+Adresse : Les Jacquets, 03230 Chevagnes, France
+Département : 3
+Type : Toiture existante / Rénovation
+GPS : 46.587410, 3.549400
+Audit toiture : NON
+
+Installateur : PROSUNFRANCE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM445M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 13/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : EARL CADOT
+Référence ID : 89219
+Puissance : 309.40 kWc
+Adresse : La Maisonneuve, 42310 Urbise, France
+Département : 42
+Type : Bâtiment à construire - C
+GPS : 46.249190, 3.883610
+Audit toiture : OUI (démontage ≥25 panneaux)
+
+Installateur : 3C instal
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification conformité DTU 40.35 + ETN + Notice montage panneau
+• Démontage minimum 25 panneaux (choix pertinent : 1er et dernier chaîne)
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 14/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : HARAS DE LA MAJORIE/MANOHA
+Référence ID : 90189
+Puissance : 499.59 kWc
+Adresse : L'Homme, 07790 Saint-Alban-d'Ay, France
+Département : 7
+Type : Bâtiment à construire - C
+GPS : 45.197090, 4.669060
+Audit toiture : NON
+
+Installateur : KEVEL
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 15/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Serge Maltaverne
+Référence ID : 90361
+Puissance : 218.85 kWc
+Adresse : 638 Chard, 71320 Sainte-Radegonde, France
+Département : 71
+Type : Toiture existante / Rénovation
+GPS : 46.693800, 4.103610
+Audit toiture : NON
+
+Installateur : PROSUNFRANCE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 16/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Hangar Eric LOGNON
+Référence ID : 95309
+Puissance : 324.87 kWc
+Adresse : Château des Millets, 03230 Chevagnes, France
+Département : 3
+Type : Bâtiment à construire -  A2
+GPS : 46.604460, 3.619070
+Audit toiture : NON
+
+Installateur : PROSUNFRANCE
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM455M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+────────────────────────────────────────────────────────────────────────────────
+ORDRE DE MISSION N° 17/17
+────────────────────────────────────────────────────────────────────────────────
+Centrale : Hangar Benjamin CHASSON
+Référence ID : 96147
+Puissance : 388.04 kWc
+Adresse : 465 Rue Jean Rostand, 26800 Portes-lès-Valence, France
+Département : 26
+Type : Bâtiment à construire - C
+GPS : 44.892250, 4.874920
+Audit toiture : NON
+
+Installateur : NEOXOM 
+Bureau contrôle : SOCOTEC POWER SERVICES
+Panneaux : DMEGC-DM445M10RT-54HSW-HBW
+
+PRESTATIONS ATTENDUES :
+• Audit qualité installation (lots électriques et photovoltaïques)
+• Vérification conformité NF C 15-100 + UTE C 15-712
+• Vérification prescriptions documentaires GIRASOLE
+• Identification bonnes et mauvaises pratiques
+• Checklist exhaustive avec PHOTOS géolocalisées (voir ci-dessous)
+• Rapport d'audit + Fichier Excel ANNEXE 2 + Reportage photo numéroté
+• Délai remise : J+5 maximum après intervention
+
+IMPORTANT :
+❌ PAS d'électroluminescence sur ces audits
+❌ PAS de thermographie sur ces audits
+✅ Photos géolocalisées pour chaque constat
+
+
+================================================================================
+CHECKLIST AUDIT QUALITÉ - EXHAUSTIVE
+Conforme Cahier des Charges GIRASOLE
+================================================================================
+
+
+1. PRESCRIPTIONS DOCUMENTAIRES GIRASOLE (obligatoire)
+--------------------------------------------------------------------------------
+  Présence autocontrôle correctement renseigné par installateur
+  Présence PV réception lot PV signé GIRASOLE + installateur
+  Présence ≥1 CR visite chantier lot PV rédigé GIRASOLE
+  Respect cahier des charges tranchées fourni au bailleur
+
+2. CONSTATS TOUTES CENTRALES (NF C 15-100 + UTE C 15-712)
+--------------------------------------------------------------------------------
+  CHEMINS DE CÂBLES & FIXATIONS:
+  • Méthode et qualité fixations du chemin de câbles
+  • Type cheminement câbles (galvanisé chaud, froid, etc.)
+  • Protections mécaniques câbles (protection contact bord saillant)
+  • Contrôle rayons courbure câbles AC et DC
+  • Qualité brassage des câbles
+  
+  REPÉRAGE & IDENTIFICATION:
+  • Type repérage câble ou filerie (sérigraphié, manuscrit, etc.)
+  • Type repérage câbles (tenant-aboutissant, etc.)
+  • Repérage équipements (présence, inscrit sur équipement lui-même)
+  • Repérage serrage connexions câbles AC
+  
+  CÂBLAGE DC & AC:
+  • Couleurs câbles DC -/+ différents
+  • Présence cosses bimétal jonction cuivre/alu (raccordement + accroche terre)
+  
+  MISE À LA TERRE:
+  • Cheminement terre le long chemins câbles (crapaud, bornier laiton, etc.)
+  
+  PROTECTION & DISJONCTION:
+  • Réglages AGCP conforme aux plans
+  
+  TRANCHÉES AC:
+  • Respect préconisations tranchée AC (Shelter vers PDL)
+  • Rebouchage entrée/sortie fourreaux (TPC, etc.) et matériaux utilisés
+  
+  DOCUMENTATION SUR SITE:
+  • Plans TQC (Tel Que Construits) présents sur place
+  
+  MODULES PHOTOVOLTAÏQUES:
+  • Constat visuel alignement modules PV
+
+3. CONSTATS AUDIT TOITURE (si applicable - DTU 40.35)
+--------------------------------------------------------------------------------
+  IMPORTANT : Démontage MINIMUM 25 PANNEAUX
+  Choix pertinent : 1er et dernier panneau chaîne
+  Remontage sans atteindre intégrité modules/supports
+  INTERDIT : marcher sur panneaux
+  
+  STRUCTURES & FIXATIONS:
+  • Qualité et conformité montage/serrage SI sur son support
+  • Qualité et conformité montage/serrage panneau sur SI
+  
+  CÂBLAGE & RACCORDEMENTS TOITURE:
+  • Contrôle fixation cheminement câbles (supports, étanchéité toiture)
+  • Compatibilité connecteurs mâle/femelle (type PVZH202B)
+  • Serrages connecteurs
+  • Étanchéités connecteurs
+  • Exposition ruissellement connecteurs
+  • Qualité cheminement câbles DC dans chemin de câbles
+  • Pas de cheminement câbles directement sur couverture
+  • Qualité raccordement terres
+  • Type repérage câbles (tenant-aboutissant, sérigraphié, manuscrit)
+  
+  SIGNALISATION SÉCURITÉ:
+  • Présence étiquettes réglementaires indiquant présence tension DC
+
+4. BONNES PRATIQUES
+--------------------------------------------------------------------------------
+  Identifier réalisations techniques/documentaires NON IMPOSÉES
+  impactant POSITIVEMENT qualité/longévité/exploitation
+
+5. MAUVAISES PRATIQUES
+--------------------------------------------------------------------------------
+  Identifier réalisations techniques/documentaires NON IMPOSÉES
+  impactant NÉGATIVEMENT qualité/longévité/exploitation
+  Préciser si constats apparaissent dans CR chantier GIRASOLE
+
+6. AUTRES CONSTATS PERTINENTS (expertise prestataire)
+--------------------------------------------------------------------------------
+  Le Prestataire mettra à profit son expertise pour compléter
+  les listes ci-dessus s'il juge que d'autres constats pertinents
+  peuvent être réalisés
+
+================================================================================
+LIVRABLES ATTENDUS PAR GIRASOLE
+================================================================================
+
+1. RAPPORT D'AUDIT PAR CENTRALE
+   - Checklist complétée avec photos géolocalisées
+
+2. FICHIER EXCEL LISTANT TOUS CONSTATS (ANNEXE 2 GIRASOLE)
+   - Sous-totaux constats par centrale
+   - Totaux généraux constats
+   - Libellés homogénéisés colonne 'Descriptions'
+   - Fichier proposé en validation à GIRASOLE avant utilisation
+
+3. REPORTAGE PHOTO POUR CHAQUE CONSTAT
+   - Nommage/numérotation écarts et photos
+   - Hyperliens facilitant rapprochement constat écrit/photo
+   - Photos géolocalisées
+
+4. RAPPORT SYNTHÈSE GÉNÉRAL indiquant :
+   - Principaux écarts constatés
+   - Bonnes pratiques à prescrire
+   - Mauvaises pratiques à proscrire
+   - Synthèse globale par installateur PV
+   - Synthèse globale par Bureau de contrôle
+
+DÉLAI : J+5 MAXIMUM après intervention
+
+================================================================================
+SÉCURITÉ INTERVENTION
+================================================================================
+
+AVANT INTERVENTION (obligatoire) :
+• Plan de prévention GIRASOLE signé par Prestataire
+• Fournir analyse des risques
+• Fournir habilitations électriques
+
+ACCÈS TOITURE :
+• Moyens : nacelle, harnais, ligne de vie, etc.
+• Habilitations : travail en hauteur, permis nacelle, etc.
+• Fournir justificatifs avant intervention
+
+INTERDICTIONS :
+• ❌ Marcher sur panneaux lors démontage/remontage
+• ❌ Atteindre intégrité modules ou supports lors remontage
+
+================================================================================
+PRIX DEMANDÉ (décomposition attendue)
+================================================================================
+
+Poste 1 : Prestation SANS audit toiture (par site, hors déplacement)
+Poste 2 : Supplément prestation AVEC audit toiture (par site, hors déplacement)
+Poste 3 : Forfait déplacement (trajet A/R, valable 1 ou plusieurs sites)
+Poste 4 : Forfait déplacement si > 1 jour (par jour supplémentaire)
+
+================================================================================
+Document généré le 24/11/2025 à 09:43
+DiagPV Solutions - Business Developer : Adrien
+
+Conforme Cahier des Charges GIRASOLE
+PERF-CDC-001-CDC_AUDIT_QUALITE_2025_INSTALLATIONS_PV-001
+Révision 001 du 02/10/2025
+================================================================================

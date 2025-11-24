@@ -1,0 +1,139 @@
+════════════════════════════════════════════════════════════════
+   ORDRE DE MISSION N°002
+   AUDIT QUALITÉ PHOTOVOLTAÏQUE
+   Conforme Cahier des Charges GIRASOLE (PERF-CDC-001)
+════════════════════════════════════════════════════════════════
+
+📅 **DATE ÉMISSION** : 24/11/2025
+📋 **RÉFÉRENCE** : OM-ARTEMIS-2025-002
+🏢 **SOUS-TRAITANT** : ARTEMIS
+👤 **DONNEUR D'ORDRE** : DIAGNOSTIC PHOTOVOLTAÏQUE
+📧 **Contact** : Adrien (Business Developer)
+📞 **Tél** : +33 X XX XX XX XX
+
+═══════════════════════════════════════════════════════════════
+📍 IDENTIFICATION CENTRALE
+═══════════════════════════════════════════════════════════════
+
+🔢 **ID Référent** : 17996
+📛 **Nom projet** : Mathieu Montet
+⚡ **Puissance installée** : 256.055 kWc
+🏛️ **Département** : 38
+🏗️ **Type installation** : Toiture existante / Rénovation
+
+📍 **Adresse complète** : 127 Route de la Tour, 38110 Montagnieu, France
+🗺️ **Coordonnées GPS** : 45.53534, 5.45229
+
+═══════════════════════════════════════════════════════════════
+📋 MISSION À RÉALISER
+═══════════════════════════════════════════════════════════════
+
+**OBJECTIF :**
+Audit qualité photovoltaïque conforme au Cahier des Charges GIRASOLE
+(PERF-CDC-001-CDC_AUDIT_QUALITE_2025_INSTALLATIONS_PV-001)
+
+**PRESTATIONS OBLIGATOIRES :**
+
+1️⃣ **Audit électrique conforme NF C 15-100**
+   - Vérification conformité installations BT
+   - Mesures résistance terre (< 100 Ω)
+   - Contrôle protections AC/DC
+
+2️⃣ **Vérification prescriptions UTE C 15-712-1**
+   - Dimensionnement câbles DC
+   - Parafoudres Type II
+   - Sectionnements DC + AC
+
+3️⃣ **Audit toiture conforme DTU 40.35**
+   - ⚠️ **DÉPOSE MINIMUM 25 MODULES** (accès sous-toiture)
+   - Contrôle étanchéité
+   - Fixations traversantes (joints EPDM/butyle)
+   - État chevrons/liteaux
+
+4️⃣ **Contrôle documentation GIRASOLE**
+   - CRAC (Compte-Rendu Auto-Contrôle)
+   - Schémas unifilaires signés
+   - Attestations Consuel
+   - DOE complet
+   - Rapport bureau contrôle
+
+5️⃣ **Application checklist 70 points GIRASOLE**
+   - Documentation (7 points)
+   - NF C 15-100 & UTE C 15-712 (7 points)
+   - Tranchées/passages câbles (6 points)
+   - Modules PV (6 points)
+   - Connectique DC (7 points)
+   - Structures (6 points)
+   - Audit toiture (7 points)
+   - Onduleurs/AC (7 points)
+   - Bonnes/Mauvaises pratiques (12 points)
+   - Sécurité (5 points)
+
+6️⃣ **Photos géolocalisées**
+   - Minimum 1 photo par point checklist
+   - Métadonnées GPS obligatoires
+   - Qualité HD (≥ 3 Mpx)
+
+═══════════════════════════════════════════════════════════════
+📦 LIVRABLES ATTENDUS
+═══════════════════════════════════════════════════════════════
+
+**À fournir pour cette centrale :**
+
+1. **📄 Rapport d'audit technique** (format PDF)
+   - Synthèse conformité normative
+   - Identification non-conformités
+   - Photos géolocalisées
+   - Préconisations hiérarchisées
+
+2. **📊 Fichier Excel ANNEXE 2** (modèle GIRASOLE)
+   - Liste exhaustive constats
+   - Classification criticité (majeure/mineure)
+
+3. **📸 Reportage photos géolocalisées**
+   - Photos HD avec métadonnées GPS
+
+⏱️ **DÉLAI IMPÉRATIF** : J+5 maximum après intervention
+
+═══════════════════════════════════════════════════════════════
+🛡️ CONSIGNES SÉCURITÉ
+═══════════════════════════════════════════════════════════════
+
+⚠️ **Obligations strictes :**
+- Harnais + ligne de vie (travaux hauteur)
+- Gants isolants classe 0 minimum (DC)
+- VAT (Vérification Absence Tension) avant intervention
+- Balisage périmètre sécurité
+- Assurance RC Pro à jour
+
+═══════════════════════════════════════════════════════════════
+📝 INFORMATIONS COMPLÉMENTAIRES
+═══════════════════════════════════════════════════════════════
+
+**Installateur** : PROSUNFRANCE
+**Type panneaux** : DMEGC-DM415M10-54HSW-V
+**Date MES** : 2024-10-02
+**Date prévisionnelle audit** : artemis
+
+**Spécificités :**
+- Audit toiture (pas de thermographie, pas d'électroluminescence)
+- Conformité stricte NF C 15-100, UTE C 15-712-1, DTU 40.35
+- Respect prescriptions GIRASOLE
+
+═══════════════════════════════════════════════════════════════
+✅ VALIDATION MISSION
+═══════════════════════════════════════════════════════════════
+
+**Date intervention prévisionnelle** : À définir avec sous-traitant
+
+**Contact exploitation** : Yasser BADREZZAMANE
+**Téléphone** : 06 74 09 71 44
+
+═══════════════════════════════════════════════════════════════
+
+**Signature Donneur d'Ordre**          **Signature Sous-Traitant**
+
+DIAGNOSTIC PHOTOVOLTAÏQUE              ARTEMIS
+Date : 24/11/2025                        Date : __/__/____
+
+═══════════════════════════════════════════════════════════════

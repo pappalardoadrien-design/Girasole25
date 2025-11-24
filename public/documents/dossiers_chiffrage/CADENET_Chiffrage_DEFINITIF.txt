@@ -1,0 +1,528 @@
+════════════════════════════════════════════════════════════════
+   DIAGNOSTIC PHOTOVOLTAÏQUE
+   DOSSIER CHIFFRAGE SOUS-TRAITANT : CADENET
+   
+   Conforme Cahier des Charges GIRASOLE
+   (PERF-CDC-001-CDC_AUDIT_QUALITE_2025_INSTALLATIONS_PV-001)
+════════════════════════════════════════════════════════════════
+
+📅 **DATE ÉMISSION** : 24/11/2025  
+📋 **RÉFÉRENCE** : DP-CADENET-2025-01  
+👤 **CONTACT DiagPV** : Adrien (Business Developer)  
+📧 **Email** : adrien@diagnostic-photovoltaique.fr  
+📞 **Tél** : +33 X XX XX XX XX  
+
+═══════════════════════════════════════════════════════════════
+📊 RÉCAPITULATIF MISSION
+═══════════════════════════════════════════════════════════════
+
+✅ **Nombre de centrales** : 10 installations  
+⚡ **Puissance totale** : 3910.35 kWc  
+🗺️ **Localisation** : 4 départements (26, 7, 3, 71)  
+
+═══════════════════════════════════════════════════════════════
+📋 LISTE DES CENTRALES À AUDITER
+═══════════════════════════════════════════════════════════════
+
+1. **CHAMPLITTE Toiture** - 109.20 kWc - Dept 71 - Toiture existante / Réno
+2. **SCI EQMV SAINT GERMAIN LAPRADE** - 109.20 kWc - Dept 7 - Toiture existante / Réno
+3. **SCI GVLG** - 109.20 kWc - Dept 26 - Toiture existante / Réno
+4. **SCI LAVILLENIE CHAMBON** - 247.80 kWc - Dept 7 - Toiture existante / Réno
+5. **SCI LEBRE ENERGIE** - 109.20 kWc - Dept 26 - Toiture existante / Réno
+6. **SCI LRNR** - 247.80 kWc - Dept 7 - Toiture existante / Réno
+7. **SCI MEGAWATT JALIGNY** - 499.95 kWc - Dept 3 - Toiture existante / Réno
+8. **SCI SCBNSL** - 109.20 kWc - Dept 7 - Toiture existante / Réno
+9. **SCI SOLAIRE TOURNON** - 247.80 kWc - Dept 7 - Toiture existante / Réno
+10. **SCI THIBIER 2** - 221.00 kWc - Dept 26 - Toiture existante / Réno
+
+═══════════════════════════════════════════════════════════════
+🔍 ORDRES DE MISSION DÉTAILLÉS
+═══════════════════════════════════════════════════════════════
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°1 : CHAMPLITTE Toiture
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3275  
+⚡ **Puissance** : 109.20 kWc  
+🏛️ **Département** : 71  
+📍 **Adresse exacte** : Centre Leclerc, 6 Route de Langres, 71240 Champlitte, France  
+🗺️ **GPS** : 47.607500, 5.506880  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 210 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°2 : SCI EQMV SAINT GERMAIN LAPRADE
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3260  
+⚡ **Puissance** : 109.20 kWc  
+🏛️ **Département** : 7  
+📍 **Adresse exacte** : Zone Artisanale Pont des Bruyères, 43700 Saint-Germain-Laprade, France  
+🗺️ **GPS** : 45.024860, 3.962110  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 210 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°3 : SCI GVLG
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3270  
+⚡ **Puissance** : 109.20 kWc  
+🏛️ **Département** : 26  
+📍 **Adresse exacte** : 18 Rue du Parc, 26400 Grane, France  
+🗺️ **GPS** : 44.734270, 4.918690  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 210 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°4 : SCI LAVILLENIE CHAMBON
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3266  
+⚡ **Puissance** : 247.80 kWc  
+🏛️ **Département** : 7  
+📍 **Adresse exacte** : 1 Rue de la Croze, 07200 Labégude, France  
+🗺️ **GPS** : 44.677650, 4.460560  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 476 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°5 : SCI LEBRE ENERGIE
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3268  
+⚡ **Puissance** : 109.20 kWc  
+🏛️ **Département** : 26  
+📍 **Adresse exacte** : Rue du Haut Bassin, 26140 Anneyron, France  
+🗺️ **GPS** : 45.270640, 4.894950  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 210 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°6 : SCI LRNR
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3265  
+⚡ **Puissance** : 247.80 kWc  
+🏛️ **Département** : 7  
+📍 **Adresse exacte** : Route de Beauchastel, 07800 La Voulte-sur-Rhône, France  
+🗺️ **GPS** : 44.808720, 4.774070  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 476 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°7 : SCI MEGAWATT JALIGNY
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3264  
+⚡ **Puissance** : 499.95 kWc  
+🏛️ **Département** : 3  
+📍 **Adresse exacte** : Zone industrielle Vernay, 03220 Jaligny-sur-Besbre, France  
+🗺️ **GPS** : 46.372450, 3.598380  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 961 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°8 : SCI SCBNSL
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3267  
+⚡ **Puissance** : 109.20 kWc  
+🏛️ **Département** : 7  
+📍 **Adresse exacte** : 51 Rue Maurice Bouchet, 07700 Bourg-Saint-Andéol, France  
+🗺️ **GPS** : 44.365810, 4.644560  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 210 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°9 : SCI SOLAIRE TOURNON
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3263  
+⚡ **Puissance** : 247.80 kWc  
+🏛️ **Département** : 7  
+📍 **Adresse exacte** : 18 Rue du Vignoble, 07300 Tournon-sur-Rhône, France  
+🗺️ **GPS** : 45.068290, 4.832600  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 476 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+─────────────────────────────────────────────────────────────
+📍 MISSION N°10 : SCI THIBIER 2
+─────────────────────────────────────────────────────────────
+🔢 **ID Référent** : 3269  
+⚡ **Puissance** : 221.00 kWc  
+🏛️ **Département** : 26  
+📍 **Adresse exacte** : Quartier Bachasson, 26700 Pierrelatte, France  
+🗺️ **GPS** : 44.379640, 4.705400  
+🏗️ **Type installation** : Toiture existante / Réno  
+
+**👷 Installateur** : Tuco Energie  
+**🔎 Bureau Contrôle** : Dekra  
+**☀️ Panneaux** : 425 modules Jinko Solar (520 Wc chacun)  
+
+**📋 MISSION ATTENDUE :**
+1. ✅ Audit électrique conforme **NF C 15-100**
+2. ✅ Vérification prescriptions photovoltaïques **UTE C 15-712-1**
+3. ✅ Audit toiture conforme **DTU 40.35** (dépose min. 25 modules)
+4. ✅ Contrôle conformité documents GIRASOLE (CRAC, Consuel, DOE)
+5. ✅ Application checklist qualité 70 points (voir ci-après)
+6. ✅ Photos géolocalisées tous points contrôle
+
+**📦 LIVRABLES EXIGÉS :**
+- Rapport audit par centrale (format PDF)
+- Fichier Excel ANNEXE 2 (synthèse observations)
+- Reportage photos géolocalisées par constat
+- ⏱️ **Délai impératif** : J+5 après intervention
+
+═══════════════════════════════════════════════════════════════
+✅ CHECKLIST QUALITÉ AUDIT (70 POINTS)
+═══════════════════════════════════════════════════════════════
+
+**📖 Référentiel normatif obligatoire :**
+- ✅ **NF C 15-100** : Installations électriques basse tension
+- ✅ **UTE C 15-712-1** : Installations photovoltaïques
+- ✅ **DTU 40.35** : Couverture par éléments métalliques en feuilles et longues feuilles en zinc
+- ✅ **ETN** : Spécifications techniques Enedis
+- ✅ **Cahier des Charges GIRASOLE** (PERF-CDC-001)
+
+─────────────────────────────────────────────────────────────
+📂 A. DOCUMENTATION OBLIGATOIRE (7 points)
+─────────────────────────────────────────────────────────────
+
+1. ☐ CRAC (Compte-Rendu Auto-Contrôle) présent et conforme
+2. ☐ Schémas unifilaires à jour et signés
+3. ☐ Notes de calculs dimensionnement DC/AC disponibles
+4. ☐ Rapport bureau contrôle + levée réserves documentée
+5. ☐ DOE (Dossier Ouvrages Exécutés) complet
+6. ☐ Attestations Consuel conformes
+7. ☐ Procès-verbaux auto-contrôles présents
+
+─────────────────────────────────────────────────────────────
+⚡ B. CONFORMITÉ NF C 15-100 & UTE C 15-712 (7 points)
+─────────────────────────────────────────────────────────────
+
+8. ☐ Section câbles DC adaptée aux courants IMPP
+9. ☐ Choix protections AC cohérent (disjoncteurs calibres)
+10. ☐ Présence dispositifs sectionnement DC + AC
+11. ☐ Parafoudres Type II sur onduleurs fonctionnels
+12. ☐ Liaisons équipotentielles structures métalliques réalisées
+13. ☐ Résistance boucle terre < 100 Ω (mesure réalisée)
+14. ☐ Repérage câbles DC+ / DC- conforme colorimétrie
+
+─────────────────────────────────────────────────────────────
+🚧 C. TRANCHÉES / PASSAGES CÂBLES (6 points)
+─────────────────────────────────────────────────────────────
+
+15. ☐ Profondeur tranchées ≥ 0.60m (câbles enterrés)
+16. ☐ Grillage avertisseur rouge/vert présent
+17. ☐ Câbles sous fourreaux TPC conformes
+18. ☐ Absence croisements non protégés (réseaux tiers)
+19. ☐ Marquage passages de câbles sur toiture visible
+20. ☐ Fixations/colliers inox (résistance corrosion)
+
+─────────────────────────────────────────────────────────────
+☀️ D. MODULES PHOTOVOLTAÏQUES (6 points)
+─────────────────────────────────────────────────────────────
+
+21. ☐ Marquage CE visible sur chaque module
+22. ☐ Absence fissures/délaminations visibles (échantillon 25 modules)
+23. ☐ Boîtiers jonction étanches (IP67 minimum)
+24. ☐ Câbles sortie module non cisaillés/écrasés
+25. ☐ Absence zones surchauffe localisées (audit visuel)
+26. ☐ Homogénéité couleur cellules (pas de jaunissement)
+
+─────────────────────────────────────────────────────────────
+🔌 E. CONNECTIQUE & CÂBLAGE DC (7 points)
+─────────────────────────────────────────────────────────────
+
+27. ☐ Connecteurs MC4 ou équivalents (IP67)
+28. ☐ Serrage mécanique correct (test traction)
+29. ☐ Absence connecteurs oxydés/corrodés
+30. ☐ Respect polarité DC+ / DC- sur strings
+31. ☐ Câbles solaires type H1Z2Z2-K ou équivalent
+32. ☐ Absence câbles dénudés/blessures isolant
+33. ☐ Rayons de courbure respectés (spécifications fabricant)
+
+─────────────────────────────────────────────────────────────
+🏗️ F. STRUCTURES & FIXATIONS (6 points)
+─────────────────────────────────────────────────────────────
+
+34. ☐ Ancrages toiture conformes DTU 40.35
+35. ☐ Absence corrosion visible fixations
+36. ☐ Serrage boulonnerie homogène (couple contrôlé)
+37. ☐ Continuité électrique rails ↔ structures (masse)
+38. ☐ Garde-corps / lignes de vie conformes (si requis)
+39. ☐ Espacement modules conforme plans (ventilation)
+
+─────────────────────────────────────────────────────────────
+🏠 G. AUDIT TOITURE DTU 40.35 (7 points)
+─────────────────────────────────────────────────────────────
+
+40. ☐ **Dépose minimum 25 modules** (accès sous-toiture)
+41. ☐ État étanchéité sous modules (absence infiltrations)
+42. ☐ Fixations traversantes avec joint EPDM/butyle
+43. ☐ Absence perforations non calfeutrées
+44. ☐ État liteaux/chevrons (pas de fléchissement)
+45. ☐ Bavettes alu/zinc conformes (raccords étanchéité)
+46. ☐ Absence mousse/végétation sous modules
+
+─────────────────────────────────────────────────────────────
+⚙️ H. ONDULEURS & PROTECTIONS AC (7 points)
+─────────────────────────────────────────────────────────────
+
+47. ☐ Fixation murale robuste onduleurs
+48. ☐ Ventilation onduleurs suffisante (T°C ambiante)
+49. ☐ Parafoudres Type II présents + voyants OK
+50. ☐ Interrupteur-sectionneur AC amont AGCP
+51. ☐ Coffrets électriques conformes IP (extérieur IP65)
+52. ☐ Repérage circuits AC conforme tableau
+53. ☐ Mesures tensions DC à vide strings (Voc cohérent)
+
+─────────────────────────────────────────────────────────────
+✅❌ I. BONNES/MAUVAISES PRATIQUES GIRASOLE (12 points)
+─────────────────────────────────────────────────────────────
+
+54. ☐ ✅ **BONNE** : Chemin câbles structuré + clips réguliers
+55. ☐ ❌ **MAUVAISE** : Câbles DC volants non fixés (vent)
+56. ☐ ✅ **BONNE** : Étiquetage strings numérotés lisibles
+57. ☐ ❌ **MAUVAISE** : Connecteurs MC4 branchés en force
+58. ☐ ✅ **BONNE** : Protection solaire câbles visibles UV
+59. ☐ ❌ **MAUVAISE** : Tranchées remblayées sans grillage
+60. ☐ ✅ **BONNE** : Boîtiers jonction modules vers le haut
+61. ☐ ❌ **MAUVAISE** : Absence marquage + / - sur boîtiers DC
+62. ☐ ✅ **BONNE** : Liaisons équipotentielles cuivre ≥ 6mm²
+63. ☐ ❌ **MAUVAISE** : Serrage insuffisant cosses sur bornes
+64. ☐ ✅ **BONNE** : Plans conformité exécution affichés
+65. ☐ ❌ **MAUVAISE** : Modifications terrain non tracées
+
+─────────────────────────────────────────────────────────────
+🚨 J. SÉCURITÉ & ACCESSIBILITÉ (5 points)
+─────────────────────────────────────────────────────────────
+
+66. ☐ Accès toiture sécurisé (échelles fixes conformes)
+67. ☐ Panneaux signalétiques "DANGER PHOTOVOLTAÏQUE" visibles
+68. ☐ Coupure urgence accessible (pompiers)
+69. ☐ Plan toiture avec implantation modules à jour
+70. ☐ Respect distances garde-corps / modules (≥ 1m)
+
+═══════════════════════════════════════════════════════════════
+📦 LIVRABLES ATTENDUS
+═══════════════════════════════════════════════════════════════
+
+**Pour chaque centrale auditée :**
+
+1. **📄 Rapport d'audit technique** (format PDF)
+   - Synthèse conformité normative
+   - Identification non-conformités détectées
+   - Photos géolocalisées par point de contrôle
+   - Préconisations hiérarchisées
+
+2. **📊 Fichier Excel ANNEXE 2** (synthèse observations)
+   - Conforme modèle GIRASOLE
+   - Liste exhaustive constats
+   - Classification criticité (majeure/mineure)
+
+3. **📸 Reportage photos géolocalisées**
+   - Minimum 1 photo par point checklist
+   - Métadonnées GPS obligatoires
+   - Qualité HD (≥ 3 Mpx)
+
+4. **📋 Rapport synthèse général**
+   - Vue d'ensemble 10 centrales
+   - Statistiques conformité
+   - Axes amélioration prioritaires
+
+⏱️ **DÉLAI IMPÉRATIF** : J+5 maximum après intervention sur site
+
+═══════════════════════════════════════════════════════════════
+🛡️ CONSIGNES SÉCURITÉ INTERVENTION
+═══════════════════════════════════════════════════════════════
+
+⚠️ **Obligations strictes :**
+- Harnais + ligne de vie (travaux hauteur)
+- Gants isolants classe 0 minimum (DC)
+- VAT (Vérification Absence Tension) avant intervention
+- Balisage périmètre sécurité (travaux toiture)
+- Permis feu (si travaux par points chauds)
+- Assurance RC Pro à jour (copie à fournir)
+
+═══════════════════════════════════════════════════════════════
+💰 MODALITÉS CHIFFRAGE DEMANDÉ
+═══════════════════════════════════════════════════════════════
+
+**Merci de chiffrer séparément :**
+
+1️⃣ **Coût audit par centrale** (10 sites)
+   - Détail par typologie puissance
+   - Inclus déplacements + main d'œuvre
+
+2️⃣ **Coût dépose/repose modules** (25 modules mini/site)
+   - Main d'œuvre + matériel
+
+3️⃣ **Coût rapports + synthèse Excel**
+   - Temps rédaction par centrale
+
+4️⃣ **Frais déplacement**
+   - Forfait par département (4 dpts : 26, 7, 3, 71)
+
+═══════════════════════════════════════════════════════════════
+📞 COORDONNÉES & RÉPONSE
+═══════════════════════════════════════════════════════════════
+
+**Merci de transmettre votre offre détaillée sous 48h à :**
+
+📧 **Email** : adrien@diagnostic-photovoltaique.fr  
+📞 **Tél direct** : +33 X XX XX XX XX  
+🏢 **DIAGNOSTIC PHOTOVOLTAÏQUE**  
+     Expert Audits Photovoltaïques Indépendants  
+
+═══════════════════════════════════════════════════════════════
+
+**DATE LIMITE RÉCEPTION OFFRES** : 26/11/2025 - 17h00
+
+═══════════════════════════════════════════════════════════════
