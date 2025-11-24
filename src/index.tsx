@@ -3668,6 +3668,189 @@ app.delete('/api/centrales/:id/unassign', async (c) => {
 })
 
 // =======================
+// API ROUTES - GÉNÉRATION 52 MISSIONS + CHECKLISTS
+// =======================
+
+// POST /api/missions/create-52 - Créer 52 missions + checklists adaptées
+app.post('/api/missions/create-52', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // 1. Récupérer les 52 centrales (la colonne statut contient 'A_AUDITER')
+    const centrales = await DB.prepare(`
+      SELECT id, nom, type_centrale, puissance_kwc, adresse, audit_toiture
+      FROM centrales
+      WHERE statut = 'A_AUDITER'
+      ORDER BY id
+      LIMIT 52
+    `).all()
+    
+    if (!centrales.results || centrales.results.length === 0) {
+      return c.json({ success: false, error: 'Aucune centrale à auditer' }, 400)
+    }
+    
+    // 2. Créer techniciens et sous-traitants par défaut (ARTEMIS + CADENET)
+    await DB.prepare(`
+      INSERT OR IGNORE INTO sous_traitants (id, nom_entreprise, email_contact, statut) VALUES 
+      (1, 'ARTEMIS', 'contact@artemis.fr', 'ACTIF'),
+      (2, 'CADENET', 'contact@cadenet.fr', 'ACTIF')
+    `).run()
+    
+    await DB.prepare(`
+      INSERT OR IGNORE INTO techniciens (id, sous_traitant_id, prenom, nom, statut) VALUES 
+      (1, 1, 'Tech', 'ARTEMIS', 'DISPONIBLE'),
+      (2, 2, 'Tech', 'CADENET', 'DISPONIBLE')
+    `).run()
+    
+    // 3. Définition checklist COMMUNE (48 points) + TOITURE (12 points)
+    const checklistCommune = [
+      // Section 1: PRESCRIPTIONS DOCUMENTAIRES GIRASOLE (4 points)
+      { categorie: 'DOC', numero: 1, texte: 'Présence autocontrôle correctement renseigné par installateur' },
+      { categorie: 'DOC', numero: 2, texte: 'Présence PV réception lot PV signé GIRASOLE + installateur' },
+      { categorie: 'DOC', numero: 3, texte: 'Présence ≥1 CR visite chantier lot PV rédigé GIRASOLE' },
+      { categorie: 'DOC', numero: 4, texte: 'Respect cahier des charges tranchées fourni au bailleur' },
+      
+      // Section 2: CHEMINS DE CÂBLES & FIXATIONS (5 points)
+      { categorie: 'CABLAGE', numero: 5, texte: 'Méthode et qualité fixations du chemin de câbles' },
+      { categorie: 'CABLAGE', numero: 6, texte: 'Type de cheminement câbles utilisé (galvanisé chaud, froid, etc.)' },
+      { categorie: 'CABLAGE', numero: 7, texte: 'Protections mécaniques câbles (protection contact bord saillant, etc.)' },
+      { categorie: 'CABLAGE', numero: 8, texte: 'Contrôle rayons courbure câbles AC et DC' },
+      { categorie: 'CABLAGE', numero: 9, texte: 'Qualité brassage des câbles' },
+      
+      // Section 2: REPÉRAGE & IDENTIFICATION (4 points)
+      { categorie: 'ELEC', numero: 10, texte: 'Type repérage câble ou filerie (sérigraphié, manuscrit, etc.)' },
+      { categorie: 'ELEC', numero: 11, texte: 'Type repérage câbles (tenant-aboutissant, etc.)' },
+      { categorie: 'ELEC', numero: 12, texte: 'Repérage équipements (présence, inscrit sur équipement lui-même)' },
+      { categorie: 'ELEC', numero: 13, texte: 'Repérage serrage connexions câbles AC' },
+      
+      // Section 2: CÂBLAGE DC & AC (2 points)
+      { categorie: 'ELEC', numero: 14, texte: 'Couleurs câbles DC -/+ différents' },
+      { categorie: 'ELEC', numero: 15, texte: 'Présence cosses bimétal jonction cuivre/alu (raccordement + accroche terre nu)' },
+      
+      // Section 2: MISE À LA TERRE (1 point)
+      { categorie: 'ELEC', numero: 16, texte: 'Cheminement terre le long chemins câbles (crapaud, bornier laiton, etc.)' },
+      
+      // Section 2: PROTECTION & DISJONCTION (1 point)
+      { categorie: 'TABLEAUX', numero: 17, texte: 'Réglages AGCP conforme aux plans' },
+      
+      // Section 2: TRANCHÉES AC (2 points)
+      { categorie: 'CABLAGE', numero: 18, texte: 'Respect préconisations tranchée AC (Shelter vers PDL)' },
+      { categorie: 'CABLAGE', numero: 19, texte: 'Rebouchage entrée/sortie fourreaux (TPC, etc.) et matériaux utilisés' },
+      
+      // Section 2: DOCUMENTATION SUR SITE (1 point)
+      { categorie: 'DOC', numero: 20, texte: 'Plans TQC (Tel Que Construits) présents sur place' },
+      
+      // Section 2: MODULES PHOTOVOLTAÏQUES (1 point)
+      { categorie: 'MODULES', numero: 21, texte: 'Constat visuel alignement modules PV' },
+      
+      // Section 4: BONNES PRATIQUES (3 points)
+      { categorie: 'STRUCTURES', numero: 22, texte: 'Bonne pratique identifiée n°1' },
+      { categorie: 'STRUCTURES', numero: 23, texte: 'Bonne pratique identifiée n°2' },
+      { categorie: 'STRUCTURES', numero: 24, texte: 'Bonne pratique identifiée n°3' },
+      
+      // Section 5: MAUVAISES PRATIQUES (3 points)
+      { categorie: 'STRUCTURES', numero: 25, texte: 'Mauvaise pratique identifiée n°1' },
+      { categorie: 'STRUCTURES', numero: 26, texte: 'Mauvaise pratique identifiée n°2' },
+      { categorie: 'STRUCTURES', numero: 27, texte: 'Mauvaise pratique identifiée n°3' },
+      
+      // Section 6: AUTRES CONSTATS PERTINENTS (3 points)
+      { categorie: 'STRUCTURES', numero: 28, texte: 'Constat complémentaire n°1' },
+      { categorie: 'STRUCTURES', numero: 29, texte: 'Constat complémentaire n°2' },
+      { categorie: 'STRUCTURES', numero: 30, texte: 'Constat complémentaire n°3' }
+    ]
+    
+    const checklistToiture = [
+      // Section 3: STRUCTURES & FIXATIONS (2 points)
+      { categorie: 'TOITURE', numero: 31, texte: 'Qualité et conformité montage/serrage SI sur son support' },
+      { categorie: 'TOITURE', numero: 32, texte: 'Qualité et conformité montage/serrage panneau sur SI' },
+      
+      // Section 3: CÂBLAGE & RACCORDEMENTS TOITURE (9 points)
+      { categorie: 'TOITURE', numero: 33, texte: 'Contrôle fixation cheminement câbles (pertinence supports, maintien étanchéité)' },
+      { categorie: 'TOITURE', numero: 34, texte: 'Contrôle raccordements : compatibilité connecteurs mâle/femelle (type PVZH202B)' },
+      { categorie: 'TOITURE', numero: 35, texte: 'Serrages connecteurs' },
+      { categorie: 'TOITURE', numero: 36, texte: 'Étanchéités connecteurs' },
+      { categorie: 'TOITURE', numero: 37, texte: 'Exposition ruissellement connecteurs' },
+      { categorie: 'TOITURE', numero: 38, texte: 'Qualité cheminement câbles DC dans chemin de câbles' },
+      { categorie: 'TOITURE', numero: 39, texte: 'Qualité cheminement câbles (pas de cheminement directement sur couverture)' },
+      { categorie: 'TOITURE', numero: 40, texte: 'Qualité raccordement terres' },
+      { categorie: 'TOITURE', numero: 41, texte: 'Type repérage câbles (tenant-aboutissant, sérigraphié, manuscrit, etc.)' },
+      
+      // Section 3: SIGNALISATION SÉCURITÉ (1 point)
+      { categorie: 'TOITURE', numero: 42, texte: 'Présence étiquettes réglementaires indiquant présence tension DC' }
+    ]
+    
+    // 4. Créer missions + checklists (utiliser batches pour éviter rate limit)
+    let missionsCreated = 0
+    let checklistsCreated = 0
+    
+    // Paramètre offset pour pagination
+    const { offset = 0 } = c.req.query()
+    const batchSize = 10
+    const startIndex = parseInt(offset as string) || 0
+    const endIndex = Math.min(startIndex + batchSize, centrales.results.length)
+    const centralesSlice = centrales.results.slice(startIndex, endIndex)
+    
+    for (const centrale of centralesSlice) {
+      // Assigner technicien par défaut (alternance ARTEMIS/CADENET)
+      const sousTraitantId = missionsCreated % 2 === 0 ? 1 : 2
+      const technicienId = missionsCreated % 2 === 0 ? 1 : 2
+      
+      // Créer mission
+      const missionResult = await DB.prepare(`
+        INSERT INTO ordres_mission 
+        (centrale_id, technicien_id, sous_traitant_id, date_mission, statut, checklist_generee)
+        VALUES (?, ?, ?, DATE('2025-02-01', '+' || ? || ' days'), 'PLANIFIE', 1)
+      `).bind(centrale.id, technicienId, sousTraitantId, missionsCreated).run()
+      
+      const missionId = missionResult.meta.last_row_id
+      missionsCreated++
+      
+      // Créer checklist adaptée (batch insert pour performance)
+      const checklistComplete = centrale.audit_toiture === 'X' 
+        ? [...checklistCommune, ...checklistToiture]
+        : checklistCommune
+      
+      // Batch insert de 10 items à la fois
+      for (let i = 0; i < checklistComplete.length; i += 10) {
+        const batch = checklistComplete.slice(i, i + 10)
+        const placeholders = batch.map(() => '(?, ?, ?, ?, ?)').join(',')
+        const values = batch.flatMap(item => [missionId, item.categorie, item.numero, item.texte, 'NON_VERIFIE'])
+        
+        await DB.prepare(`
+          INSERT INTO checklist_items 
+          (ordre_mission_id, categorie, item_numero, item_texte, statut)
+          VALUES ${placeholders}
+        `).bind(...values).run()
+        
+        checklistsCreated += batch.length
+      }
+    }
+    
+    const hasMore = endIndex < centrales.results.length
+    const nextOffset = hasMore ? endIndex : null
+    
+    return c.json({
+      success: true,
+      missions_created: missionsCreated,
+      checklists_created: checklistsCreated,
+      total_centrales: centrales.results.length,
+      processed: endIndex,
+      remaining: centrales.results.length - endIndex,
+      has_more: hasMore,
+      next_offset: nextOffset,
+      message: `✅ ${endIndex}/${centrales.results.length} missions créées avec checklists adaptées (SOL: 30 pts, TOITURE: 42 pts)`
+    })
+    
+  } catch (error) {
+    console.error('Erreur création missions:', error)
+    return c.json({
+      success: false,
+      error: String(error)
+    }, 500)
+  }
+})
+
+// =======================
 // API ROUTES - SHAREPOINT
 // =======================
 
