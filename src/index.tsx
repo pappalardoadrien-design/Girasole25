@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { serveStatic } from 'hono/cloudflare-workers'
+// COMMENTED: serveStatic not needed - Cloudflare Pages serves public/ files automatically
+// import { serveStatic } from 'hono/cloudflare-workers'
 
 type Bindings = {
   DB: D1Database;
@@ -11,11 +12,10 @@ const app = new Hono<{ Bindings: Bindings }>()
 // Enable CORS for API routes
 app.use('/api/*', cors())
 
-// Serve static files
-app.use('/static/*', serveStatic({ root: './public' }))
-
-// Serve documents files
-app.use('/documents/*', serveStatic({ root: './public' }))
+// COMMENTED: Cloudflare Pages automatically serves files from public/ directory
+// No need for serveStatic middleware - files are accessible directly
+// app.use('/static/*', serveStatic({ root: './public' }))
+// app.use('/documents/*', serveStatic({ root: './public' }))
 
 // ======================
 // API ROUTES - CENTRALES
