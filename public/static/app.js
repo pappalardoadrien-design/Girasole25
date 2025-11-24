@@ -278,16 +278,28 @@ async function loadCentrales() {
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <button onclick="changeCentraleStatut(${c.id}, '${c.statut}')" 
-                          class="text-blue-600 hover:text-blue-800 mr-3 transition-colors" 
-                          title="Modifier statut">
-                    <i class="fas fa-edit text-lg"></i>
-                  </button>
-                  <button onclick="viewCentraleDetail(${c.id})" 
-                          class="text-green-600 hover:text-green-800 transition-colors" 
-                          title="Voir détails">
-                    <i class="fas fa-eye text-lg"></i>
-                  </button>
+                  <div class="flex items-center justify-center space-x-2">
+                    <a href="/audit/${c.id}" target="_blank" 
+                       class="text-blue-600 hover:text-blue-800 transition-colors" 
+                       title="Checklist Audit">
+                      <i class="fas fa-clipboard-check text-lg"></i>
+                    </a>
+                    <a href="/photos-audit/${c.id}" target="_blank" 
+                       class="text-purple-600 hover:text-purple-800 transition-colors" 
+                       title="Photos (${c.total_photos || 0})">
+                      <i class="fas fa-images text-lg"></i>
+                    </a>
+                    <button onclick="changeCentraleStatut(${c.id}, '${c.statut}')" 
+                            class="text-orange-600 hover:text-orange-800 transition-colors" 
+                            title="Modifier statut">
+                      <i class="fas fa-edit text-lg"></i>
+                    </button>
+                    <button onclick="viewCentraleDetail(${c.id})" 
+                            class="text-green-600 hover:text-green-800 transition-colors" 
+                            title="Voir détails">
+                      <i class="fas fa-eye text-lg"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             `).join('')}

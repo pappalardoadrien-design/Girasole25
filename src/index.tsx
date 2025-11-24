@@ -2484,6 +2484,224 @@ app.get('/audit/:mission_id', async (c) => {
   }
 })
 
+// ========================================
+// PAGE PHOTOS AUDIT - GALERIE PAR MISSION
+// ========================================
+app.get('/photos-audit/:mission_id', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  
+  try {
+    // Récupérer mission
+    const mission = await DB.prepare(`
+      SELECT om.*, c.nom as centrale_nom, c.id_ref, c.type as centrale_type, c.puissance_kwc
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      WHERE om.id = ?
+    `).bind(missionId).first()
+    
+    if (!mission) {
+      return c.html('<h1 style="text-align:center;margin-top:50px;">❌ Mission non trouvée</h1>')
+    }
+    
+    // Récupérer photos avec items checklist
+    const photos = await DB.prepare(`
+      SELECT ci.id, ci.categorie, ci.item_texte, ci.photo_base64, ci.date_modification
+      FROM checklist_items ci
+      WHERE ci.ordre_mission_id = ? AND ci.photo_base64 IS NOT NULL
+      ORDER BY ci.categorie, ci.item_numero
+    `).bind(missionId).all()
+    
+    return c.html(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Photos Audit ${mission.centrale_nom}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+          .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+          }
+          
+          .photo-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+          }
+          
+          .photo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+          }
+          
+          .photo-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+          }
+          
+          .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+          }
+          
+          .lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+          }
+        </style>
+      </head>
+      <body class="bg-gray-50">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-6 shadow-lg">
+          <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h1 class="text-3xl font-bold mb-2">
+                  <i class="fas fa-images mr-3"></i>${mission.centrale_nom}
+                </h1>
+                <p class="text-purple-100">
+                  ID Ref: ${mission.id_ref || 'N/A'} | ${mission.puissance_kwc || 0} kWc | ${mission.centrale_type}
+                </p>
+              </div>
+              <div class="text-right">
+                <div class="bg-white bg-opacity-20 rounded-lg px-6 py-3">
+                  <p class="text-sm text-purple-100">Total Photos</p>
+                  <p class="text-4xl font-bold">${photos.results?.length || 0}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+        
+        <!-- Actions -->
+        <div class="container mx-auto px-4 py-4">
+          <div class="flex gap-3">
+            <a href="/audit/${missionId}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+              <i class="fas fa-clipboard-check mr-2"></i>Retour Checklist
+            </a>
+            <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg">
+              <i class="fas fa-home mr-2"></i>Dashboard
+            </a>
+            <button onclick="downloadAll()" class="ml-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+              <i class="fas fa-download mr-2"></i>Télécharger Toutes (ZIP)
+            </button>
+          </div>
+        </div>
+        
+        <!-- Galerie -->
+        <div class="container mx-auto px-4 pb-12">
+          ${photos.results && photos.results.length > 0 ? `
+            <div class="photo-gallery">
+              ${photos.results.map((photo, idx) => `
+                <div class="photo-card bg-white">
+                  <img 
+                    src="${photo.photo_base64}" 
+                    alt="${photo.item_texte}"
+                    class="photo-img"
+                    onclick="openLightbox(${idx})"
+                  />
+                  <div class="p-4">
+                    <span class="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded mb-2">
+                      ${photo.categorie}
+                    </span>
+                    <h3 class="font-bold text-gray-800 mb-2">${photo.item_texte}</h3>
+                    <p class="text-xs text-gray-500">
+                      <i class="fas fa-calendar mr-1"></i>
+                      ${new Date(photo.date_modification).toLocaleString('fr-FR')}
+                    </p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="text-center py-20">
+              <i class="fas fa-image text-gray-300 text-6xl mb-4"></i>
+              <p class="text-gray-500 text-lg">Aucune photo disponible pour cette mission</p>
+              <a href="/audit/${missionId}" class="inline-block mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                <i class="fas fa-camera mr-2"></i>Prendre des photos
+              </a>
+            </div>
+          `}
+        </div>
+        
+        <!-- Lightbox -->
+        <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+          <button onclick="prevPhoto()" class="absolute left-4 text-white text-4xl hover:scale-110 transition">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <img id="lightbox-img" src="" alt="">
+          <button onclick="nextPhoto()" class="absolute right-4 text-white text-4xl hover:scale-110 transition">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-3xl hover:scale-110 transition">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <script>
+          const photos = ${JSON.stringify(photos.results || [])};
+          let currentPhotoIndex = 0;
+          
+          function openLightbox(index) {
+            currentPhotoIndex = index;
+            document.getElementById('lightbox-img').src = photos[index].photo_base64;
+            document.getElementById('lightbox').style.display = 'flex';
+          }
+          
+          function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+          }
+          
+          function prevPhoto() {
+            event.stopPropagation();
+            currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+            document.getElementById('lightbox-img').src = photos[currentPhotoIndex].photo_base64;
+          }
+          
+          function nextPhoto() {
+            event.stopPropagation();
+            currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+            document.getElementById('lightbox-img').src = photos[currentPhotoIndex].photo_base64;
+          }
+          
+          function downloadAll() {
+            alert('Fonctionnalité ZIP en développement\\n\\nPour l\\'instant, vous pouvez:\\n1. Clic droit > Enregistrer sur chaque photo\\n2. Utiliser l\\'export PDF depuis la checklist');
+          }
+          
+          // Navigation clavier
+          document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lightbox').style.display === 'flex') {
+              if (e.key === 'ArrowLeft') prevPhoto();
+              if (e.key === 'ArrowRight') nextPhoto();
+              if (e.key === 'Escape') closeLightbox();
+            }
+          });
+        </script>
+      </body>
+      </html>
+    `)
+  } catch (error) {
+    return c.html('<h1 style="text-align:center;margin-top:50px;">❌ Erreur: ' + String(error) + '</h1>')
+  }
+})
+
 // ======================
 // PAGE PRINCIPALE
 // ======================
