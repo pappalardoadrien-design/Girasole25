@@ -2722,6 +2722,14 @@ app.get('/', (c) => {
         <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
         
+        <!-- Leaflet.js CSS + JS pour carte interactive -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+              integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+              crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+                crossorigin=""></script>
+        
         <link href="/static/styles.css" rel="stylesheet">
     </head>
     <body class="bg-gray-50">
@@ -3226,25 +3234,28 @@ app.get('/', (c) => {
                 </div>
 
                 <script>
-                    // Charger Leaflet.js dynamiquement
-                    if (!window.L) {
-                        const link = document.createElement('link');
-                        link.rel = 'stylesheet';
-                        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-                        document.head.appendChild(link);
-                        
-                        const script = document.createElement('script');
-                        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-                        script.onload = initCarte;
-                        document.head.appendChild(script);
-                    }
-
+                    // Variables globales carte
                     let mapInstance = null;
                     let markersLayer = null;
                     let allMissions = [];
+                    let carteInitialized = false;
 
                     async function initCarte() {
                         console.log('🗺️ Initialisation carte Leaflet');
+                        
+                        // Vérifier que Leaflet est chargé
+                        if (typeof L === 'undefined') {
+                            console.error('❌ Leaflet.js non chargé');
+                            setTimeout(initCarte, 500); // Réessayer dans 500ms
+                            return;
+                        }
+                        
+                        // Si déjà initialisée, pas besoin de recréer
+                        if (carteInitialized && mapInstance) {
+                            console.log('✅ Carte déjà initialisée');
+                            mapInstance.invalidateSize(); // Rafraîchir l'affichage
+                            return;
+                        }
                         
                         // Créer carte centrée sur la France (centre approximatif Yonne/Nièvre)
                         if (!mapInstance) {
@@ -3260,12 +3271,15 @@ app.get('/', (c) => {
                         }
                         
                         // Charger les missions
+                        carteInitialized = true;
                         await loadMissionsCarte();
                         
                         // Attacher event listeners filtres
                         document.getElementById('filter-st-carte')?.addEventListener('change', filterMissionsCarte);
                         document.getElementById('filter-statut-carte')?.addEventListener('change', filterMissionsCarte);
                         document.getElementById('search-centrale-carte')?.addEventListener('input', filterMissionsCarte);
+                        
+                        console.log('✅ Carte initialisée avec succès');
                     }
 
                     async function loadMissionsCarte() {
