@@ -2992,7 +2992,13 @@ app.get('/', (c) => {
                         }).join('');
                         
                         console.log('✅ HTML généré, longueur:', container.innerHTML.length, 'caractères');
-                        console.log('🎉 loadMissionsGlobal() terminée avec succès');
+                        
+                        // ✅ Attacher les event listeners APRÈS génération du HTML
+                        document.getElementById('filter-st-missions')?.addEventListener('change', filterMissions);
+                        document.getElementById('filter-statut-missions')?.addEventListener('change', filterMissions);
+                        document.getElementById('search-centrale-missions')?.addEventListener('input', filterMissions);
+                        
+                        console.log('🎉 loadMissionsGlobal() terminée avec succès + event listeners attachés');
                         
                     } catch (error) {
                         console.error('❌ Erreur chargement missions:', error);
@@ -3106,11 +3112,7 @@ app.get('/', (c) => {
                 </div>
                 
                 <script>
-                    // Filtres missions (la fonction loadMissionsGlobal est définie en haut de page)
-                    document.getElementById('filter-st-missions')?.addEventListener('change', filterMissions);
-                    document.getElementById('filter-statut-missions')?.addEventListener('change', filterMissions);
-                    document.getElementById('search-centrale-missions')?.addEventListener('input', filterMissions);
-                    
+                    // ✅ Fonction filterMissions (event listeners attachés dans loadMissionsGlobal après génération HTML)
                     function filterMissions() {
                         const st = document.getElementById('filter-st-missions')?.value.toLowerCase() || '';
                         const statut = document.getElementById('filter-statut-missions')?.value || '';
