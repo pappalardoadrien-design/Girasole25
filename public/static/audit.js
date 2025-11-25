@@ -192,14 +192,21 @@ function renderChecklistItem(item) {
         onchange="scheduleAutoSave(${item.id})"
       >${item.commentaire || ''}</textarea>
       
-      <!-- Photo -->
-      <div>
-        <label for="photo-${item.id}" class="photo-btn">
-          <i class="fas fa-camera mr-2"></i>${item.photo_filename ? 'Changer photo' : 'Ajouter photo'}
-        </label>
-        <input type="file" id="photo-${item.id}" accept="image/*" capture="environment" 
-               onchange="handlePhotoUpload(${item.id}, event)">
-        ${item.photo_base64 ? `<img src="data:image/jpeg;base64,${item.photo_base64}" class="photo-preview" alt="Photo">` : ''}
+      <!-- Photos Multiples (nouveau système) -->
+      <div class="mt-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">
+            <i class="fas fa-images mr-1"></i>Photos (<span id="photo-count-${item.id}">0</span>)
+          </span>
+          <button class="photo-btn inline-flex items-center" onclick="openPhotoUploader(${item.id})">
+            <i class="fas fa-camera mr-2"></i>Ajouter photos
+          </button>
+        </div>
+        <input type="file" id="photo-input-${item.id}" accept="image/*" capture="environment" 
+               multiple onchange="handleMultiPhotoUpload(${item.id}, event)" style="display:none">
+        <div id="photos-gallery-${item.id}" class="grid grid-cols-3 gap-2">
+          <!-- Photos chargées dynamiquement -->
+        </div>
       </div>
     </div>
   `;
@@ -473,9 +480,186 @@ async function finishAudit() {
   }
 }
 
+// ========================================
+// PHOTOS MULTIPLES PAR ITEM (Nouveau système)
+// ========================================
+
+// Ouvrir sélecteur photos
+function openPhotoUploader(itemId) {
+  document.getElementById(`photo-input-${itemId}`).click();
+}
+
+// Gérer upload photos multiples
+async function handleMultiPhotoUpload(itemId, event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+  
+  showSaveIndicator(`📤 Upload ${files.length} photo(s)...`, '#3b82f6');
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    
+    // Vérifier taille (max 5 MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert(`❌ Photo "${file.name}" trop lourde (max 5 MB)`);
+      continue;
+    }
+    
+    try {
+      // Compresser image
+      const base64 = await compressImage(file);
+      
+      // Upload via API
+      const response = await fetch(`/api/checklist/${missionId}/item/${itemId}/photos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photo_base64: base64,
+          photo_filename: file.name,
+          commentaire: null
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Erreur upload');
+      }
+      
+      console.log(`✅ Photo ${i+1}/${files.length} uploadée (ID: ${data.photo_id})`);
+      
+    } catch (error) {
+      console.error(`❌ Erreur upload photo ${file.name}:`, error);
+      alert(`Erreur upload ${file.name}: ${error.message}`);
+    }
+  }
+  
+  // Recharger galerie photos
+  await loadItemPhotos(itemId);
+  showSaveIndicator(`✅ ${files.length} photo(s) uploadée(s)`, '#10b981');
+  
+  // Reset input
+  event.target.value = '';
+}
+
+// Charger photos d'un item
+async function loadItemPhotos(itemId) {
+  try {
+    const response = await fetch(`/api/checklist/${missionId}/item/${itemId}/photos`);
+    const data = await response.json();
+    
+    if (!data.success) {
+      console.error('Erreur chargement photos:', data.error);
+      return;
+    }
+    
+    const photos = data.photos || [];
+    const gallery = document.getElementById(`photos-gallery-${itemId}`);
+    const counter = document.getElementById(`photo-count-${itemId}`);
+    
+    if (counter) {
+      counter.textContent = photos.length;
+    }
+    
+    if (!gallery) return;
+    
+    if (photos.length === 0) {
+      gallery.innerHTML = '<p class="text-sm text-gray-400 col-span-3 text-center py-2">Aucune photo</p>';
+      return;
+    }
+    
+    gallery.innerHTML = photos.map(photo => `
+      <div class="relative group">
+        <div class="aspect-square bg-gray-100 rounded overflow-hidden cursor-pointer"
+             onclick="viewPhoto(${itemId}, ${photo.id})">
+          <div class="w-full h-full flex items-center justify-center">
+            <i class="fas fa-image text-2xl text-gray-400"></i>
+          </div>
+        </div>
+        <button class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                onclick="deletePhoto(${itemId}, ${photo.id}, event)">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+        <div class="text-xs text-gray-500 mt-1 truncate">${photo.photo_filename || 'Photo'}</div>
+      </div>
+    `).join('');
+    
+  } catch (error) {
+    console.error('Erreur chargement photos:', error);
+  }
+}
+
+// Voir photo en grand (avec Base64)
+async function viewPhoto(itemId, photoId) {
+  try {
+    const response = await fetch(`/api/checklist/item/${itemId}/photo/${photoId}`);
+    const data = await response.json();
+    
+    if (!data.success || !data.photo) {
+      alert('Erreur chargement photo');
+      return;
+    }
+    
+    const photo = data.photo;
+    
+    // Créer lightbox
+    const lightbox = document.createElement('div');
+    lightbox.id = 'photo-lightbox';
+    lightbox.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:1000;display:flex;align-items:center;justify-content:center;';
+    lightbox.onclick = () => lightbox.remove();
+    
+    const img = document.createElement('img');
+    img.src = `data:image/jpeg;base64,${photo.photo_base64}`;
+    img.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;';
+    
+    lightbox.appendChild(img);
+    document.body.appendChild(lightbox);
+    
+  } catch (error) {
+    console.error('Erreur affichage photo:', error);
+    alert('Erreur affichage photo');
+  }
+}
+
+// Supprimer photo
+async function deletePhoto(itemId, photoId, event) {
+  event.stopPropagation();
+  
+  if (!confirm('Supprimer cette photo ?')) return;
+  
+  try {
+    const response = await fetch(`/api/checklist/item/${itemId}/photo/${photoId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Erreur suppression');
+    }
+    
+    showSaveIndicator('🗑️ Photo supprimée', '#ef4444');
+    await loadItemPhotos(itemId);
+    
+  } catch (error) {
+    console.error('Erreur suppression photo:', error);
+    alert('Erreur suppression photo');
+  }
+}
+
+// Charger photos pour tous les items au démarrage
+async function loadAllPhotos() {
+  for (const item of checklistItems) {
+    await loadItemPhotos(item.id);
+  }
+}
+
 // Charger au démarrage page
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadChecklist);
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadChecklist();
+    await loadAllPhotos();
+  });
 } else {
-  loadChecklist();
+  loadChecklist().then(() => loadAllPhotos());
 }

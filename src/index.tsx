@@ -1762,6 +1762,128 @@ app.put('/api/checklist/:id', async (c) => {
   }
 })
 
+// ========================================
+// API ROUTES - PHOTOS MULTIPLES PAR ITEM
+// ========================================
+
+// GET /api/checklist/:mission_id/item/:item_id/photos - Récupérer toutes les photos d'un item
+app.get('/api/checklist/:mission_id/item/:item_id/photos', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  const itemId = c.req.param('item_id')
+  
+  try {
+    const photos = await DB.prepare(`
+      SELECT id, ordre, photo_filename, commentaire, date_creation
+      FROM ordres_mission_item_photos
+      WHERE ordre_mission_id = ? AND item_checklist_id = ?
+      ORDER BY ordre ASC
+    `).bind(missionId, itemId).all()
+    
+    return c.json({ success: true, photos: photos.results || [], count: photos.results?.length || 0 })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/checklist/item/:item_id/photo/:photo_id - Récupérer une photo complète (avec Base64)
+app.get('/api/checklist/item/:item_id/photo/:photo_id', async (c) => {
+  const { DB } = c.env
+  const photoId = c.req.param('photo_id')
+  
+  try {
+    const photo = await DB.prepare(`
+      SELECT * FROM ordres_mission_item_photos WHERE id = ?
+    `).bind(photoId).first()
+    
+    if (!photo) {
+      return c.json({ success: false, error: 'Photo non trouvée' }, 404)
+    }
+    
+    return c.json({ success: true, photo })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/checklist/:mission_id/item/:item_id/photos - Ajouter photo à un item (upload multiple)
+app.post('/api/checklist/:mission_id/item/:item_id/photos', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  const itemId = parseInt(c.req.param('item_id'))
+  
+  try {
+    const body = await c.req.json()
+    const { photo_base64, photo_filename, commentaire } = body
+    
+    if (!photo_base64) {
+      return c.json({ success: false, error: 'Photo Base64 requise' }, 400)
+    }
+    
+    // Calculer prochain ordre (position)
+    const maxOrdre = await DB.prepare(`
+      SELECT COALESCE(MAX(ordre), 0) as max_ordre
+      FROM ordres_mission_item_photos
+      WHERE ordre_mission_id = ? AND item_checklist_id = ?
+    `).bind(missionId, itemId).first()
+    
+    const newOrdre = (maxOrdre?.max_ordre || 0) + 1
+    
+    // Insérer photo
+    const result = await DB.prepare(`
+      INSERT INTO ordres_mission_item_photos 
+      (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, ordre, commentaire)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(missionId, itemId, photo_base64, photo_filename, newOrdre, commentaire || null).run()
+    
+    return c.json({ 
+      success: true, 
+      message: 'Photo ajoutée',
+      photo_id: result.meta.last_row_id,
+      ordre: newOrdre
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// DELETE /api/checklist/item/:item_id/photo/:photo_id - Supprimer une photo
+app.delete('/api/checklist/item/:item_id/photo/:photo_id', async (c) => {
+  const { DB } = c.env
+  const photoId = c.req.param('photo_id')
+  
+  try {
+    await DB.prepare(`
+      DELETE FROM ordres_mission_item_photos WHERE id = ?
+    `).bind(photoId).run()
+    
+    return c.json({ success: true, message: 'Photo supprimée' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/checklist/item/photo/:photo_id - Mettre à jour commentaire photo
+app.put('/api/checklist/item/photo/:photo_id', async (c) => {
+  const { DB } = c.env
+  const photoId = c.req.param('photo_id')
+  
+  try {
+    const body = await c.req.json()
+    const { commentaire } = body
+    
+    await DB.prepare(`
+      UPDATE ordres_mission_item_photos 
+      SET commentaire = ?, date_modification = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(commentaire || null, photoId).run()
+    
+    return c.json({ success: true, message: 'Commentaire photo mis à jour' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 // POST /api/retours-json - Upload JSON V4 complet
 app.post('/api/retours-json', async (c) => {
   const { DB } = c.env
