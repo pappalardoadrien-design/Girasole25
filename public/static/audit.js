@@ -472,15 +472,25 @@ async function finishAudit() {
     if (!confirm) return;
   }
   
-  if (window.confirm('Marquer la mission comme TERMINÉE ?')) {
+  if (window.confirm('Marquer la mission comme TERMINÉE ?\n\n💡 Vous pourrez toujours modifier la checklist, ajouter des photos et des commentaires après.')) {
     try {
       await fetch(`/api/ordres-mission/${missionId}/statut`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ statut: 'TERMINE' })
       });
-      alert('✅ Mission terminée ! Retour à l\'interface planning...');
-      window.location.href = '/';
+      
+      // Proposer de voir le rapport
+      const voirRapport = window.confirm('✅ Mission terminée !\n\n📄 Voulez-vous consulter le rapport final ?\n\n💡 Vous pourrez revenir sur cette page pour modifier la checklist et ajouter des photos.');
+      
+      if (voirRapport) {
+        window.open(`/api/ordres-mission/${missionId}/rapport-final`, '_blank');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
+      } else {
+        window.location.href = '/';
+      }
     } catch (error) {
       alert('Erreur mise à jour statut');
       console.error(error);

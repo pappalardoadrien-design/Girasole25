@@ -2723,6 +2723,17 @@ app.get('/audit/:mission_id', async (c) => {
           </div>
         </header>
 
+        <!-- Bandeau Info Modifications -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mx-4 mt-4 rounded-lg">
+          <div class="flex items-center">
+            <i class="fas fa-info-circle text-blue-500 text-xl mr-3"></i>
+            <div>
+              <p class="text-sm font-semibold text-blue-800">✏️ Modifications toujours possibles</p>
+              <p class="text-xs text-blue-600">Vous pouvez modifier la checklist, ajouter des photos et des commentaires même après avoir terminé l'audit.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Contenu -->
         <main class="p-4 pb-20">
           <div id="checklistContainer">
@@ -3251,15 +3262,18 @@ app.get('/', (c) => {
                                         </p>
                                     </div>
                                     
-                                    <div class="flex gap-2">
-                                        <a href="/audit/\${m.mission_id}" target="_blank" class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm font-semibold">
-                                            <i class="fas fa-clipboard-check mr-2"></i>Voir Checklist
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <a href="/audit/\${m.mission_id}" target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-center text-sm font-semibold">
+                                            <i class="fas fa-clipboard-check mr-2"></i>Checklist
                                         </a>
-                                        <a href="/photos-audit/\${m.mission_id}" target="_blank" class="flex-1 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm font-semibold">
+                                        <a href="/photos-audit/\${m.mission_id}" target="_blank" class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition text-center text-sm font-semibold">
                                             <i class="fas fa-images mr-2"></i>Photos (\${m.nb_photos || 0})
                                         </a>
-                                        <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-sm font-semibold">
-                                            <i class="fas fa-file-pdf mr-2"></i>OM
+                                        <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-center text-sm font-semibold">
+                                            <i class="fas fa-file-pdf mr-2"></i>Ordre Mission
+                                        </a>
+                                        <a href="/api/ordres-mission/\${m.mission_id}/rapport-final" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition text-center text-sm font-semibold">
+                                            <i class="fas fa-file-alt mr-2"></i>📄 Rapport
                                         </a>
                                     </div>
                                 </div>
