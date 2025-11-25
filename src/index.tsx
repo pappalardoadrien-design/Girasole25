@@ -3560,18 +3560,45 @@ app.get('/', (c) => {
                             allMissions = data.data;
                             console.log(\`✅ \${allMissions.length} missions chargées\`);
                             
-                            // Générer coordonnées GPS factices pour démo (à remplacer par vraies coordonnées)
-                            // Centre Yonne/Nièvre : 47.5°N, 3.5°E
-                            allMissions = allMissions.map((m, index) => ({
-                                ...m,
-                                latitude: 47.3 + (Math.random() * 0.6), // 47.3 à 47.9
-                                longitude: 3.2 + (Math.random() * 0.8), // 3.2 à 4.0
-                                progression: m.nb_points_total > 0 
-                                    ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
-                                    : 0
-                            }));
+                            // Charger coordonnées GPS réelles depuis centrales
+                            const responseCentrales = await fetch('/api/centrales');
+                            const dataCentrales = await responseCentrales.json();
+                            const centralesMap = {};
                             
-                            displayMarkers(allMissions);
+                            if (dataCentrales.success && dataCentrales.data) {
+                                dataCentrales.data.forEach(c => {
+                                    if (c.localisation) {
+                                        const [lat, lon] = c.localisation.split(',').map(parseFloat);
+                                        centralesMap[c.id] = { latitude: lat, longitude: lon };
+                                    }
+                                });
+                            }
+                            
+                            // Mapper coordonnées GPS réelles avec progression
+                            allMissions = allMissions.map(m => {
+                                const coords = centralesMap[m.centrale_id] || { latitude: null, longitude: null };
+                                return {
+                                    ...m,
+                                    latitude: coords.latitude,
+                                    longitude: coords.longitude,
+                                    progression: m.nb_points_total > 0 
+                                        ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
+                                        : 0
+                                };
+                            });
+                            
+                            // Filtrer missions avec coordonnées valides
+                            const missionsWithCoords = allMissions.filter(m => m.latitude && m.longitude);
+                            console.log(\`📍 \${missionsWithCoords.length} missions avec coordonnées GPS\`);
+                            
+                            // Centrer carte sur France métropolitaine si missions avec GPS
+                            if (missionsWithCoords.length > 0) {
+                                const avgLat = missionsWithCoords.reduce((sum, m) => sum + m.latitude, 0) / missionsWithCoords.length;
+                                const avgLon = missionsWithCoords.reduce((sum, m) => sum + m.longitude, 0) / missionsWithCoords.length;
+                                mapInstance.setView([avgLat, avgLon], 6);
+                            }
+                            
+                            displayMarkers(missionsWithCoords);
                             updateStats(allMissions);
                             
                         } catch (error) {
