@@ -2759,6 +2759,9 @@ app.get('/', (c) => {
                     <button onclick="showTab('missions')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-tasks mr-2"></i>Missions
                     </button>
+                    <button onclick="showTab('carte')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Carte
+                    </button>
                     <button onclick="showTab('upload')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-upload mr-2"></i>Upload JSON
                     </button>
@@ -3046,6 +3049,11 @@ app.get('/', (c) => {
                         if (!window.missionsInterval) {
                             window.missionsInterval = setInterval(window.loadMissionsGlobal, 30000);
                         }
+                    } else if (tabName === 'carte') {
+                        console.log('🗺️ showTab(carte) - Initialisation carte');
+                        if (typeof initCarte === 'function') {
+                            initCarte();
+                        }
                     } else if (tabName === 'upload' && typeof loadUploadForm === 'function') {
                         loadUploadForm();
                     } else if (tabName === 'planning' && typeof loadPlanningData === 'function') {
@@ -3137,6 +3145,277 @@ app.get('/', (c) => {
                             
                             card.style.display = matchSt && matchSearch && matchStatut ? 'block' : 'none';
                         });
+                    }
+                </script>
+            </div>
+
+            <!-- Carte Interactive Tab -->
+            <div id="tab-carte" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-map-marked-alt text-green-600 mr-3"></i>
+                        Carte Interactive - 52 Centrales Photovoltaïques
+                    </h2>
+                    
+                    <!-- Filtres Carte -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-building mr-2"></i>Sous-Traitant
+                            </label>
+                            <select id="filter-st-carte" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="">Tous les sous-traitants</option>
+                                <option value="ARTEMIS">ARTEMIS</option>
+                                <option value="CADENET">CADENET</option>
+                                <option value="DIAGPV">DIAGPV</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-filter mr-2"></i>Statut
+                            </label>
+                            <select id="filter-statut-carte" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="">Tous les statuts</option>
+                                <option value="0">Non commencée</option>
+                                <option value="en-cours">En cours</option>
+                                <option value="100">Terminée</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-search mr-2"></i>Recherche
+                            </label>
+                            <input 
+                                type="text" 
+                                id="search-centrale-carte" 
+                                placeholder="Nom centrale..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            >
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="resetFiltersCarte()" class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">
+                                <i class="fas fa-redo mr-2"></i>Réinitialiser
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques rapides -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Total Centrales</p>
+                            <p id="carte-total" class="text-2xl font-bold text-blue-600">52</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Terminées</p>
+                            <p id="carte-terminees" class="text-2xl font-bold text-green-600">0</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">En Cours</p>
+                            <p id="carte-en-cours" class="text-2xl font-bold text-yellow-600">0</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Non Commencées</p>
+                            <p id="carte-non-commencees" class="text-2xl font-bold text-gray-600">52</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte Leaflet -->
+                <div class="bg-white rounded-lg shadow p-2">
+                    <div id="map" style="height: 600px; border-radius: 8px;"></div>
+                </div>
+
+                <script>
+                    // Charger Leaflet.js dynamiquement
+                    if (!window.L) {
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                        document.head.appendChild(link);
+                        
+                        const script = document.createElement('script');
+                        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                        script.onload = initCarte;
+                        document.head.appendChild(script);
+                    }
+
+                    let mapInstance = null;
+                    let markersLayer = null;
+                    let allMissions = [];
+
+                    async function initCarte() {
+                        console.log('🗺️ Initialisation carte Leaflet');
+                        
+                        // Créer carte centrée sur la France (centre approximatif Yonne/Nièvre)
+                        if (!mapInstance) {
+                            mapInstance = L.map('map').setView([47.5, 3.5], 9);
+                            
+                            // Ajouter tuiles OpenStreetMap
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors',
+                                maxZoom: 19
+                            }).addTo(mapInstance);
+                            
+                            markersLayer = L.layerGroup().addTo(mapInstance);
+                        }
+                        
+                        // Charger les missions
+                        await loadMissionsCarte();
+                        
+                        // Attacher event listeners filtres
+                        document.getElementById('filter-st-carte')?.addEventListener('change', filterMissionsCarte);
+                        document.getElementById('filter-statut-carte')?.addEventListener('change', filterMissionsCarte);
+                        document.getElementById('search-centrale-carte')?.addEventListener('input', filterMissionsCarte);
+                    }
+
+                    async function loadMissionsCarte() {
+                        try {
+                            console.log('📡 Chargement missions pour carte...');
+                            const response = await fetch('/api/suivi-missions');
+                            const data = await response.json();
+                            
+                            if (!data.success || !data.data) {
+                                console.error('❌ Erreur chargement missions carte');
+                                return;
+                            }
+                            
+                            allMissions = data.data;
+                            console.log(\`✅ \${allMissions.length} missions chargées\`);
+                            
+                            // Générer coordonnées GPS factices pour démo (à remplacer par vraies coordonnées)
+                            // Centre Yonne/Nièvre : 47.5°N, 3.5°E
+                            allMissions = allMissions.map((m, index) => ({
+                                ...m,
+                                latitude: 47.3 + (Math.random() * 0.6), // 47.3 à 47.9
+                                longitude: 3.2 + (Math.random() * 0.8), // 3.2 à 4.0
+                                progression: m.nb_points_total > 0 
+                                    ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
+                                    : 0
+                            }));
+                            
+                            displayMarkers(allMissions);
+                            updateStats(allMissions);
+                            
+                        } catch (error) {
+                            console.error('❌ Erreur:', error);
+                        }
+                    }
+
+                    function displayMarkers(missions) {
+                        if (!markersLayer || !mapInstance) return;
+                        
+                        markersLayer.clearLayers();
+                        
+                        missions.forEach(m => {
+                            // Icône couleur selon statut
+                            let markerColor = 'gray'; // Non commencée
+                            if (m.progression === 100) markerColor = 'green'; // Terminée
+                            else if (m.progression > 0) markerColor = 'orange'; // En cours
+                            
+                            // Créer marker avec icon personnalisé
+                            const marker = L.circleMarker([m.latitude, m.longitude], {
+                                radius: 8,
+                                fillColor: markerColor,
+                                color: '#fff',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.8
+                            });
+                            
+                            // Popup avec infos centrale
+                            const popupContent = \`
+                                <div style="min-width: 250px;">
+                                    <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 8px;">
+                                        \${m.centrale_nom}
+                                    </h3>
+                                    <p style="font-size: 12px; color: #666; margin-bottom: 8px;">
+                                        <strong>Ref:</strong> \${m.id_ref || 'N/A'} | 
+                                        <strong>Puissance:</strong> \${m.puissance_kwc || 0} kWc
+                                    </p>
+                                    <p style="font-size: 12px; margin-bottom: 4px;">
+                                        <strong>Sous-Traitant:</strong> \${m.sous_traitant}
+                                    </p>
+                                    <p style="font-size: 12px; margin-bottom: 4px;">
+                                        <strong>Technicien:</strong> \${m.technicien_nom}
+                                    </p>
+                                    <p style="font-size: 12px; margin-bottom: 8px;">
+                                        <strong>Photos:</strong> \${m.nb_photos || 0}
+                                    </p>
+                                    <div style="margin-bottom: 8px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                            <span style="font-size: 12px; font-weight: 600;">Progression</span>
+                                            <span style="font-size: 12px; font-weight: bold; color: #3b82f6;">\${m.progression}%</span>
+                                        </div>
+                                        <div style="width: 100%; background: #e5e7eb; border-radius: 9999px; height: 8px;">
+                                            <div style="background: linear-gradient(to right, #3b82f6, #8b5cf6); height: 8px; border-radius: 9999px; width: \${m.progression}%;"></div>
+                                        </div>
+                                        <p style="font-size: 11px; color: #666; margin-top: 2px;">
+                                            \${m.nb_points_completes || 0} / \${m.nb_points_total || 0} points
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; gap: 4px; margin-top: 8px;">
+                                        <a href="/audit/\${m.mission_id}" target="_blank" 
+                                           style="flex: 1; background: #3b82f6; color: white; padding: 6px 8px; border-radius: 6px; text-align: center; text-decoration: none; font-size: 11px; font-weight: 600;">
+                                            📋 Checklist
+                                        </a>
+                                        <a href="/photos-audit/\${m.mission_id}" target="_blank" 
+                                           style="flex: 1; background: #8b5cf6; color: white; padding: 6px 8px; border-radius: 6px; text-align: center; text-decoration: none; font-size: 11px; font-weight: 600;">
+                                            📸 Photos
+                                        </a>
+                                    </div>
+                                </div>
+                            \`;
+                            
+                            marker.bindPopup(popupContent);
+                            marker.addTo(markersLayer);
+                        });
+                        
+                        console.log(\`✅ \${missions.length} markers affichés\`);
+                    }
+
+                    function filterMissionsCarte() {
+                        const st = document.getElementById('filter-st-carte')?.value.toLowerCase() || '';
+                        const statut = document.getElementById('filter-statut-carte')?.value || '';
+                        const search = document.getElementById('search-centrale-carte')?.value.toLowerCase() || '';
+                        
+                        const filtered = allMissions.filter(m => {
+                            const matchSt = !st || m.sous_traitant.toLowerCase().includes(st);
+                            const matchSearch = !search || m.centrale_nom.toLowerCase().includes(search);
+                            
+                            let matchStatut = true;
+                            if (statut === '0') {
+                                matchStatut = m.progression === 0;
+                            } else if (statut === 'en-cours') {
+                                matchStatut = m.progression > 0 && m.progression < 100;
+                            } else if (statut === '100') {
+                                matchStatut = m.progression === 100;
+                            }
+                            
+                            return matchSt && matchSearch && matchStatut;
+                        });
+                        
+                        displayMarkers(filtered);
+                        updateStats(filtered);
+                    }
+
+                    function resetFiltersCarte() {
+                        document.getElementById('filter-st-carte').value = '';
+                        document.getElementById('filter-statut-carte').value = '';
+                        document.getElementById('search-centrale-carte').value = '';
+                        displayMarkers(allMissions);
+                        updateStats(allMissions);
+                    }
+
+                    function updateStats(missions) {
+                        const total = missions.length;
+                        const terminees = missions.filter(m => m.progression === 100).length;
+                        const enCours = missions.filter(m => m.progression > 0 && m.progression < 100).length;
+                        const nonCommencees = missions.filter(m => m.progression === 0).length;
+                        
+                        document.getElementById('carte-total').textContent = total;
+                        document.getElementById('carte-terminees').textContent = terminees;
+                        document.getElementById('carte-en-cours').textContent = enCours;
+                        document.getElementById('carte-non-commencees').textContent = nonCommencees;
                     }
                 </script>
             </div>
