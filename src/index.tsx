@@ -1878,7 +1878,142 @@ app.put('/api/checklist/item/photo/:photo_id', async (c) => {
       WHERE id = ?
     `).bind(commentaire || null, photoId).run()
     
-    return c.json({ success: true, message: 'Commentaire photo mis à jour' })
+    return c.json({ success: true, message: 'Commentaire mis à jour' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ==========================================
+// ROUTES COMMENTAIRE FINAL MISSION
+// ==========================================
+
+// GET /api/ordres-mission/:mission_id/commentaire-final
+app.get('/api/ordres-mission/:mission_id/commentaire-final', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT commentaire_final, created_at, updated_at
+      FROM ordres_mission_commentaires_finaux
+      WHERE mission_id = ?
+    `).bind(missionId).first()
+    
+    return c.json({ success: true, data: result || { commentaire_final: '' } })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/ordres-mission/:mission_id/commentaire-final
+app.put('/api/ordres-mission/:mission_id/commentaire-final', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  
+  try {
+    const body = await c.req.json()
+    const { commentaire_final } = body
+    
+    // Insérer ou mettre à jour (UPSERT)
+    await DB.prepare(`
+      INSERT INTO ordres_mission_commentaires_finaux (mission_id, commentaire_final, updated_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(mission_id) DO UPDATE SET 
+        commentaire_final = excluded.commentaire_final,
+        updated_at = CURRENT_TIMESTAMP
+    `).bind(missionId, commentaire_final || '').run()
+    
+    return c.json({ success: true, message: 'Commentaire final sauvegardé' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ==========================================
+// ROUTES PHOTOS GÉNÉRALES MISSION
+// ==========================================
+
+// GET /api/ordres-mission/:mission_id/photos-generales
+app.get('/api/ordres-mission/:mission_id/photos-generales', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  
+  try {
+    const photos = await DB.prepare(`
+      SELECT id, filename, description, uploaded_at
+      FROM ordres_mission_photos_generales
+      WHERE mission_id = ?
+      ORDER BY uploaded_at DESC
+    `).bind(missionId).all()
+    
+    return c.json({ success: true, photos: photos.results || [] })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/ordres-mission/:mission_id/photos-generales/:photo_id (avec Base64)
+app.get('/api/ordres-mission/:mission_id/photos-generales/:photo_id', async (c) => {
+  const { DB } = c.env
+  const photoId = parseInt(c.req.param('photo_id'))
+  
+  try {
+    const photo = await DB.prepare(`
+      SELECT id, filename, photo_base64, description, uploaded_at
+      FROM ordres_mission_photos_generales
+      WHERE id = ?
+    `).bind(photoId).first()
+    
+    if (!photo) {
+      return c.json({ success: false, error: 'Photo non trouvée' }, 404)
+    }
+    
+    return c.json({ success: true, photo })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/ordres-mission/:mission_id/photos-generales
+app.post('/api/ordres-mission/:mission_id/photos-generales', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  
+  try {
+    const body = await c.req.json()
+    const { photo_base64, filename, description } = body
+    
+    if (!photo_base64) {
+      return c.json({ success: false, error: 'Photo Base64 requise' }, 400)
+    }
+    
+    const result = await DB.prepare(`
+      INSERT INTO ordres_mission_photos_generales (mission_id, filename, photo_base64, description)
+      VALUES (?, ?, ?, ?)
+    `).bind(missionId, filename, photo_base64, description || null).run()
+    
+    return c.json({ 
+      success: true, 
+      message: 'Photo générale ajoutée',
+      photo_id: result.meta.last_row_id
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// DELETE /api/ordres-mission/photos-generales/:photo_id
+app.delete('/api/ordres-mission/photos-generales/:photo_id', async (c) => {
+  const { DB } = c.env
+  const photoId = parseInt(c.req.param('photo_id'))
+  
+  try {
+    await DB.prepare(`
+      DELETE FROM ordres_mission_photos_generales WHERE id = ?
+    `).bind(photoId).run()
+    
+    return c.json({ success: true, message: 'Photo générale supprimée' })
   } catch (error) {
     return c.json({ success: false, error: String(error) }, 500)
   }
@@ -2589,10 +2724,17 @@ app.get('/audit/:mission_id', async (c) => {
         </header>
 
         <!-- Contenu -->
-        <main class="p-4 pb-20" id="checklistContainer">
-          <div class="text-center py-8">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p class="text-gray-600">Chargement checklist...</p>
+        <main class="p-4 pb-20">
+          <div id="checklistContainer">
+            <div class="text-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p class="text-gray-600">Chargement checklist...</p>
+            </div>
+          </div>
+          
+          <!-- Section Commentaire Final Mission -->
+          <div id="commentaireFinalSection" class="mt-8">
+            <!-- Sera rempli par audit.js -->
           </div>
         </main>
 

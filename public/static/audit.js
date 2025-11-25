@@ -2,6 +2,8 @@
 
 const missionId = parseInt(window.location.pathname.split('/')[2]);
 let checklistItems = [];
+let commentaireFinal = '';
+let photosGenerales = [];
 let autoSaveTimer = null;
 let isOnline = navigator.onLine;
 let pendingSyncQueue = [];
@@ -9,6 +11,8 @@ let pendingSyncQueue = [];
 // LocalStorage keys
 const STORAGE_KEY = `audit_mission_${missionId}`;
 const SYNC_QUEUE_KEY = `sync_queue_${missionId}`;
+const COMMENTAIRE_FINAL_KEY = `commentaire_final_${missionId}`;
+const PHOTOS_GENERALES_KEY = `photos_generales_${missionId}`;
 
 // Détecter changements connexion
 window.addEventListener('online', () => {
@@ -103,6 +107,10 @@ async function loadChecklist() {
     
     renderChecklist();
     updateProgress();
+    
+    // Charger commentaire final et photos générales
+    await loadCommentaireFinal();
+    await loadPhotosGenerales();
     
     // Sync changements en attente si connexion rétablie
     if (isOnline) {
@@ -651,6 +659,304 @@ async function deletePhoto(itemId, photoId, event) {
 async function loadAllPhotos() {
   for (const item of checklistItems) {
     await loadItemPhotos(item.id);
+  }
+}
+
+// ==========================================
+// COMMENTAIRE FINAL MISSION
+// ==========================================
+
+// Charger commentaire final
+async function loadCommentaireFinal() {
+  try {
+    const localData = safeLocalStorageGet(COMMENTAIRE_FINAL_KEY);
+    
+    if (isOnline) {
+      const response = await fetch(`/api/ordres-mission/${missionId}/commentaire-final`);
+      const data = await response.json();
+      commentaireFinal = data.data?.commentaire_final || '';
+      safeLocalStorageSet(COMMENTAIRE_FINAL_KEY, commentaireFinal);
+    } else if (localData) {
+      commentaireFinal = localData;
+    }
+    
+    renderCommentaireFinal();
+  } catch (error) {
+    console.error('Erreur chargement commentaire final:', error);
+  }
+}
+
+// Afficher section commentaire final
+function renderCommentaireFinal() {
+  const container = document.getElementById('commentaireFinalSection');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-2xl shadow-lg border-2 border-blue-200 mb-6">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-comment-dots mr-3 text-blue-600"></i>
+        📋 SYNTHÈSE GÉNÉRALE MISSION
+      </h3>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Commentaire général sur la centrale :
+        </label>
+        <textarea 
+          id="commentaire-final-textarea"
+          rows="6" 
+          class="w-full p-4 border-2 border-blue-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-y"
+          placeholder="Vue d'ensemble installation, conditions météo, accès chantier, sécurité, observations générales..."
+        >${commentaireFinal}</textarea>
+        <p class="text-xs text-gray-500 mt-2">
+          💡 Ce commentaire sera inclus dans le rapport final PDF
+        </p>
+      </div>
+      
+      <div id="photosGeneralesContainer">
+        <div class="flex items-center justify-between mb-3">
+          <label class="block text-sm font-medium text-gray-700">
+            Photos générales (contexte, vue d'ensemble) :
+          </label>
+          <span id="photosGeneralesCount" class="text-xs text-gray-500">
+            ${photosGenerales.length} photo(s)
+          </span>
+        </div>
+        
+        <input 
+          type="file" 
+          id="photosGeneralesInput" 
+          accept="image/*" 
+          multiple 
+          capture="environment"
+          class="hidden"
+        >
+        
+        <button 
+          onclick="document.getElementById('photosGeneralesInput').click()" 
+          class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition-all mb-4 flex items-center justify-center gap-2"
+        >
+          <i class="fas fa-camera"></i>
+          📸 Ajouter photos générales
+        </button>
+        
+        <div id="photosGeneralesGallery" class="grid grid-cols-3 gap-3 mt-3">
+          <!-- Photos générales ici -->
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Event listener textarea auto-save
+  const textarea = document.getElementById('commentaire-final-textarea');
+  textarea?.addEventListener('input', (e) => {
+    commentaireFinal = e.target.value;
+    debounceSaveCommentaireFinal();
+  });
+  
+  // Event listener upload photos
+  const input = document.getElementById('photosGeneralesInput');
+  input?.addEventListener('change', handlePhotosGeneralesUpload);
+  
+  renderPhotosGenerales();
+}
+
+// Sauvegarder commentaire final (debounce 1s)
+let commentaireFinalTimer = null;
+function debounceSaveCommentaireFinal() {
+  clearTimeout(commentaireFinalTimer);
+  commentaireFinalTimer = setTimeout(saveCommentaireFinal, 1000);
+}
+
+async function saveCommentaireFinal() {
+  try {
+    safeLocalStorageSet(COMMENTAIRE_FINAL_KEY, commentaireFinal);
+    
+    if (!isOnline) {
+      showSaveIndicator('💾 Sauvegardé localement', '#f59e0b');
+      return;
+    }
+    
+    const response = await fetch(`/api/ordres-mission/${missionId}/commentaire-final`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commentaire_final: commentaireFinal })
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      showSaveIndicator('✅ Commentaire sauvegardé', '#10b981');
+    }
+  } catch (error) {
+    console.error('Erreur save commentaire final:', error);
+    showSaveIndicator('⚠️ Erreur sauvegarde', '#ef4444');
+  }
+}
+
+// ==========================================
+// PHOTOS GÉNÉRALES MISSION
+// ==========================================
+
+// Charger photos générales
+async function loadPhotosGenerales() {
+  try {
+    const localData = safeLocalStorageGet(PHOTOS_GENERALES_KEY);
+    
+    if (isOnline) {
+      const response = await fetch(`/api/ordres-mission/${missionId}/photos-generales`);
+      const data = await response.json();
+      photosGenerales = data.photos || [];
+      safeLocalStorageSet(PHOTOS_GENERALES_KEY, JSON.stringify(photosGenerales));
+    } else if (localData) {
+      photosGenerales = JSON.parse(localData);
+    }
+    
+    renderPhotosGenerales();
+  } catch (error) {
+    console.error('Erreur chargement photos générales:', error);
+  }
+}
+
+// Afficher galerie photos générales
+function renderPhotosGenerales() {
+  const gallery = document.getElementById('photosGeneralesGallery');
+  const countSpan = document.getElementById('photosGeneralesCount');
+  
+  if (!gallery) return;
+  
+  if (countSpan) {
+    countSpan.textContent = `${photosGenerales.length} photo(s)`;
+  }
+  
+  if (photosGenerales.length === 0) {
+    gallery.innerHTML = `
+      <div class="col-span-3 text-center text-gray-400 py-6">
+        <i class="fas fa-images text-4xl mb-2"></i>
+        <p class="text-sm">Aucune photo générale</p>
+      </div>
+    `;
+    return;
+  }
+  
+  gallery.innerHTML = photosGenerales.map(photo => `
+    <div class="relative bg-white rounded-lg shadow-md overflow-hidden group">
+      <div 
+        class="w-full h-24 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center cursor-pointer"
+        onclick="viewPhotoGenerale(${photo.id})"
+      >
+        <i class="fas fa-image text-3xl text-blue-400"></i>
+      </div>
+      <button 
+        onclick="deletePhotoGenerale(${photo.id})"
+        class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <i class="fas fa-times text-xs"></i>
+      </button>
+      <p class="text-xs text-gray-600 p-1 truncate">${photo.filename}</p>
+    </div>
+  `).join('');
+}
+
+// Upload photos générales
+async function handlePhotosGeneralesUpload(event) {
+  const files = Array.from(event.target.files);
+  if (files.length === 0) return;
+  
+  showSaveIndicator(`📤 Upload ${files.length} photo(s)...`, '#3b82f6');
+  
+  for (const file of files) {
+    try {
+      const compressed = await compressImage(file);
+      
+      const photoData = {
+        photo_base64: compressed,
+        filename: file.name,
+        description: 'Photo générale mission'
+      };
+      
+      if (!isOnline) {
+        // Mode offline : stocker en attente
+        photosGenerales.push({ ...photoData, id: Date.now(), uploaded_at: new Date().toISOString() });
+        safeLocalStorageSet(PHOTOS_GENERALES_KEY, JSON.stringify(photosGenerales));
+        showSaveIndicator('💾 Photo sauvegardée localement', '#f59e0b');
+      } else {
+        const response = await fetch(`/api/ordres-mission/${missionId}/photos-generales`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(photoData)
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          await loadPhotosGenerales();
+          showSaveIndicator('✅ Photo uploadée', '#10b981');
+        }
+      }
+    } catch (error) {
+      console.error('Erreur upload photo générale:', error);
+      alert('Erreur upload photo');
+    }
+  }
+  
+  event.target.value = '';
+}
+
+// Voir photo générale (lightbox)
+async function viewPhotoGenerale(photoId) {
+  try {
+    const response = await fetch(`/api/ordres-mission/${missionId}/photos-generales/${photoId}`);
+    const data = await response.json();
+    
+    if (data.success && data.photo) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4';
+      modal.onclick = () => modal.remove();
+      
+      modal.innerHTML = `
+        <div class="relative max-w-4xl max-h-full">
+          <img src="${data.photo.photo_base64}" class="max-w-full max-h-screen rounded-lg shadow-2xl">
+          <button onclick="this.parentElement.parentElement.remove()" class="absolute top-4 right-4 bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200">
+            <i class="fas fa-times"></i> Fermer
+          </button>
+          <div class="absolute bottom-4 left-4 right-4 bg-white bg-opacity-90 p-3 rounded-lg">
+            <p class="font-semibold">${data.photo.filename}</p>
+            <p class="text-xs text-gray-600">${new Date(data.photo.uploaded_at).toLocaleString('fr-FR')}</p>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+  } catch (error) {
+    console.error('Erreur affichage photo:', error);
+    alert('Erreur affichage photo');
+  }
+}
+
+// Supprimer photo générale
+async function deletePhotoGenerale(photoId) {
+  if (!confirm('Supprimer cette photo ?')) return;
+  
+  try {
+    if (isOnline) {
+      const response = await fetch(`/api/ordres-mission/photos-generales/${photoId}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        await loadPhotosGenerales();
+        showSaveIndicator('🗑️ Photo supprimée', '#ef4444');
+      }
+    } else {
+      photosGenerales = photosGenerales.filter(p => p.id !== photoId);
+      safeLocalStorageSet(PHOTOS_GENERALES_KEY, JSON.stringify(photosGenerales));
+      renderPhotosGenerales();
+      showSaveIndicator('🗑️ Suppression locale', '#f59e0b');
+    }
+  } catch (error) {
+    console.error('Erreur suppression photo:', error);
+    alert('Erreur suppression photo');
   }
 }
 
