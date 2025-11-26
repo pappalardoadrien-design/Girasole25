@@ -91,12 +91,24 @@ Pour faciliter tes interventions, on met à ta dispo :
 
 ---
 
+**⏱️ DURÉE ESTIMÉE PAR SITE :**
+
+- **Audit hors toiture** : ~30 minutes/site
+- **Audit EN toiture** : Durée supérieure (démontage/remontage ~25 panneaux)
+
+---
+
 **📦 LIVRABLES ATTENDUS PAR CENTRALE :**
 
 1. Rapport d'audit complet par centrale (format PDF)
 2. Fichier Excel récapitulatif des constats (descriptions homogénéisées)
 3. Reportage photo exhaustif pour chaque constat (nommage/numérotation facilitant rapprochement)
-4. Rapport synthèse général indiquant :
+4. **Photos/vidéos supplémentaires obligatoires** :
+   - **Vidéo complète de l'AGCP** (Armoire Générale de Commande et de Protection) au shelter ou local technique
+   - **Vidéo descente de câbles** (cheminements DC depuis panneaux jusqu'à onduleurs)
+   - **Photos monitoring** : Si prise branchée sur système de monitoring, photos détaillées impératives
+   - **Photos annexes** : Vue d'ensemble installation, points singuliers, accès site
+5. Rapport synthèse général indiquant :
    - Principaux écarts constatés
    - Bonnes pratiques à prescrire
    - Mauvaises pratiques à proscrire
@@ -319,12 +331,24 @@ Pour faciliter tes interventions, on met à ta dispo :
 
 ---
 
+**⏱️ DURÉE ESTIMÉE PAR SITE :**
+
+- **Audit hors toiture** : ~30 minutes/site
+- **Audit EN toiture** : Durée supérieure (démontage/remontage ~25 panneaux)
+
+---
+
 **📦 LIVRABLES ATTENDUS PAR CENTRALE :**
 
 1. Rapport d'audit complet par centrale (format PDF)
 2. Fichier Excel récapitulatif des constats (descriptions homogénéisées)
 3. Reportage photo exhaustif pour chaque constat (nommage/numérotation facilitant rapprochement)
-4. Rapport synthèse général indiquant :
+4. **Photos/vidéos supplémentaires obligatoires** :
+   - **Vidéo complète de l'AGCP** (Armoire Générale de Commande et de Protection) au shelter ou local technique
+   - **Vidéo descente de câbles** (cheminements DC depuis panneaux jusqu'à onduleurs)
+   - **Photos monitoring** : Si prise branchée sur système de monitoring, photos détaillées impératives
+   - **Photos annexes** : Vue d'ensemble installation, points singuliers, accès site
+5. Rapport synthèse général indiquant :
    - Principaux écarts constatés
    - Bonnes pratiques à prescrire
    - Mauvaises pratiques à proscrire
