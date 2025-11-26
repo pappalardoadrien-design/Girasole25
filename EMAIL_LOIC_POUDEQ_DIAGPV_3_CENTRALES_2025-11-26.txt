@@ -1,0 +1,194 @@
+═══════════════════════════════════════════════════════════════════════
+📧 EMAIL LOÏC POUDEQ - DiagPV
+═══════════════════════════════════════════════════════════════════════
+
+À : Loïc Poudeq (DiagPV)
+CC : a.pappalardo@diagnosticphotovoltaique.fr
+Objet : Demande intervention - 3 audits qualité installations PV (Estadens 31 - client GIRASOLE)
+
+---
+
+Salut Loïc,
+
+On aurait besoin de ton intervention pour réaliser **3 audits qualité** pour **notre client GIRASOLE** (développeur et exploitant de centrales PV) sur des installations situées à **Estadens (31)**.
+
+L'idée serait de prévoir ça **mardi 2 et mercredi 3 décembre 2025**.
+
+**📋 CENTRALES À AUDITER (3 sites) :**
+
+1. **Hangar Yannick CLEMENT**
+   - Puissance : 331,24 kWc
+   - Adresse : Gazailles, 31160 Estadens, France
+   - GPS : 43.049103, 0.855347
+   - Département : 31 (Haute-Garonne)
+   - Type : Bâtiment à construire - C
+   - **Type audit** : Audit hors toiture (visuel & mécanique lots électriques)
+   - Checklist interactive : https://0da64170.girasole-diagpv.pages.dev/audit/30
+
+2. **Hangar Frédéric CASTET** (Goutille)
+   - Puissance : 309,40 kWc
+   - Adresse : 11 Carrère de la Goutille, 31160 Estadens, France
+   - GPS : 43.043825, 0.859333
+   - Département : 31 (Haute-Garonne)
+   - Type : Bâtiment à construire - C
+   - **Type audit** : **Audit EN TOITURE** (démontage ~25 panneaux + visuel & mécanique)
+   - Checklist interactive : https://0da64170.girasole-diagpv.pages.dev/audit/35
+
+3. **Hangar Frédéric CASTET (2)** (Gentille)
+   - Puissance : 268,65 kWc
+   - Adresse : 11 carrère de la Gentille, ESTADENS, 31160
+   - GPS : 43.043896, 0.859961
+   - Département : 31 (Haute-Garonne)
+   - Type : Toiture existante / Rénovation
+   - **Type audit** : Audit hors toiture (visuel & mécanique lots électriques)
+   - Checklist interactive : https://0da64170.girasole-diagpv.pages.dev/audit/25
+
+**Puissance totale à auditer : ~909 kWc**
+**Répartition audits : 2 audits hors toiture + 1 audit EN toiture (CASTET Goutille)**
+
+---
+
+**🔍 PÉRIMÈTRE DE LA MISSION :**
+
+L'audit qualité consiste à vérifier que l'installation a été réalisée dans le respect des normes et des prescriptions GIRASOLE :
+
+**A. VÉRIFICATIONS NORMATIVES :**
+- Conformité **NF C 15-100** (installations électriques)
+- Conformité **UTE C 15-712-1** (installations photovoltaïques)
+- Contrôle respect prescriptions techniques GIRASOLE (autocontrôles, PV réception, CR visite chantier)
+
+**B. AUDIT VISUEL & MÉCANIQUE - Points de contrôle (40 points checklist) :**
+
+**Lots électriques :**
+- Qualité fixations chemins de câbles
+- Type cheminement câbles (galvanisé chaud/froid)
+- Protections mécaniques câbles (bords saillants)
+- Présence cosses bimétal jonctions cuivre/alu
+- Rayons de courbure câbles AC/DC
+- Repérage équipements et câblage (tenant-aboutissant, sérigraphié)
+- Réglages AGCP conformes aux plans
+- Couleurs câbles DC -/+ différentes
+- Qualité brassage câbles
+- Serrage connexions câbles AC
+- Cheminement terre (crapauds, borniers laiton)
+- Respect préconisations tranchées AC
+- Rebouchage entrées/sorties fourreaux
+
+**C. AUDIT EN TOITURE (pour CASTET Goutille uniquement) :**
+- Démontage et remontage ~25 panneaux pertinents (1er/dernier chaîne, etc.)
+- Conformité **DTU 40.35**
+- Qualité montage/serrage structures sur support
+- Qualité montage/serrage panneaux sur structures
+- Fixation cheminement câbles (supports, étanchéité toiture)
+- Compatibilité/serrage/étanchéité connecteurs MC4
+- Qualité cheminement câbles DC dans chemins de câbles
+- Raccordements terres
+- Étiquettes réglementaires tension DC
+- **INTERDICTION de marcher sur panneaux**
+- Respect notices de montage
+
+**D. BONNES & MAUVAISES PRATIQUES :**
+- Identification pratiques impactant positivement/négativement qualité, longévité, exploitation
+- Constat alignement modules PV
+- Plans TQC présents sur site
+- Méthodes de repérage (manuscrit/sérigraphié)
+
+---
+
+**📎 DOCUMENTS TECHNIQUES FOURNIS :**
+
+Pour faciliter tes interventions, on met à ta dispo :
+
+1. **Cahier des Charges Audit Qualité 2025 GIRASOLE** (complet) :
+   → https://www.genspark.ai/api/files/s/Y1Zivl6w
+
+2. **Template Ordre de Mission** (ANNEXE 2 - fichier synthèse) :
+   → https://www.genspark.ai/api/files/s/IeFQyPmv
+
+3. **Checklists interactives 40 points** (remplissage terrain sur smartphone) :
+   - CLEMENT : https://0da64170.girasole-diagpv.pages.dev/audit/30
+   - CASTET Goutille (EN toiture) : https://0da64170.girasole-diagpv.pages.dev/audit/35
+   - CASTET Gentille : https://0da64170.girasole-diagpv.pages.dev/audit/25
+
+4. **Dashboard gestion missions** :
+   → https://0da64170.girasole-diagpv.pages.dev
+
+---
+
+**⏱️ DURÉE ESTIMÉE PAR SITE :**
+
+- **Audit hors toiture** : ~30 minutes/site (CLEMENT + CASTET Gentille)
+- **Audit EN toiture** : Durée supérieure (CASTET Goutille - démontage/remontage ~25 panneaux)
+
+---
+
+**📦 LIVRABLES ATTENDUS PAR CENTRALE :**
+
+1. Rapport d'audit complet par centrale (format PDF)
+2. Fichier Excel récapitulatif des constats (descriptions homogénéisées)
+3. Reportage photo exhaustif pour chaque constat (nommage/numérotation facilitant rapprochement)
+4. **Photos/vidéos supplémentaires obligatoires** :
+   - **Vidéo complète de l'AGCP** (Armoire Générale de Commande et de Protection) au shelter ou local technique
+   - **Vidéo descente de câbles** (cheminements DC depuis panneaux jusqu'à onduleurs)
+   - **Photos monitoring** : Si prise branchée sur système de monitoring, photos détaillées impératives
+   - **Photos annexes** : Vue d'ensemble installation, points singuliers, accès site
+5. Rapport synthèse général indiquant :
+   - Principaux écarts constatés
+   - Bonnes pratiques à prescrire
+   - Mauvaises pratiques à proscrire
+
+---
+
+**📅 PLANNING & DÉLAIS :**
+
+- **Interventions terrain** : **MARDI 2 et MERCREDI 3 DÉCEMBRE 2025** (proposition)
+- **Délai remise rapports** : Sous 5 jours ouvrés après intervention
+- **Ta disponibilité** : Merci de confirmer si ces dates te conviennent
+
+**Note** : Les 3 centrales sont situées à Estadens (31), ce qui permet d'optimiser la tournée.
+
+---
+
+**🔒 SÉCURITÉ :**
+
+Avant toute visite, GIRASOLE établira un plan de prévention à signer.
+
+**Documents à fournir impérativement** :
+- Analyse des risques de ton entreprise
+- Habilitations électriques de l'intervenant
+- Pour l'audit toiture (CASTET Goutille) : autorisations travail en hauteur, permis nacelle, justificatifs moyens (nacelle/harnais/ligne de vie)
+
+---
+
+**📩 RETOUR :**
+
+Merci de me confirmer ta disponibilité pour les **2-3 décembre 2025** et si tu as besoin d'infos complémentaires.
+
+On reste dispo !
+
+Bien cordialement,
+
+**Adrien Pappalardo**
+Business Developer
+Diagnostic Photovoltaïque
+📧 a.pappalardo@diagnosticphotovoltaique.fr
+🌐 https://diagnosticphotovoltaique.fr
+
+
+═══════════════════════════════════════════════════════════════════════
+FIN EMAIL LOÏC POUDEQ - DiagPV
+═══════════════════════════════════════════════════════════════════════
+
+✅ **RÉCAPITULATIF :**
+
+**3 CENTRALES ESTADENS (31) :**
+- 2 audits hors toiture (CLEMENT + CASTET Gentille) : ~1h total
+- 1 audit EN toiture (CASTET Goutille) : durée variable
+
+**PLANNING PROPOSÉ :**
+- Mardi 2 décembre 2025
+- Mercredi 3 décembre 2025
+
+**PUISSANCE TOTALE :** ~909 kWc
+
+**LOCALISATION :** Toutes à Estadens (31) - tournée optimisée
