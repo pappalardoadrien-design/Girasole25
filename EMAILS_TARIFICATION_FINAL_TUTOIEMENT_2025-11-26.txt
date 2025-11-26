@@ -164,16 +164,16 @@ Diagnostic Photovoltaïque
 
 
 ═══════════════════════════════════════════════════════════════════════
-📧 EMAIL 2/3 : ARTEMIS - Serge Maltaverne
+📧 EMAIL 2/3 : ARTEMIS - Loïc Morin
 ═══════════════════════════════════════════════════════════════════════
 
-À : serge.maltaverne@artemis.fr
+À : l.morin@artemisconcept.fr
 CC : a.pappalardo@diagnosticphotovoltaique.fr
 Objet : Demande de tarification - Audits qualité installations PV (14 centrales multi-départements - client GIRASOLE)
 
 ---
 
-Salut Serge,
+Salut Loïc,
 
 On lance une campagne d'audits qualité pour **notre client GIRASOLE** (développeur et exploitant de centrales PV) sur un échantillon de leurs installations en exploitation.
 
