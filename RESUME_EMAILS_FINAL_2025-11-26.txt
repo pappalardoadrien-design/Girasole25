@@ -1,0 +1,105 @@
+═══════════════════════════════════════════════════════════════════════
+📧 RÉSUMÉ FINAL DES 3 EMAILS SOUS-TRAITANTS - 26 NOV 2025
+═══════════════════════════════════════════════════════════════════════
+
+✅ **MODIFICATIONS FINALES APPLIQUÉES :**
+
+1. ✉️ **Email correct** : a.pappalardo@diagnosticphotovoltaique.fr
+2. 🏢 **Client GIRASOLE** : "pour notre client GIRASOLE"
+3. ⏰ **Planning URGENT** : AVANT LE 31 DÉCEMBRE 2025 (impératif)
+4. ⏱️ **Durée estimée** : ~30 min/site (hors audits toiture)
+5. 📸 **Photos/vidéos obligatoires** :
+   - Vidéo complète AGCP (Armoire Générale de Commande et de Protection)
+   - Vidéo descente de câbles (cheminements DC)
+   - Photos monitoring (si prise branchée)
+   - Photos annexes (vue d'ensemble, accès site)
+
+---
+
+📊 **RÉPARTITION DES 17 AUDITS :**
+
+┌─────────────────────┬──────────────────────────────────┬──────────────┬──────────────────────┐
+│ Sous-traitant       │ Email                            │ Nb centrales │ Type audit           │
+├─────────────────────┼──────────────────────────────────┼──────────────┼──────────────────────┤
+│ DRONE AVEYRON       │ contact@droneaveyron.fr          │ 2 (Aveyron)  │ 2 hors toiture       │
+│ SERVICES            │                                  │ ~630 kWc     │ Durée: ~1h total     │
+├─────────────────────┼──────────────────────────────────┼──────────────┼──────────────────────┤
+│ ARTEMIS             │ serge.maltaverne@artemis.fr      │ 14 (multi)   │ 11 hors + 3 EN       │
+│                     │                                  │ ~4 215 kWc   │ Durée: ~5h30 + 3 EN  │
+├─────────────────────┼──────────────────────────────────┼──────────────┼──────────────────────┤
+│ WEWISE              │ bruce@wewise.fr                  │ 1 (Yonne)    │ 1 EN toiture         │
+│                     │                                  │ ~280 kWc     │ Durée: variable      │
+└─────────────────────┴──────────────────────────────────┴──────────────┴──────────────────────┘
+
+**TOTAL : 17 audits (13 hors toiture + 4 EN toiture) = ~5 215 kWc**
+
+---
+
+🎯 **PÉRIMÈTRE AUDIT (RAPPEL) :**
+
+✅ Audit visuel & mécanique 40 points (lots électriques)
+✅ Vérifications normatives (NF C 15-100, UTE C 15-712-1)
+✅ Prescriptions techniques GIRASOLE
+✅ Bonnes & mauvaises pratiques
+✅ Audit toiture (pour 4 centrales : démontage 25 panneaux, DTU 40.35)
+✅ Photos/vidéos AGCP, descente câbles, monitoring
+
+❌ PAS d'électroluminescence
+❌ PAS de thermographie
+❌ PAS de courbes I-V
+
+---
+
+📅 **PLANNING CRITIQUE :**
+
+- **Retour offres** : AVANT LE 6 DÉCEMBRE 2025
+- **Interventions** : AVANT LE 31 DÉCEMBRE 2025 (impératif)
+- **Remise rapports** : Sous 5 jours ouvrés après intervention
+- **Disponibilités** : Créneaux décembre 2025 demandés
+
+---
+
+📎 **DOCUMENTS FOURNIS AUX SOUS-TRAITANTS :**
+
+1. Cahier des Charges complet 2025 GIRASOLE
+   → https://www.genspark.ai/api/files/s/Y1Zivl6w
+
+2. Template Ordre de Mission (ANNEXE 2)
+   → https://www.genspark.ai/api/files/s/IeFQyPmv
+
+3. Checklists interactives 40 points (par centrale)
+   → https://0da64170.girasole-diagpv.pages.dev/audit/{id}
+
+4. Dashboard gestion missions
+   → https://0da64170.girasole-diagpv.pages.dev
+
+---
+
+📧 **COORDONNÉES CONTACT :**
+
+**Adrien Pappalardo**
+Business Developer
+Diagnostic Photovoltaïque
+📧 a.pappalardo@diagnosticphotovoltaique.fr
+🌐 https://diagnosticphotovoltaique.fr
+
+---
+
+🚀 **PROCHAINES ACTIONS :**
+
+1. ✅ Copier/coller les 3 emails depuis :
+   → /home/user/webapp/EMAILS_TARIFICATION_FINAL_TUTOIEMENT_2025-11-26.txt
+
+2. ✅ Envoyer aux 3 sous-traitants avec CC à toi-même
+
+3. ⏳ Attendre réponses avant le 6 décembre 2025
+
+4. 📊 Comparer tarifs et disponibilités
+
+5. ✅ Valider les sous-traitants retenus
+
+6. 📋 Établir plans de prévention avec GIRASOLE
+
+7. 🚀 Lancer interventions AVANT 31 décembre 2025
+
+═══════════════════════════════════════════════════════════════════════
