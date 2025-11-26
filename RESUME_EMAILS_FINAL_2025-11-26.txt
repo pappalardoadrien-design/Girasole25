@@ -24,8 +24,8 @@
 │ DRONE AVEYRON       │ contact@droneaveyron.fr          │ 2 (Aveyron)  │ 2 hors toiture       │
 │ SERVICES            │                                  │ ~630 kWc     │ Durée: ~1h total     │
 ├─────────────────────┼──────────────────────────────────┼──────────────┼──────────────────────┤
-│ ARTEMIS             │ serge.maltaverne@artemis.fr      │ 14 (multi)   │ 11 hors + 3 EN       │
-│                     │                                  │ ~4 215 kWc   │ Durée: ~5h30 + 3 EN  │
+│ ARTEMIS             │ l.morin@artemisconcept.fr        │ 14 (multi)   │ 11 hors + 3 EN       │
+│ (Loïc Morin)        │                                  │ ~4 215 kWc   │ Durée: ~5h30 + 3 EN  │
 ├─────────────────────┼──────────────────────────────────┼──────────────┼──────────────────────┤
 │ WEWISE              │ bruce@wewise.fr                  │ 1 (Yonne)    │ 1 EN toiture         │
 │                     │                                  │ ~280 kWc     │ Durée: variable      │
