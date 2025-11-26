@@ -580,6 +580,133 @@ function printReport() {
   window.print();
 }
 
+// ======================
+// MISSIONS TAB
+// ======================
+window.loadMissionsGlobal = async function() {
+  console.log('🔄 loadMissionsGlobal() démarré...');
+  try {
+    const response = await axios.get('/api/centrales');
+    if (!response.data.success) {
+      throw new Error(response.data.error);
+    }
+    
+    const centrales = response.data.data;
+    const container = document.getElementById('missions-container');
+    
+    if (!centrales || centrales.length === 0) {
+      container.innerHTML = `
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <i class="fas fa-info-circle text-yellow-600 text-3xl mb-3"></i>
+          <p class="text-gray-700">Aucune mission disponible</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Générer HTML des missions
+    let html = '';
+    for (const centrale of centrales) {
+      const progression = centrale.nb_retours || 0;
+      const totalPoints = 40;
+      const pourcentage = Math.round((progression / totalPoints) * 100);
+      
+      let statut = 'Non commencée';
+      let statutColor = 'gray';
+      if (pourcentage === 100) {
+        statut = 'Terminée';
+        statutColor = 'green';
+      } else if (pourcentage > 0) {
+        statut = 'En cours';
+        statutColor = 'yellow';
+      }
+      
+      html += `
+        <div class="mission-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition" 
+             data-st="${centrale.sous_traitant_nom || 'Non attribué'}"
+             data-centrale="${centrale.nom}"
+             data-progression="${pourcentage}">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+              <h3 class="text-xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-solar-panel text-blue-600 mr-2"></i>
+                ${centrale.nom}
+              </h3>
+              <p class="text-sm text-gray-600">
+                <i class="fas fa-building mr-2"></i>
+                ${centrale.sous_traitant_nom || '<span class="text-gray-400">Non attribué</span>'}
+              </p>
+              <p class="text-sm text-gray-600">
+                <i class="fas fa-bolt mr-2"></i>
+                ${centrale.puissance_kwc} kWc | Dept ${centrale.dept || '-'}
+              </p>
+            </div>
+            <div class="text-right">
+              <span class="px-3 py-1 rounded-full text-sm font-semibold bg-${statutColor}-100 text-${statutColor}-800">
+                ${statut}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Barre progression -->
+          <div class="mb-4">
+            <div class="flex justify-between text-sm text-gray-600 mb-1">
+              <span>Progression checklist</span>
+              <span class="font-semibold">${progression}/${totalPoints} points (${pourcentage}%)</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div class="bg-blue-600 h-3 rounded-full transition-all" style="width: ${pourcentage}%"></div>
+            </div>
+          </div>
+          
+          <!-- Photos -->
+          <div class="mb-4 flex items-center text-gray-600">
+            <i class="fas fa-camera mr-2"></i>
+            <span class="text-sm">${centrale.total_photos || 0} photo(s)</span>
+          </div>
+          
+          <!-- Actions -->
+          <div class="flex gap-3">
+            <a href="/audit/${centrale.id}" 
+               class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center">
+              <i class="fas fa-clipboard-check mr-2"></i>
+              Accéder à la checklist
+            </a>
+          </div>
+        </div>
+      `;
+    }
+    
+    container.innerHTML = html;
+    
+    // Attacher event listeners filtres
+    ['filter-st-missions', 'filter-statut-missions', 'search-centrale-missions'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.removeEventListener('input', filterMissions);
+        el.removeEventListener('change', filterMissions);
+        el.addEventListener('input', filterMissions);
+        el.addEventListener('change', filterMissions);
+      }
+    });
+    
+    console.log(`✅ ${centrales.length} missions chargées`);
+    
+  } catch (error) {
+    console.error('❌ Erreur loadMissionsGlobal:', error);
+    const container = document.getElementById('missions-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <i class="fas fa-exclamation-triangle text-red-600 text-3xl mb-3"></i>
+          <p class="text-gray-700">Erreur de chargement des missions</p>
+          <p class="text-sm text-gray-500 mt-2">${error.message}</p>
+        </div>
+      `;
+    }
+  }
+};
+
 // Upload form submit
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-upload');
