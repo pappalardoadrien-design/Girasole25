@@ -1,0 +1,552 @@
+═══════════════════════════════════════════════════════════════════
+📧 EMAIL 1/3 - DRONE AVEYRON SERVICES (Jean-Pascal Viguier)
+═══════════════════════════════════════════════════════════════════
+
+À: contact@droneaveyron.fr
+Objet: Demande de Tarification - Audit Qualité Photovoltaïque (2 centrales Aveyron)
+
+---
+
+Bonjour Jean-Pascal,
+
+Dans le cadre de notre programme d'audits qualité photovoltaïques 2025, nous souhaitons vous solliciter pour réaliser les audits de 2 centrales situées dans l'Aveyron (12).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 LISTE DES CENTRALES (2)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. AZEMAR
+   • Type: Sol
+   • Puissance: 319.41 kWc
+   • Localisation: Département 12 (Aveyron)
+   • GPS: 44.25786, 2.45787
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/3
+
+2. HANGAR SEBASTIEN RUDELLE
+   • Type: Toiture
+   • Puissance: 309.40 kWc
+   • Localisation: Crayssac, 12120 Salmiech, France (Département 12)
+   • GPS: Voir localisation
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/51
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 DESCRIPTION DE LA MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Type d'intervention: Audit Qualité Commissioning post-installation
+
+PRESTATIONS INCLUSES:
+
+✅ Audit Visuel & Contrôle Mécanique:
+   • Inspection visuelle complète (modules PV, structures, câblage)
+   • Contrôle fixations, ancrages, étanchéité (toiture)
+   • Vérification connectique MC4, boîtes de jonction
+   • État général installation (corrosion, dégradations)
+
+✅ Thermographie Drone/Sol:
+   • Selon norme DTU NF EN 62446-3
+   • Cartographie thermique complète
+   • Détection points chauds, cellules défectueuses
+   • Images thermiques haute résolution
+
+✅ Électroluminescence Nocturne:
+   • Analyse PID (Potential Induced Degradation)
+   • Détection LID (Light Induced Degradation)
+   • Identification microfissures, cellules cassées
+   • Cartographie défauts par module
+
+✅ Courbes I-V (Caractéristiques électriques):
+   • Courbes sombres + courbes de référence
+   • Validation selon IEC 60904-1
+   • Analyse performance par string
+   • Comparaison vs datasheet fabricant
+
+✅ Tests Électriques:
+   • Isolement DC (seuil > 1 MΩ, NF C 15-100)
+   • Continuité terre, liaisons équipotentielles
+   • Vérification protections (fusibles, disjoncteurs, parafoudres)
+   • Contrôle coffrets AC/DC
+
+✅ Monitoring & Performance:
+   • Analyse production vs prévisionnel
+   • Vérification système supervision
+   • Calcul ratio de performance (PR)
+   • Identification sous-performances
+
+✅ Rapport Final:
+   • Rapport PDF normé (< 5 jours ouvrés)
+   • Photos terrain, images thermiques, courbes I-V
+   • Synthèse conformité/non-conformité par point
+   • Liste préconisations hiérarchisées (impacts kWh/an, €/an)
+   • Cartographie défauts géolocalisés
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 DOCUMENTS DE RÉFÉRENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 Cahier des Charges Audit 2025:
+https://www.genspark.ai/api/files/s/Y1Zivl6w
+
+📄 Template Ordre de Mission (ANNEXE 2):
+https://www.genspark.ai/api/files/s/IeFQyPmv
+
+📋 Checklists Interactives (40 points):
+• Centrale 1: https://0da64170.girasole-diagpv.pages.dev/audit/3
+• Centrale 2: https://0da64170.girasole-diagpv.pages.dev/audit/51
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚖️ NORMES APPLICABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• IEC 62446-1 (Contrôle commissioning installations PV)
+• IEC 61215 / IEC 61730 (Qualification modules PV)
+• IEC 60904-1 (Mesure caractéristiques I-V)
+• IEC 60891 (Correction température/éclairement)
+• NF C 15-100 (Installations électriques BT)
+• UTE C 15-712-1 (Installations PV)
+• DTU NF EN 62446-3 (Thermographie infrarouge)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 DEMANDE DE TARIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pourriez-vous nous communiquer votre tarification pour ces 2 centrales (Aveyron 12) ?
+
+Merci de préciser:
+✓ Tarif unitaire par centrale (€ HT)
+✓ Tarif total package 2 centrales (€ HT)
+✓ Délais d'intervention proposés
+✓ Disponibilité Janvier-Février 2025
+✓ Matériel utilisé (drone, caméra EL, traceur I-V)
+✓ Délai livraison rapport PDF
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📅 PLANNING & CONTRAINTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Période souhaitée: Janvier-Février 2025
+Réponse attendue: Sous 5 jours ouvrés
+Centralisation: 2 sites en Aveyron (12) - optimisation déplacements possible
+
+Contraintes spécifiques:
+• Électroluminescence: Intervention nocturne requise
+• Thermographie drone: Conditions météo favorables (vent < 20 km/h)
+• Accès sites: Coordination avec exploitants (contacts fournis après validation)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 CONTACT & INFORMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pour toute question ou précision:
+
+📧 Email: adrien@diagpv.fr
+📱 Mobile: [Votre numéro]
+🌐 Dashboard: https://0da64170.girasole-diagpv.pages.dev
+
+Nous restons à votre entière disposition pour échanger sur les modalités techniques et organiser une réunion de cadrage si nécessaire.
+
+Dans l'attente de votre retour, nous vous prions d'agréer, Monsieur Viguier, nos salutations distinguées.
+
+Cordialement,
+
+Adrien PAPPALARDO
+Bras Droit du Fondateur
+Diagnostic Photovoltaïque
+www.diagpv.fr
+
+
+═══════════════════════════════════════════════════════════════════
+📧 EMAIL 2/3 - ARTEMIS (Serge Maltaverne)
+═══════════════════════════════════════════════════════════════════
+
+À: serge.maltaverne@artemis.fr
+Objet: Demande de Tarification - Audit Qualité Photovoltaïque (14 centrales multi-départements)
+
+---
+
+Bonjour Serge,
+
+Dans le cadre de notre programme d'audits qualité photovoltaïques 2025, nous souhaitons vous solliciter pour réaliser les audits de 14 centrales réparties sur 6 départements (03, 07, 26, 42, 71, 89).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 LISTE DES CENTRALES (14)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 ALLIER (03) - 5 centrales:
+
+1. DUMONT GUY
+   • Puissance: 232.20 kWc | Dept 03
+   • GPS: 46.19085, 3.16724
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/13
+
+2. HANGAR Angelina SIMMONET
+   • Puissance: 177.45 kWc | Dept 03
+   • GPS: 46.23756, -0.12139
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/10
+
+3. Hangar Eric LOGNON
+   • Puissance: 324.87 kWc | Dept 03
+   • Localisation: Château des Millets, 03230 Chevagnes
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/37
+
+4. Hangar Julien Vaudin
+   • Puissance: 348.88 kWc | Dept 03
+   • Localisation: Les Jacquets, 03230 Chevagnes
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/19
+
+5. Maymat
+   • Puissance: 345.80 kWc | Dept 03
+   • Localisation: Les Sorreaux, 03400 Toulon-sur-Allier
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/11
+
+📍 ARDÈCHE (07) - 2 centrales:
+
+6. HARAS DE LA MAJORIE/MANOHA
+   • Puissance: 499.59 kWc | Dept 07
+   • Localisation: L'Homme, 07790 Saint-Alban-d'Ay
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/29
+
+7. SCI KILJOR
+   • Puissance: 109.20 kWc | Dept 07
+   • Localisation: 6 Rue Albert Camus, 07800 La Voulte-sur-Rhône
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/41
+
+📍 DRÔME (26) - 3 centrales:
+
+8. Didier - PRIEUR
+   • Puissance: 449.54 kWc | Dept 26
+   • Localisation: Quartier de Montalivet 26120 Montmeyran
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/36
+
+9. Hangar Benjamin CHASSON
+   • Puissance: 388.04 kWc | Dept 26
+   • GPS: 45.58147, 4.87942
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/42
+
+10. Hangar Patrick BLANCHET
+    • Puissance: 159.25 kWc | Dept 26
+    • Localisation: Les Exclis, 26110 Venterol
+    📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/32
+
+📍 LOIRE (42) - 3 centrales:
+
+11. EARL CADOT
+    • Puissance: 309.40 kWc | Dept 42
+    • GPS: 46.24919, 3.88361
+    📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/2
+
+12. GAYET 42
+    • Puissance: 309.40 kWc | Dept 42
+    • Localisation: 419 Chemin des Seigles, 42210 Craintilleux
+    📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/50
+
+13. Hangar LAMIOT
+    • Puissance: 343.07 kWc | Dept 42
+    • Localisation: La Gélopière, 42110 Feurs
+    📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/38
+
+📍 SAÔNE-ET-LOIRE (71) - 1 centrale:
+
+14. Serge Maltaverne
+    • Puissance: 218.86 kWc | Dept 71
+    • Localisation: 638 Chard, 71320 Sainte-Radegonde
+    📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/23
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 DESCRIPTION DE LA MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Type d'intervention: Audit Qualité Commissioning post-installation
+
+PRESTATIONS INCLUSES (par centrale):
+
+✅ Audit Visuel & Contrôle Mécanique:
+   • Inspection visuelle complète (modules PV, structures, câblage)
+   • Contrôle fixations, ancrages, étanchéité (toiture)
+   • Vérification connectique MC4, boîtes de jonction
+   • État général installation (corrosion, dégradations)
+
+✅ Thermographie Drone/Sol:
+   • Selon norme DTU NF EN 62446-3
+   • Cartographie thermique complète
+   • Détection points chauds, cellules défectueuses
+   • Images thermiques haute résolution
+
+✅ Électroluminescence Nocturne:
+   • Analyse PID (Potential Induced Degradation)
+   • Détection LID (Light Induced Degradation)
+   • Identification microfissures, cellules cassées
+   • Cartographie défauts par module
+
+✅ Courbes I-V (Caractéristiques électriques):
+   • Courbes sombres + courbes de référence
+   • Validation selon IEC 60904-1
+   • Analyse performance par string
+   • Comparaison vs datasheet fabricant
+
+✅ Tests Électriques:
+   • Isolement DC (seuil > 1 MΩ, NF C 15-100)
+   • Continuité terre, liaisons équipotentielles
+   • Vérification protections (fusibles, disjoncteurs, parafoudres)
+   • Contrôle coffrets AC/DC
+
+✅ Monitoring & Performance:
+   • Analyse production vs prévisionnel
+   • Vérification système supervision
+   • Calcul ratio de performance (PR)
+   • Identification sous-performances
+
+✅ Rapport Final:
+   • Rapport PDF normé (< 5 jours ouvrés)
+   • Photos terrain, images thermiques, courbes I-V
+   • Synthèse conformité/non-conformité par point
+   • Liste préconisations hiérarchisées (impacts kWh/an, €/an)
+   • Cartographie défauts géolocalisés
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 DOCUMENTS DE RÉFÉRENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 Cahier des Charges Audit 2025:
+https://www.genspark.ai/api/files/s/Y1Zivl6w
+
+📄 Template Ordre de Mission (ANNEXE 2):
+https://www.genspark.ai/api/files/s/IeFQyPmv
+
+📋 Dashboard Missions:
+https://0da64170.girasole-diagpv.pages.dev
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚖️ NORMES APPLICABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• IEC 62446-1 (Contrôle commissioning installations PV)
+• IEC 61215 / IEC 61730 (Qualification modules PV)
+• IEC 60904-1 (Mesure caractéristiques I-V)
+• IEC 60891 (Correction température/éclairement)
+• NF C 15-100 (Installations électriques BT)
+• UTE C 15-712-1 (Installations PV)
+• DTU NF EN 62446-3 (Thermographie infrarouge)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 DEMANDE DE TARIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pourriez-vous nous communiquer votre tarification pour ces 14 centrales multi-départements ?
+
+Merci de préciser:
+✓ Tarif unitaire par centrale (€ HT)
+✓ Tarif total package 14 centrales (€ HT)
+✓ Tarif dégressif volume possible ?
+✓ Délais d'intervention proposés
+✓ Disponibilité Janvier-Février 2025
+✓ Matériel utilisé (drone, caméra EL, traceur I-V)
+✓ Délai livraison rapports PDF (< 5 jours/centrale ?)
+
+Volumétrie totale: ~4 200 kWc répartis sur 6 départements
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📅 PLANNING & CONTRAINTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Période souhaitée: Janvier-Février 2025
+Réponse attendue: Sous 5 jours ouvrés
+Centralisation: 6 départements - circuits optimisés possible
+
+Contraintes spécifiques:
+• Électroluminescence: Interventions nocturnes requises (14 nuits)
+• Thermographie drone: Conditions météo favorables (vent < 20 km/h)
+• Accès sites: Coordination avec exploitants (contacts fournis après validation)
+• Groupements géographiques: 
+  - Zone Allier (03): 5 sites
+  - Zone Drôme/Ardèche (07/26): 5 sites
+  - Zone Loire (42): 3 sites
+  - Zone Saône-et-Loire (71): 1 site
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 CONTACT & INFORMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pour toute question ou précision:
+
+📧 Email: adrien@diagpv.fr
+📱 Mobile: [Votre numéro]
+🌐 Dashboard: https://0da64170.girasole-diagpv.pages.dev
+
+Nous restons à votre entière disposition pour échanger sur les modalités techniques, organiser une réunion de cadrage, ou discuter d'une optimisation des circuits d'intervention par zone géographique.
+
+Dans l'attente de votre retour, nous vous prions d'agréer, Serge, nos salutations distinguées.
+
+Cordialement,
+
+Adrien PAPPALARDO
+Bras Droit du Fondateur
+Diagnostic Photovoltaïque
+www.diagpv.fr
+
+
+═══════════════════════════════════════════════════════════════════
+📧 EMAIL 3/3 - WEWISE (Bruce)
+═══════════════════════════════════════════════════════════════════
+
+À: bruce@wewise.fr
+Objet: Demande de Tarification - Audit Qualité Photovoltaïque (1 centrale Yonne)
+
+---
+
+Bonjour Bruce,
+
+Dans le cadre de notre programme d'audits qualité photovoltaïques 2025, nous souhaitons vous solliciter pour réaliser l'audit d'une centrale située dans l'Yonne (89).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 CENTRALE À AUDITER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HANGAR BENOIT BERTELOOT
+   • Type: Toiture
+   • Puissance: 279.50 kWc
+   • Localisation: 127 Lieu Dit les Cleris, 89150 Vernoy (Département 89)
+   📋 Checklist: https://0da64170.girasole-diagpv.pages.dev/audit/21
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 DESCRIPTION DE LA MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Type d'intervention: Audit Qualité Commissioning post-installation
+
+PRESTATIONS INCLUSES:
+
+✅ Audit Visuel & Contrôle Mécanique:
+   • Inspection visuelle complète (modules PV, structures, câblage)
+   • Contrôle fixations, ancrages, étanchéité toiture
+   • Vérification connectique MC4, boîtes de jonction
+   • État général installation (corrosion, dégradations)
+   • Conformité DTU 40.35 (installation toiture)
+
+✅ Thermographie Drone/Sol:
+   • Selon norme DTU NF EN 62446-3
+   • Cartographie thermique complète
+   • Détection points chauds, cellules défectueuses
+   • Images thermiques haute résolution
+
+✅ Électroluminescence Nocturne:
+   • Analyse PID (Potential Induced Degradation)
+   • Détection LID (Light Induced Degradation)
+   • Identification microfissures, cellules cassées
+   • Cartographie défauts par module
+
+✅ Courbes I-V (Caractéristiques électriques):
+   • Courbes sombres + courbes de référence
+   • Validation selon IEC 60904-1
+   • Analyse performance par string
+   • Comparaison vs datasheet fabricant
+
+✅ Tests Électriques:
+   • Isolement DC (seuil > 1 MΩ, NF C 15-100)
+   • Continuité terre, liaisons équipotentielles
+   • Vérification protections (fusibles, disjoncteurs, parafoudres)
+   • Contrôle coffrets AC/DC
+
+✅ Monitoring & Performance:
+   • Analyse production vs prévisionnel
+   • Vérification système supervision
+   • Calcul ratio de performance (PR)
+   • Identification sous-performances
+
+✅ Rapport Final:
+   • Rapport PDF normé (< 5 jours ouvrés)
+   • Photos terrain, images thermiques, courbes I-V
+   • Synthèse conformité/non-conformité par point
+   • Liste préconisations hiérarchisées (impacts kWh/an, €/an)
+   • Cartographie défauts géolocalisés
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 DOCUMENTS DE RÉFÉRENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 Cahier des Charges Audit 2025:
+https://www.genspark.ai/api/files/s/Y1Zivl6w
+
+📄 Template Ordre de Mission (ANNEXE 2):
+https://www.genspark.ai/api/files/s/IeFQyPmv
+
+📋 Checklist Interactive (40 points + DTU 40.35 toiture):
+https://0da64170.girasole-diagpv.pages.dev/audit/21
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚖️ NORMES APPLICABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• IEC 62446-1 (Contrôle commissioning installations PV)
+• IEC 61215 / IEC 61730 (Qualification modules PV)
+• IEC 60904-1 (Mesure caractéristiques I-V)
+• IEC 60891 (Correction température/éclairement)
+• NF C 15-100 (Installations électriques BT)
+• UTE C 15-712-1 (Installations PV)
+• DTU NF EN 62446-3 (Thermographie infrarouge)
+• DTU 40.35 (Systèmes photovoltaïques en toiture)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 DEMANDE DE TARIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pourriez-vous nous communiquer votre tarification pour cette centrale (Yonne 89) ?
+
+Merci de préciser:
+✓ Tarif audit complet (€ HT)
+✓ Délai d'intervention proposé
+✓ Disponibilité Janvier-Février 2025
+✓ Matériel utilisé (drone, caméra EL, traceur I-V)
+✓ Délai livraison rapport PDF
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📅 PLANNING & CONTRAINTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Période souhaitée: Janvier-Février 2025
+Réponse attendue: Sous 5 jours ouvrés
+Localisation: Yonne (89) - 127 Lieu Dit les Cleris, 89150 Vernoy
+
+Contraintes spécifiques:
+• Électroluminescence: Intervention nocturne requise
+• Thermographie drone: Conditions météo favorables (vent < 20 km/h)
+• Accès site: Coordination avec exploitant (contact fourni après validation)
+• Installation toiture: Respect DTU 40.35, attention sécurité
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 CONTACT & INFORMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pour toute question ou précision:
+
+📧 Email: adrien@diagpv.fr
+📱 Mobile: [Votre numéro]
+🌐 Dashboard: https://0da64170.girasole-diagpv.pages.dev
+
+Nous restons à votre entière disposition pour échanger sur les modalités techniques et organiser une réunion de cadrage si nécessaire.
+
+Dans l'attente de votre retour, nous vous prions d'agréer, Bruce, nos salutations distinguées.
+
+Cordialement,
+
+Adrien PAPPALARDO
+Bras Droit du Fondateur
+Diagnostic Photovoltaïque
+www.diagpv.fr
+
+
+═══════════════════════════════════════════════════════════════════
+📋 FIN DU DOCUMENT - 3 EMAILS GÉNÉRÉS
+═══════════════════════════════════════════════════════════════════
+
+✅ Email 1: Drone Aveyron Services - 2 centrales (Aveyron 12)
+✅ Email 2: ARTEMIS - 14 centrales (Multi-départements)
+✅ Email 3: Wewise - 1 centrale (Yonne 89)
+
+📄 Document source: /home/user/webapp/EMAILS_TARIFICATION_2025-11-26.txt
+📅 Généré le: 26/11/2025
+
+🔗 LIENS RAPIDES:
+• Dashboard: https://0da64170.girasole-diagpv.pages.dev
+• CDC Audit 2025: https://www.genspark.ai/api/files/s/Y1Zivl6w
+• Template OM: https://www.genspark.ai/api/files/s/IeFQyPmv
