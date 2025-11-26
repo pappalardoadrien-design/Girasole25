@@ -108,6 +108,11 @@ async function loadChecklist() {
     renderChecklist();
     updateProgress();
     
+    // Charger photos de chaque item
+    for (const item of checklistItems) {
+      await loadItemPhotos(item.id);
+    }
+    
     // Charger commentaire final et photos générales
     await loadCommentaireFinal();
     await loadPhotosGenerales();
