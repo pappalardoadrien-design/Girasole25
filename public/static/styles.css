@@ -51,6 +51,47 @@ button {
   transition: all 0.2s ease;
 }
 
+/* Audit checklist styles */
+.photo-btn {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-blue);
+  color: white;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.photo-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.photo-btn:active {
+  transform: translateY(0);
+}
+
+/* Commentaire final section */
+#section-commentaire-final {
+  background-color: #fef3c7;
+  border-left: 4px solid var(--warning-orange);
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+/* Photos gallery */
+.grid.grid-cols-3 img {
+  border-radius: 0.375rem;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.grid.grid-cols-3 img:hover {
+  transform: scale(1.05);
+}
+
 /* Table row hover */
 tr.hover\:bg-gray-50:hover {
   background-color: var(--gray-50);
