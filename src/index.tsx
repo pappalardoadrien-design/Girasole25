@@ -18,6 +18,108 @@ app.use('/api/*', cors())
 // app.use('/documents/*', serveStatic({ root: './public' }))
 
 // ======================
+// API ROUTES - SOUS-TRAITANTS
+// ======================
+
+// GET /api/sous-traitants - Liste tous les sous-traitants
+app.get('/api/sous-traitants', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT * FROM sous_traitants 
+      WHERE statut = 'ACTIF'
+      ORDER BY nom_entreprise
+    `).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/attributions - Liste toutes les attributions
+app.get('/api/attributions', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const result = await DB.prepare(`
+      SELECT 
+        a.*,
+        c.nom as centrale_nom,
+        c.type_centrale,
+        c.puissance_kwc,
+        c.localisation,
+        c.dept,
+        s.nom_entreprise as sous_traitant_nom,
+        s.email_contact as sous_traitant_email
+      FROM attributions_centrales a
+      JOIN centrales c ON a.centrale_id = c.id
+      JOIN sous_traitants s ON a.sous_traitant_id = s.id
+      ORDER BY a.date_attribution DESC
+    `).all()
+    
+    return c.json({ success: true, data: result.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/attributions - Attribuer centrale(s) à un sous-traitant
+app.post('/api/attributions', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { centrale_ids, sous_traitant_id, notes } = body
+    
+    if (!centrale_ids || !sous_traitant_id) {
+      return c.json({ success: false, error: 'centrale_ids et sous_traitant_id requis' }, 400)
+    }
+    
+    const inserted = []
+    for (const centrale_id of centrale_ids) {
+      const result = await DB.prepare(`
+        INSERT INTO attributions_centrales (centrale_id, sous_traitant_id, notes)
+        VALUES (?, ?, ?)
+      `).bind(centrale_id, sous_traitant_id, notes || null).run()
+      
+      inserted.push(result.meta.last_row_id)
+      
+      // Mettre à jour sous_traitant_prevu dans centrales
+      await DB.prepare(`
+        UPDATE centrales SET sous_traitant_prevu = ? WHERE id = ?
+      `).bind(sous_traitant_id, centrale_id).run()
+    }
+    
+    return c.json({ 
+      success: true, 
+      data: { inserted_ids: inserted, count: inserted.length } 
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/attributions/:id/email - Marquer email comme envoyé
+app.put('/api/attributions/:id/email', async (c) => {
+  const { DB } = c.env
+  const id = c.req.param('id')
+  
+  try {
+    await DB.prepare(`
+      UPDATE attributions_centrales 
+      SET email_envoye = 1, date_email = datetime('now'), statut = 'DEVIS_ENVOYE'
+      WHERE id = ?
+    `).bind(id).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ======================
 // API ROUTES - CENTRALES
 // ======================
 
@@ -29,9 +131,11 @@ app.get('/api/centrales', async (c) => {
     const result = await DB.prepare(`
       SELECT 
         c.*,
+        s.nom_entreprise as sous_traitant_nom,
         0 as nb_retours,
         0 as total_photos
       FROM centrales c
+      LEFT JOIN sous_traitants s ON c.sous_traitant_prevu = s.id
       ORDER BY c.nom
     `).all()
     
@@ -3051,6 +3155,9 @@ app.get('/', (c) => {
                     <button onclick="showTab('planning')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-calendar-alt mr-2"></i>Planning
                     </button>
+                    <button onclick="showTab('attribution')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-handshake mr-2"></i>Attribution
+                    </button>
                     <button onclick="showTab('analytics')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-chart-pie mr-2"></i>Analytics
                     </button>
@@ -3344,6 +3451,11 @@ app.get('/', (c) => {
                         loadUploadForm();
                     } else if (tabName === 'planning' && typeof loadPlanningData === 'function') {
                         loadPlanningData();
+                    } else if (tabName === 'attribution') {
+                        console.log('🤝 showTab(attribution) - Chargement attribution');
+                        if (typeof loadAttributionData === 'function') {
+                            loadAttributionData();
+                        }
                     } else if (tabName === 'analytics' && typeof loadAnalytics === 'function') {
                         loadAnalytics();
                     }
@@ -3916,6 +4028,94 @@ app.get('/', (c) => {
                 </div>
             </div>
 
+            <!-- Attribution Tab -->
+            <div id="tab-attribution" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-handshake mr-2 text-blue-600"></i>
+                        Attribution Centrales aux Sous-Traitants
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        Sélectionnez les centrales et attribuez-les à un sous-traitant. Un email personnalisé sera généré automatiquement.
+                    </p>
+                </div>
+
+                <!-- Sélection Sous-Traitant -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h4 class="font-bold mb-4">1️⃣ Sélectionner le Sous-Traitant</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sous-Traitant</label>
+                            <select id="select-soustraitant" class="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                                <option value="">Chargement...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Informations</label>
+                            <div id="soustraitant-info" class="px-4 py-2 bg-gray-50 rounded text-sm text-gray-600">
+                                Sélectionnez un sous-traitant
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sélection Centrales -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h4 class="font-bold mb-4">2️⃣ Sélectionner les Centrales à Attribuer</h4>
+                    <div class="mb-4 flex items-center gap-4">
+                        <input 
+                            type="text" 
+                            id="search-attribution" 
+                            placeholder="🔍 Rechercher centrale..." 
+                            class="flex-1 px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500"
+                        >
+                        <button onclick="selectAllCentrales()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                            Tout sélectionner
+                        </button>
+                        <button onclick="deselectAllCentrales()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                            Tout désélectionner
+                        </button>
+                    </div>
+                    <div id="centrales-list" class="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-500 text-center py-4">Chargement des centrales...</p>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 rounded">
+                        <p class="text-sm font-medium text-blue-800">
+                            <span id="selected-count">0</span> centrale(s) sélectionnée(s)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Génération Email -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h4 class="font-bold mb-4">3️⃣ Aperçu Email & Envoi</h4>
+                    <div class="mb-4 flex gap-2">
+                        <button onclick="generateEmail()" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium">
+                            <i class="fas fa-envelope mr-2"></i>Générer Email
+                        </button>
+                        <button onclick="copyEmail()" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-medium">
+                            <i class="fas fa-copy mr-2"></i>Copier Email
+                        </button>
+                        <button onclick="saveAttribution()" class="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-medium">
+                            <i class="fas fa-save mr-2"></i>Enregistrer Attribution
+                        </button>
+                    </div>
+                    <div id="email-preview" class="border rounded p-4 bg-gray-50 whitespace-pre-wrap font-mono text-sm max-h-96 overflow-y-auto">
+                        <p class="text-gray-500 text-center">Cliquez sur "Générer Email" pour voir l'aperçu</p>
+                    </div>
+                </div>
+
+                <!-- Historique Attributions -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h4 class="font-bold mb-4">
+                        <i class="fas fa-history mr-2"></i>Historique des Attributions
+                    </h4>
+                    <div id="attributions-history" class="space-y-2">
+                        <p class="text-gray-500 text-center py-4">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Analytics Tab -->
             <div id="tab-analytics" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -4184,6 +4384,7 @@ app.get('/', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="/static/app.js"></script>
         <script src="/static/planning.js"></script>
+        <script src="/static/attribution.js"></script>
     </body>
     </html>
   `)
