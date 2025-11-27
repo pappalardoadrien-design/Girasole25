@@ -8931,128 +8931,345 @@ app.post('/api/migrate-photos', async (c) => {
   }
 })
 
-// GET /migrate-photos - Page HTML migration
-app.get('/migrate-photos', (c) => {
-  return c.html(`
+// POST /api/migrate-all - Recevoir TOUS les audits (checklists + commentaires + photos)
+app.post('/api/migrate-all', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const data = await c.req.json()
+    const { audits } = data
+    
+    if (!audits || !Array.isArray(audits)) {
+      return c.json({ success: false, error: 'Données invalides' }, 400)
+    }
+    
+    let stats = {
+      missions: 0,
+      items_updated: 0,
+      commentaires: 0,
+      photos: 0
+    }
+    
+    for (const audit of audits) {
+      const { mission_id, checklist_items, commentaire_final, photos_generales, item_photos } = audit
+      
+      if (!mission_id) continue
+      
+      stats.missions++
+      
+      // 1. Mettre à jour checklist items (statuts + commentaires)
+      if (checklist_items && Array.isArray(checklist_items)) {
+        for (const item of checklist_items) {
+          if (!item.id) continue
+          
+          await DB.prepare(\`
+            UPDATE checklist_items 
+            SET statut = ?, commentaire = ?, date_modification = CURRENT_TIMESTAMP
+            WHERE id = ? AND ordre_mission_id = ?
+          \`).bind(
+            item.statut || 'NON_VERIFIE',
+            item.commentaire || '',
+            item.id,
+            mission_id
+          ).run()
+          
+          stats.items_updated++
+          if (item.commentaire) stats.commentaires++
+        }
+      }
+      
+      // 2. Commentaire final mission
+      if (commentaire_final) {
+        await DB.prepare(\`
+          INSERT OR REPLACE INTO ordres_mission_commentaires_finaux 
+          (ordre_mission_id, commentaire, updated_at)
+          VALUES (?, ?, CURRENT_TIMESTAMP)
+        \`).bind(mission_id, commentaire_final).run()
+      }
+      
+      // 3. Photos par item
+      if (item_photos && Array.isArray(item_photos)) {
+        for (const photo of item_photos) {
+          if (!photo.item_id || !photo.base64) continue
+          
+          await DB.prepare(\`
+            INSERT INTO ordres_mission_item_photos 
+            (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, commentaire, ordre)
+            VALUES (?, ?, ?, ?, ?, ?)
+          \`).bind(
+            mission_id,
+            photo.item_id,
+            photo.base64,
+            photo.filename || 'photo.jpg',
+            photo.commentaire || '',
+            photo.ordre || 0
+          ).run()
+          
+          stats.photos++
+        }
+      }
+      
+      // 4. Photos générales
+      if (photos_generales && Array.isArray(photos_generales)) {
+        for (const photo of photos_generales) {
+          if (!photo.base64) continue
+          
+          await DB.prepare(\`
+            INSERT INTO ordres_mission_photos_generales 
+            (ordre_mission_id, photo_base64, photo_filename, legende, ordre)
+            VALUES (?, ?, ?, ?, ?)
+          \`).bind(
+            mission_id,
+            photo.base64,
+            photo.filename || 'photo.jpg',
+            photo.legende || '',
+            photo.ordre || 0
+          ).run()
+          
+          stats.photos++
+        }
+      }
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: 'Migration complète terminée',
+      stats: stats
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /migrate-all - Page HTML migration COMPLÈTE
+app.get('/migrate-all', (c) => {
+  return c.html(\`
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Migration Photos DiagPV</title>
+      <title>Migration Complète DiagPV</title>
       <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body class="bg-gray-100 p-8">
-      <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6">📸 Migration Photos localStorage → DB Cloudflare</h1>
-        
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-          <p class="text-gray-700 mb-4">
-            Cette page va extraire toutes les photos stockées dans localStorage et les sauvegarder 
-            définitivement dans la DB Cloudflare Production.
+    <body class="bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+      <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6">
+          <h1 class="text-4xl font-bold mb-4 text-blue-900">
+            🚀 Migration Complète localStorage → DB Cloudflare
+          </h1>
+          <p class="text-gray-600 mb-6">
+            Cette page va extraire <strong>TOUS les audits</strong> depuis localStorage et les sauvegarder définitivement dans la DB Cloudflare Production.
           </p>
           
-          <button onclick="migratePhotos()" class="bg-blue-600 text-white px-6 py-3 rounded-lg w-full font-bold">
-            🚀 LANCER MIGRATION
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg text-center">
+              <div class="text-3xl font-bold text-blue-600" id="count-missions">0</div>
+              <div class="text-sm text-gray-600">Missions</div>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg text-center">
+              <div class="text-3xl font-bold text-green-600" id="count-items">0</div>
+              <div class="text-sm text-gray-600">Checklist Items</div>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg text-center">
+              <div class="text-3xl font-bold text-purple-600" id="count-comments">0</div>
+              <div class="text-sm text-gray-600">Commentaires</div>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg text-center">
+              <div class="text-3xl font-bold text-orange-600" id="count-photos">0</div>
+              <div class="text-sm text-gray-600">Photos</div>
+            </div>
+          </div>
+          
+          <button onclick="migrateAll()" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl w-full font-bold text-lg shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all">
+            🚀 LANCER MIGRATION COMPLÈTE
           </button>
         </div>
         
-        <div id="log" class="bg-gray-800 text-green-400 rounded-lg p-4 font-mono text-sm h-96 overflow-y-auto"></div>
+        <div class="bg-gray-900 rounded-2xl shadow-2xl p-6">
+          <h2 class="text-xl font-bold text-green-400 mb-4">📋 Logs Migration</h2>
+          <div id="log" class="text-green-400 font-mono text-sm h-96 overflow-y-auto whitespace-pre-wrap"></div>
+        </div>
       </div>
       
       <script>
-        function log(msg) {
+        function log(msg, color = 'text-green-400') {
           const logDiv = document.getElementById('log');
-          logDiv.innerHTML += msg + '\\n';
+          const line = document.createElement('div');
+          line.className = color;
+          line.textContent = msg;
+          logDiv.appendChild(line);
           logDiv.scrollTop = logDiv.scrollHeight;
         }
         
-        async function migratePhotos() {
-          log('🚀 DEBUT MIGRATION...');
+        function updateCount(id, value) {
+          document.getElementById(id).textContent = value;
+        }
+        
+        async function migrateAll() {
+          log('═══════════════════════════════════════════════════════', 'text-blue-400');
+          log('🚀 DÉBUT MIGRATION COMPLÈTE - TOUS AUDITS', 'text-blue-400');
+          log('═══════════════════════════════════════════════════════', 'text-blue-400');
           log('');
           
-          // Parcourir toutes les clés localStorage
-          const missions = {};
+          const audits = [];
+          let totalItems = 0;
+          let totalComments = 0;
+          let totalPhotos = 0;
+          
+          // Scanner localStorage pour tous les audits
+          const missionIds = new Set();
           
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
+            if (key && key.startsWith('audit_') && key.includes('_')) {
+              const match = key.match(/audit_(\\d+)_/);
+              if (match) {
+                missionIds.add(parseInt(match[1]));
+              }
+            }
+          }
+          
+          log(\`📊 Missions trouvées dans localStorage: \${missionIds.size}\`, 'text-yellow-400');
+          log('');
+          updateCount('count-missions', missionIds.size);
+          
+          // Extraire données pour chaque mission
+          for (const missionId of missionIds) {
+            log(\`📦 Extraction Mission \${missionId}...\`);
             
-            // Chercher clés format: audit_X_photos_item_Y
-            if (key && key.match(/audit_(\\d+)_photos_item_(\\d+)/)) {
-              const match = key.match(/audit_(\\d+)_photos_item_(\\d+)/);
-              const missionId = parseInt(match[1]);
-              const itemId = parseInt(match[2]);
-              
-              const photosData = localStorage.getItem(key);
-              if (!photosData) continue;
-              
+            const audit = {
+              mission_id: missionId,
+              checklist_items: [],
+              item_photos: [],
+              commentaire_final: '',
+              photos_generales: []
+            };
+            
+            // 1. Checklist items
+            const checklistKey = \`audit_\${missionId}_checklistItems\`;
+            const checklistData = localStorage.getItem(checklistKey);
+            if (checklistData) {
               try {
-                const photos = JSON.parse(photosData);
-                
-                if (!missions[missionId]) {
-                  missions[missionId] = [];
+                const items = JSON.parse(checklistData);
+                if (Array.isArray(items)) {
+                  audit.checklist_items = items;
+                  totalItems += items.length;
+                  const withComments = items.filter(i => i.commentaire && i.commentaire.trim()).length;
+                  totalComments += withComments;
+                  log(\`  ✅ \${items.length} items, \${withComments} commentaires\`);
                 }
-                
-                // Ajouter photos avec item_id
-                if (Array.isArray(photos)) {
-                  photos.forEach((photo, idx) => {
-                    missions[missionId].push({
-                      item_id: itemId,
-                      base64: photo.base64 || photo.photo_base64 || photo,
-                      filename: photo.filename || photo.photo_filename || 'photo.jpg',
-                      commentaire: photo.commentaire || '',
-                      ordre: idx
-                    });
-                  });
-                }
-                
-                log(\`✅ Mission \${missionId} Item \${itemId}: \${photos.length} photo(s) trouvée(s)\`);
               } catch (e) {
-                log(\`⚠️ Erreur parsing \${key}: \${e.message}\`);
+                log(\`  ⚠️ Erreur checklist: \${e.message}\`, 'text-red-400');
               }
             }
-          }
-          
-          log('');
-          log(\`📊 Total missions avec photos: \${Object.keys(missions).length}\`);
-          log('');
-          
-          // Envoyer chaque mission
-          for (const [missionId, photos] of Object.entries(missions)) {
-            log(\`📤 Envoi Mission \${missionId}: \${photos.length} photos...\`);
             
-            try {
-              const response = await fetch('/api/migrate-photos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  mission_id: parseInt(missionId),
-                  photos: photos
-                })
-              });
-              
-              const result = await response.json();
-              
-              if (result.success) {
-                log(\`✅ Mission \${missionId}: \${result.count} photos importées\`);
-              } else {
-                log(\`❌ Mission \${missionId}: ERREUR - \${result.error}\`);
+            // 2. Photos par item
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key && key.startsWith(\`audit_\${missionId}_photos_item_\`)) {
+                const itemMatch = key.match(/item_(\\d+)/);
+                if (itemMatch) {
+                  const itemId = parseInt(itemMatch[1]);
+                  const photosData = localStorage.getItem(key);
+                  if (photosData) {
+                    try {
+                      const photos = JSON.parse(photosData);
+                      if (Array.isArray(photos)) {
+                        photos.forEach((photo, idx) => {
+                          audit.item_photos.push({
+                            item_id: itemId,
+                            base64: photo.base64 || photo.photo_base64 || photo,
+                            filename: photo.filename || photo.photo_filename || 'photo.jpg',
+                            commentaire: photo.commentaire || '',
+                            ordre: idx
+                          });
+                          totalPhotos++;
+                        });
+                        log(\`  📸 Item \${itemId}: \${photos.length} photo(s)\`);
+                      }
+                    } catch (e) {
+                      log(\`  ⚠️ Erreur photos item \${itemId}: \${e.message}\`, 'text-red-400');
+                    }
+                  }
+                }
               }
-            } catch (error) {
-              log(\`❌ Mission \${missionId}: ERREUR réseau - \${error.message}\`);
             }
+            
+            // 3. Commentaire final
+            const commentKey = \`audit_\${missionId}_commentaireFinal\`;
+            const commentData = localStorage.getItem(commentKey);
+            if (commentData) {
+              audit.commentaire_final = commentData;
+              log(\`  💬 Commentaire final: \${commentData.substring(0, 50)}...\`);
+            }
+            
+            // 4. Photos générales
+            const photosGenKey = \`audit_\${missionId}_photosGenerales\`;
+            const photosGenData = localStorage.getItem(photosGenKey);
+            if (photosGenData) {
+              try {
+                const photos = JSON.parse(photosGenData);
+                if (Array.isArray(photos)) {
+                  audit.photos_generales = photos;
+                  totalPhotos += photos.length;
+                  log(\`  📷 \${photos.length} photo(s) générale(s)\`);
+                }
+              } catch (e) {
+                log(\`  ⚠️ Erreur photos générales: \${e.message}\`, 'text-red-400');
+              }
+            }
+            
+            audits.push(audit);
+            log('');
+            
+            updateCount('count-items', totalItems);
+            updateCount('count-comments', totalComments);
+            updateCount('count-photos', totalPhotos);
           }
           
+          log('═══════════════════════════════════════════════════════', 'text-blue-400');
+          log('📤 ENVOI VERS DB CLOUDFLARE...', 'text-blue-400');
+          log('═══════════════════════════════════════════════════════', 'text-blue-400');
           log('');
-          log('🎉 MIGRATION TERMINÉE !');
-          log('');
-          log('✅ Toutes les photos sont maintenant dans la DB Cloudflare.');
-          log('✅ Elles sont accessibles sur https://1616a8d3.girasole-diagpv.pages.dev/');
+          
+          try {
+            const response = await fetch('/api/migrate-all', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ audits })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              log('');
+              log('═══════════════════════════════════════════════════════', 'text-green-400');
+              log('🎉 MIGRATION TERMINÉE AVEC SUCCÈS !', 'text-green-400');
+              log('═══════════════════════════════════════════════════════', 'text-green-400');
+              log('');
+              log(\`✅ \${result.stats.missions} missions migrées\`);
+              log(\`✅ \${result.stats.items_updated} items mis à jour\`);
+              log(\`✅ \${result.stats.commentaires} commentaires sauvegardés\`);
+              log(\`✅ \${result.stats.photos} photos importées\`);
+              log('');
+              log('🌐 Données accessibles sur: https://1616a8d3.girasole-diagpv.pages.dev/', 'text-cyan-400');
+              log('');
+              log('⚠️ IMPORTANT: Vous pouvez maintenant utiliser uniquement la nouvelle version.', 'text-yellow-400');
+              log('⚠️ Plus besoin de localStorage - tout est en DB Cloudflare !', 'text-yellow-400');
+            } else {
+              log('');
+              log('❌ ERREUR MIGRATION: ' + result.error, 'text-red-400');
+            }
+          } catch (error) {
+            log('');
+            log('❌ ERREUR RÉSEAU: ' + error.message, 'text-red-400');
+          }
         }
       </script>
     </body>
     </html>
-  `)
+  \`)
 })
 
 export default app
