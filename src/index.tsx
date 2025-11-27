@@ -7531,8 +7531,19 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
       return c.json({ success: false, error: 'Mission non trouvée' }, 404)
     }
     
-    const itemsSol = await DB.prepare(`SELECT * FROM checklist_items WHERE ordre_mission_id = ? ORDER BY item_numero`).bind(missionId).all()
-    const photosSol = await DB.prepare(`SELECT * FROM ordres_mission_item_photos WHERE ordre_mission_id = ? ORDER BY item_checklist_id, ordre`).bind(missionId).all()
+    const itemsSol = await DB.prepare(`
+      SELECT id, ordre_mission_id, item_numero, categorie, item_texte, statut, commentaire, technicien_nom
+      FROM checklist_items
+      WHERE ordre_mission_id = ?
+      ORDER BY item_numero
+    `).bind(missionId).all()
+    
+    const photosSol = await DB.prepare(`
+      SELECT id, ordre_mission_id, item_checklist_id, photo_filename, photo_base64, commentaire, ordre
+      FROM ordres_mission_item_photos
+      WHERE ordre_mission_id = ?
+      ORDER BY item_checklist_id, ordre
+    `).bind(missionId).all()
     
     let itemsToiture = { results: [] }
     let photosToiture = { results: [] }

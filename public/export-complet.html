@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Complet Audits - GIRASOLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-4">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">📦 Export Complet Audits</h1>
+        
+        <div id="status" class="bg-blue-900 border border-blue-500 rounded-lg p-4 mb-6">
+            <p class="text-lg">🔍 Recherche des audits en cours...</p>
+        </div>
+        
+        <div id="missions-list" class="space-y-3 mb-6">
+            <!-- Liste missions -->
+        </div>
+        
+        <div id="actions" class="hidden space-y-3">
+            <button id="btn-export" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-xl">
+                📥 TÉLÉCHARGER JSON COMPLET
+            </button>
+            
+            <button id="btn-sync" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-xl">
+                ☁️ SAUVEGARDER SUR SERVEUR
+            </button>
+        </div>
+        
+        <div id="result" class="mt-6 hidden">
+            <div class="bg-green-900 border border-green-500 rounded-lg p-4">
+                <p id="result-text" class="text-lg"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IDs des 9 centrales que tu as auditées
+        const MISSION_IDS = ['7', '9', '12', '20', '24', '33', '44', '45', '46'];
+        const CENTRALE_NAMES = {
+            '7': 'Pierre MOURGUES',
+            '9': 'BURGAT',
+            '12': 'Christian MIGNARD',
+            '20': 'VAN ZANTEN',
+            '24': 'Christophe CARRERE 2',
+            '33': 'Mathieu VINCENT',
+            '44': 'GOUNY',
+            '45': 'Maxime BAYLE',
+            '46': 'Commune de POMAS'
+        };
+
+        let foundMissions = {};
+        
+        // Scan localStorage
+        function scanMissions() {
+            const status = document.getElementById('status');
+            const missionsList = document.getElementById('missions-list');
+            const actions = document.getElementById('actions');
+            
+            let html = '';
+            let totalFound = 0;
+            
+            MISSION_IDS.forEach(id => {
+                const key = 'audit_mission_' + id;
+                const data = localStorage.getItem(key);
+                
+                if (data) {
+                    try {
+                        const items = JSON.parse(data);
+                        foundMissions[id] = {
+                            items: items,
+                            commentaire: localStorage.getItem('commentaire_final_' + id) || '',
+                            photos_generales: JSON.parse(localStorage.getItem('photos_generales_' + id) || '[]'),
+                            photos_items: []
+                        };
+                        
+                        // Photos par item
+                        items.forEach(item => {
+                            const pk = 'audit_photos_item_' + id + '_' + item.id;
+                            const photos = JSON.parse(localStorage.getItem(pk) || '[]');
+                            if (photos.length > 0) {
+                                foundMissions[id].photos_items.push({
+                                    item_numero: item.item_numero,
+                                    item_id: item.id,
+                                    photos: photos
+                                });
+                            }
+                        });
+                        
+                        totalFound++;
+                        html += `
+                            <div class="bg-green-900 border border-green-500 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-bold text-lg">✅ Mission ${id} - ${CENTRALE_NAMES[id]}</p>
+                                        <p class="text-sm text-green-300">${items.length} items + ${foundMissions[id].photos_items.length} photos</p>
+                                    </div>
+                                    <span class="text-3xl">✓</span>
+                                </div>
+                            </div>
+                        `;
+                    } catch (e) {
+                        html += `
+                            <div class="bg-red-900 border border-red-500 rounded-lg p-4">
+                                <p class="font-bold">❌ Mission ${id} - ${CENTRALE_NAMES[id]}</p>
+                                <p class="text-sm text-red-300">Erreur lecture</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    html += `
+                        <div class="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                            <p class="font-bold text-gray-400">⚪ Mission ${id} - ${CENTRALE_NAMES[id]}</p>
+                            <p class="text-sm text-gray-500">Non trouvée</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            missionsList.innerHTML = html;
+            
+            if (totalFound > 0) {
+                status.innerHTML = `
+                    <p class="text-xl font-bold">✅ ${totalFound} audits trouvés sur 9</p>
+                    <p class="text-sm mt-2">Tu peux maintenant télécharger ou synchroniser</p>
+                `;
+                status.className = 'bg-green-900 border border-green-500 rounded-lg p-4 mb-6';
+                actions.classList.remove('hidden');
+            } else {
+                status.innerHTML = `
+                    <p class="text-xl font-bold text-red-400">❌ Aucun audit trouvé</p>
+                    <p class="text-sm mt-2">Es-tu sur le bon téléphone / navigateur ?</p>
+                `;
+                status.className = 'bg-red-900 border border-red-500 rounded-lg p-4 mb-6';
+            }
+        }
+        
+        // Export JSON
+        document.getElementById('btn-export')?.addEventListener('click', () => {
+            const json = JSON.stringify(foundMissions, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'audits_complets_9missions_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('result-text').textContent = '✅ Fichier téléchargé ! Envoie-le moi par message.';
+        });
+        
+        // Sync serveur
+        document.getElementById('btn-sync')?.addEventListener('click', async () => {
+            const btn = document.getElementById('btn-sync');
+            btn.disabled = true;
+            btn.textContent = '⏳ Synchronisation...';
+            
+            let saved = 0;
+            let errors = [];
+            
+            for (const [missionId, missionData] of Object.entries(foundMissions)) {
+                try {
+                    const response = await fetch('/api/audit/sync-bulk', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            mission_id: missionId,
+                            checklist_items: missionData.items,
+                            photos_items: missionData.photos_items,
+                            commentaire_final: missionData.commentaire,
+                            photos_generales: missionData.photos_generales
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        saved++;
+                    } else {
+                        errors.push(`Mission ${missionId}: ${result.error}`);
+                    }
+                } catch (error) {
+                    errors.push(`Mission ${missionId}: ${error.message}`);
+                }
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '☁️ SAUVEGARDER SUR SERVEUR';
+            
+            document.getElementById('result').classList.remove('hidden');
+            if (errors.length === 0) {
+                document.getElementById('result-text').textContent = `✅ ${saved} missions sauvegardées sur le serveur !`;
+            } else {
+                document.getElementById('result-text').innerHTML = `
+                    ⚠️ ${saved} missions OK, ${errors.length} erreurs:<br>
+                    ${errors.join('<br>')}
+                `;
+            }
+        });
+        
+        // Lancer le scan au chargement
+        scanMissions();
+    </script>
+</body>
+</html>
