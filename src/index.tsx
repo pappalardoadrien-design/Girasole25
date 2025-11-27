@@ -8617,6 +8617,54 @@ app.get('/migrate-storage', (c) => {
 </html>`)
 })
 
+// Route export 7 audits complets depuis DB
+app.get('/export-audits-db', async (c) => {
+  const { DB } = c.env
+  
+  const auditIds = [7, 12, 20, 24, 33, 45, 46]; // 7 audits sauvegardés
+  
+  try {
+    const exportData: any = {};
+    
+    for (const missionId of auditIds) {
+      // Récupérer mission
+      const mission = await DB.prepare(`
+        SELECT om.*, c.nom as centrale_nom, c.type as centrale_type, c.puissance_kwc
+        FROM ordres_mission om
+        JOIN centrales c ON om.centrale_id = c.id
+        WHERE om.id = ?
+      `).bind(missionId).first();
+      
+      if (!mission) continue;
+      
+      // Récupérer checklist items
+      const items = await DB.prepare(`
+        SELECT id, item_text, statut, commentaire, photo_base64, ordre, created_at, updated_at
+        FROM checklist_items
+        WHERE ordre_mission_id = ?
+        ORDER BY ordre
+      `).bind(missionId).all();
+      
+      exportData[missionId] = {
+        mission: mission,
+        items: items.results,
+        commentaireFinal: mission.commentaire_final || '',
+        photosGenerales: [] // À implémenter si besoin
+      };
+    }
+    
+    return c.json({
+      success: true,
+      export_date: new Date().toISOString(),
+      audits_count: Object.keys(exportData).length,
+      data: exportData
+    });
+    
+  } catch (error: any) {
+    return c.json({ success: false, error: error.message }, 500);
+  }
+})
+
 // Route favicon pour éviter erreur 500
 app.get('/favicon.ico', (c) => {
   return new Response(null, { status: 204 })
