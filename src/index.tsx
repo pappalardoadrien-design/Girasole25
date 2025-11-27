@@ -8617,6 +8617,99 @@ app.get('/migrate-storage', (c) => {
 </html>`)
 })
 
+// Route dashboard sous-traitant
+app.get('/st/:sous_traitant_id', async (c) => {
+  const { DB } = c.env
+  const sousTraitantId = c.req.param('sous_traitant_id')
+  
+  try {
+    // Récupérer infos sous-traitant
+    const sousTraitant = await DB.prepare(`
+      SELECT * FROM sous_traitants WHERE id = ?
+    `).bind(sousTraitantId).first()
+    
+    if (!sousTraitant) {
+      return c.html('<h1>Sous-traitant non trouvé</h1>')
+    }
+    
+    // Récupérer missions du sous-traitant
+    const missions = await DB.prepare(`
+      SELECT 
+        om.id as mission_id,
+        om.date_mission,
+        c.nom as centrale_nom,
+        c.puissance_kwc,
+        t.prenom || ' ' || t.nom as technicien_nom,
+        (SELECT COUNT(*) FROM checklist_items WHERE ordre_mission_id = om.id AND statut != 'NON_VERIFIE') as nb_points_completes,
+        40 as nb_points_total
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      JOIN techniciens t ON om.technicien_id = t.id
+      WHERE om.sous_traitant_id = ?
+      ORDER BY om.date_mission DESC
+    `).bind(sousTraitantId).all()
+    
+    return c.html(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard ${sousTraitant.nom_entreprise}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+      </head>
+      <body class="bg-gray-100">
+        <div class="max-w-7xl mx-auto p-6">
+          <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+              <i class="fas fa-building mr-2 text-blue-600"></i>
+              ${sousTraitant.nom_entreprise}
+            </h1>
+            <p class="text-gray-600">Contact: ${sousTraitant.contact_principal || 'N/A'}</p>
+            <p class="text-gray-600">Email: ${sousTraitant.email_contact || 'N/A'}</p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${missions.results.map(m => `
+              <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">${m.centrale_nom}</h3>
+                <p class="text-sm text-gray-600 mb-2">
+                  <i class="fas fa-calendar mr-2"></i>${new Date(m.date_mission).toLocaleDateString('fr-FR')}
+                </p>
+                <p class="text-sm text-gray-600 mb-2">
+                  <i class="fas fa-user mr-2"></i>${m.technicien_nom}
+                </p>
+                <p class="text-sm text-gray-600 mb-4">
+                  <i class="fas fa-bolt mr-2"></i>${m.puissance_kwc} kWc
+                </p>
+                
+                <div class="mb-4">
+                  <div class="flex justify-between text-sm mb-1">
+                    <span>Progression</span>
+                    <span class="font-semibold">${Math.round((m.nb_points_completes / m.nb_points_total) * 100)}%</span>
+                  </div>
+                  <div class="bg-gray-200 rounded-full h-3">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full" style="width: ${Math.round((m.nb_points_completes / m.nb_points_total) * 100)}%"></div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${m.nb_points_completes} / ${m.nb_points_total} points</p>
+                </div>
+                
+                <a href="/audit/${m.mission_id}" class="block w-full bg-blue-500 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                  <i class="fas fa-clipboard-check mr-2"></i>Ouvrir audit
+                </a>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </body>
+      </html>
+    `)
+  } catch (error: any) {
+    return c.html(\`<h1>Erreur: \${error.message}</h1>\`, 500)
+  }
+})
+
 // Route export 7 audits complets depuis DB
 app.get('/export-audits-db', async (c) => {
   const { DB } = c.env
