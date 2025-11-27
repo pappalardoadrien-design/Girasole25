@@ -7912,6 +7912,459 @@ app.get('/api/rapports/:rapport_id', async (c) => {
   }
 })
 
+// GET /rapport/:rapport_id - Affichage HTML du rapport (pour visualisation/impression PDF)
+app.get('/rapport/:rapport_id', async (c) => {
+  const { DB } = c.env
+  const rapportId = c.req.param('rapport_id')
+  
+  try {
+    const rapport = await DB.prepare(`
+      SELECT r.*, c.nom as centrale_nom, c.type_centrale, c.puissance_kwc, c.localisation, c.adresse
+      FROM rapports_audits r
+      JOIN centrales c ON r.centrale_id = c.id
+      WHERE r.id = ?
+    `).bind(rapportId).first()
+    
+    if (!rapport) {
+      return c.html(`
+        <html>
+          <head><title>Rapport non trouvé</title></head>
+          <body><h1>Erreur : Rapport non trouvé</h1></body>
+        </html>
+      `, 404)
+    }
+    
+    const donnees = JSON.parse(rapport.donnees_rapport)
+    
+    // Générer HTML complet avec style DiagPV
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${rapport.titre}</title>
+  <style>
+    @media print {
+      body { margin: 0; }
+      .no-print { display: none; }
+      .page-break { page-break-before: always; }
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f9fafb;
+    }
+    .header {
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
+    }
+    .header .subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .info-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #f59e0b;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .info-card .label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .info-card .value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .section {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #f59e0b;
+    }
+    .checklist-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 15px 0;
+    }
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+    .checklist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .item-numero {
+      font-weight: 700;
+      color: #1f2937;
+      font-size: 14px;
+    }
+    .item-libelle {
+      font-size: 15px;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    .item-categorie {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      background: #e5e7eb;
+      color: #6b7280;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-right: 10px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-CONFORME {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .status-NON_CONFORME {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .status-N\\/A, .status-NON_VERIFIE {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .commentaire {
+      background: #fef3c7;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 14px;
+      border-left: 3px solid #f59e0b;
+    }
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .photo-item {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+    }
+    .photo-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .photo-caption {
+      padding: 8px;
+      font-size: 12px;
+      color: #6b7280;
+      background: #f9fafb;
+    }
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      flex: 1;
+      min-width: 150px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #e5e7eb;
+    }
+    .stat-card.conformes {
+      border-color: #22c55e;
+    }
+    .stat-card.non-conformes {
+      border-color: #ef4444;
+    }
+    .stat-card.na {
+      border-color: #94a3b8;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .stat-value.conformes {
+      color: #22c55e;
+    }
+    .stat-value.non-conformes {
+      color: #ef4444;
+    }
+    .stat-value.na {
+      color: #94a3b8;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .synthese-box {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .synthese-box h3 {
+      margin-top: 0;
+      color: #92400e;
+    }
+    .btn-actions {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: #f59e0b;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #d97706;
+    }
+    .btn-secondary {
+      background: white;
+      color: #374151;
+      border: 2px solid #d1d5db;
+    }
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+  </style>
+</head>
+<body>
+  <div class="btn-actions no-print">
+    <button class="btn btn-primary" onclick="window.print()">
+      📄 Imprimer / Sauvegarder PDF
+    </button>
+    <a href="/" class="btn btn-secondary">
+      ← Retour Dashboard
+    </a>
+  </div>
+
+  <div class="header">
+    <h1>${rapport.titre}</h1>
+    <div class="subtitle">
+      Type : ${rapport.type_rapport} | Statut : ${rapport.statut} | Généré le ${new Date(rapport.created_at).toLocaleDateString('fr-FR')}
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="label">Centrale</div>
+      <div class="value">${donnees.mission.centrale_nom}</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Type</div>
+      <div class="value">${donnees.mission.type}</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Puissance</div>
+      <div class="value">${donnees.mission.puissance_kwc} kWc</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Localisation</div>
+      <div class="value">${donnees.mission.localisation || 'N/A'}</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Date Audit</div>
+      <div class="value">${new Date(donnees.mission.date_audit).toLocaleDateString('fr-FR')}</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Auditeur</div>
+      <div class="value">${donnees.mission.auditeur}</div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST SOL -->
+  <div class="section">
+    <h2 class="section-title">🔍 CHECKLIST AUDIT SOL (${donnees.checklist_sol.stats.total} points)</h2>
+    
+    <div class="stats">
+      <div class="stat-card conformes">
+        <div class="stat-value conformes">${donnees.checklist_sol.stats.conformes}</div>
+        <div class="stat-label">Conformes</div>
+      </div>
+      <div class="stat-card non-conformes">
+        <div class="stat-value non-conformes">${donnees.checklist_sol.stats.non_conformes}</div>
+        <div class="stat-label">Non Conformes</div>
+      </div>
+      <div class="stat-card na">
+        <div class="stat-value na">${donnees.checklist_sol.stats.na}</div>
+        <div class="stat-label">N/A</div>
+      </div>
+    </div>
+
+    ${donnees.checklist_sol.items.map(item => `
+      <div class="checklist-item">
+        <div class="checklist-header">
+          <div>
+            <span class="item-numero">Point ${item.numero}</span>
+            <span class="item-categorie">${item.categorie}</span>
+          </div>
+          <span class="status-badge status-${item.statut}">${item.statut || 'NON_VERIFIE'}</span>
+        </div>
+        <div class="item-libelle">${item.libelle}</div>
+        ${item.commentaire ? `<div class="commentaire">💬 ${item.commentaire}</div>` : ''}
+        ${item.photos && item.photos.length > 0 ? `
+          <div class="photos-grid">
+            ${item.photos.map(photo => `
+              <div class="photo-item">
+                <img src="${photo.base64.startsWith('data:') ? photo.base64 : 'data:image/jpeg;base64,' + photo.base64}" alt="${photo.filename || 'Photo'}" />
+                <div class="photo-caption">${photo.commentaire || photo.filename || 'Photo audit'}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `).join('')}
+  </div>
+
+  ${donnees.checklist_toiture ? `
+  <div class="section page-break">
+    <h2 class="section-title">🏠 CHECKLIST AUDIT TOITURE (${donnees.checklist_toiture.stats.total} points)</h2>
+    
+    <div class="stats">
+      <div class="stat-card conformes">
+        <div class="stat-value conformes">${donnees.checklist_toiture.stats.conformes}</div>
+        <div class="stat-label">Conformes</div>
+      </div>
+      <div class="stat-card non-conformes">
+        <div class="stat-value non-conformes">${donnees.checklist_toiture.stats.non_conformes}</div>
+        <div class="stat-label">Non Conformes</div>
+      </div>
+      <div class="stat-card na">
+        <div class="stat-value na">${donnees.checklist_toiture.stats.na}</div>
+        <div class="stat-label">N/A</div>
+      </div>
+    </div>
+
+    ${donnees.checklist_toiture.items.map(item => `
+      <div class="checklist-item">
+        <div class="checklist-header">
+          <div>
+            <span class="item-numero">Point ${item.numero}</span>
+          </div>
+          <span class="status-badge status-${item.statut}">${item.statut || 'NON_VERIFIE'}</span>
+        </div>
+        <div class="item-libelle">${item.libelle}</div>
+        ${item.commentaire ? `<div class="commentaire">💬 ${item.commentaire}</div>` : ''}
+        ${item.photos && item.photos.length > 0 ? `
+          <div class="photos-grid">
+            ${item.photos.map(photo => `
+              <div class="photo-item">
+                <img src="${photo.base64.startsWith('data:') ? photo.base64 : 'data:image/jpeg;base64,' + photo.base64}" alt="${photo.filename || 'Photo'}" />
+                <div class="photo-caption">${photo.commentaire || photo.filename || 'Photo audit'}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `).join('')}
+  </div>
+  ` : ''}
+
+  <!-- SYNTHESE -->
+  <div class="section page-break">
+    <h2 class="section-title">📋 SYNTHÈSE ET CONCLUSION</h2>
+    
+    ${donnees.synthese.commentaire_final ? `
+      <div class="synthese-box">
+        <h3>Commentaire Final Auditeur</h3>
+        <p>${donnees.synthese.commentaire_final.replace(/\n/g, '<br>')}</p>
+      </div>
+    ` : '<p style="color: #6b7280; font-style: italic;">Aucun commentaire final</p>'}
+
+    ${donnees.synthese.photos_generales && donnees.synthese.photos_generales.length > 0 ? `
+      <h3 style="margin-top: 30px;">Photos Complémentaires</h3>
+      <div class="photos-grid">
+        ${donnees.synthese.photos_generales.map(photo => `
+          <div class="photo-item">
+            <img src="${photo.base64.startsWith('data:') ? photo.base64 : 'data:image/jpeg;base64,' + photo.base64}" alt="${photo.filename || 'Photo'}" />
+            <div class="photo-caption">${photo.legende || photo.filename || 'Photo générale'}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+  </div>
+
+  <div style="text-align: center; color: #6b7280; padding: 30px; border-top: 2px solid #e5e7eb;">
+    <p><strong>Rapport généré par GIRASOLE DiagPV</strong></p>
+    <p style="font-size: 12px;">© ${new Date().getFullYear()} Diagnostic Photovoltaïque - Tous droits réservés</p>
+  </div>
+</body>
+</html>
+    `
+    
+    return c.html(htmlContent)
+  } catch (error) {
+    return c.html(`
+      <html>
+        <head><title>Erreur</title></head>
+        <body>
+          <h1>Erreur lors de la génération du rapport</h1>
+          <pre>${String(error)}</pre>
+        </body>
+      </html>
+    `, 500)
+  }
+})
+
 // POST /api/rapports/:rapport_id/complements - Ajouter complément
 app.post('/api/rapports/:rapport_id/complements', async (c) => {
   const { DB } = c.env
