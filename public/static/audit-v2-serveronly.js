@@ -173,7 +173,11 @@ async function saveItemStatus(itemId, statut, conformite = null) {
       })
     });
     
-    if (!response.ok) throw new Error('Server error');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ PUT /api/checklist/item/${itemId} ${response.status}:`, errorText);
+      throw new Error(`Server error ${response.status}`);
+    }
     
     // Mettre à jour en mémoire
     const item = checklistItems.find(i => i.id === itemId);
@@ -216,7 +220,11 @@ async function saveItemComment(itemId, commentaire) {
       })
     });
     
-    if (!response.ok) throw new Error('Server error');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ PUT /api/checklist/item/${itemId}/comment ${response.status}:`, errorText);
+      throw new Error(`Server error ${response.status}`);
+    }
     
     // Mettre à jour en mémoire
     const item = checklistItems.find(i => i.id === itemId);
