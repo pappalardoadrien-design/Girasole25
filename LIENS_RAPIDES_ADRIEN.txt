@@ -1,0 +1,58 @@
+🎯 LIENS RAPIDES GIRASOLE - ADRIEN PAPPALARDO
+===============================================
+
+📅 Date: 26 novembre 2025
+
+🌐 URLS WEBAPP
+--------------
+Homepage:     https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev
+Rapports:     https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/rapports
+
+🔍 AUDITS EN COURS
+------------------
+Audit 24 (CARRERE):     https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/audit/24
+Audit 44 (GOUNY):       https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/audit/44
+Audit 20 (VAN ZANTEN):  https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/audit/20
+Audit 7 (MOURGUES):     https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/audit/7
+
+📊 DONNÉES
+----------
+✅ 53 centrales intactes
+✅ Audits 24, 44, 20, 7 sauvegardés (localStorage mobile)
+✅ Checklist SOL 40 points opérationnelle
+✅ Checklist TOITURE 11 points opérationnelle
+✅ Système rapports créé
+✅ Multi-photos par item fonctionnel
+✅ Mode offline + auto-save
+
+📧 EMAILS PRÊTS
+---------------
+DRONE AVEYRON:   EMAILS_TARIFICATION_FINAL_TUTOIEMENT_2025-11-26.txt (email 1/3)
+ARTEMIS (Loïc):  EMAILS_TARIFICATION_FINAL_TUTOIEMENT_2025-11-26.txt (email 2/3)
+WEWISE (Bruce):  EMAILS_TARIFICATION_FINAL_TUTOIEMENT_2025-11-26.txt (email 3/3)
+Loïc Poudeq:     EMAIL_LOIC_POUDEQ_DIAGPV_3_CENTRALES_2025-11-26.txt
+
+⏰ DÉLAIS CRITIQUES
+-------------------
+Offres sous-traitants: 6 décembre 2025
+Interventions terrain: AVANT 31 décembre 2025 (impératif)
+Rapports: 5 jours après intervention
+
+📚 DOCUMENTATION
+----------------
+Guide rapports:       GUIDE_RAPPORTS_AUDITS.md
+Accès Fabien:         ACCES_FABIEN_GIRASOLE.md
+Ce fichier:           LIENS_RAPIDES_ADRIEN.txt
+
+🎯 STATUT MISSION
+-----------------
+✅ 17 centrales attribuées à 3 sous-traitants
+✅ GPS mis à jour pour 51 centrales
+✅ Checklist 40 pts SOL + 11 pts TOITURE
+✅ Système rapports opérationnel
+✅ Interface Fabien accessible
+⏳ En attente: Réponses sous-traitants (délai 06/12)
+⏳ En attente: Tests rapports après sync données terrain
+
+===============================================
+Tout est prêt pour la mission GIRASOLE 2025 ! 🚀
