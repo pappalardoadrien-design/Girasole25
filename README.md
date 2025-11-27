@@ -13,18 +13,18 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 ## 🚀 URLs et Accès
 
 ### **Environnement de Production**
-- **Interface Web**: https://d8be86bc.girasole-diagpv.pages.dev
-- **Dashboard**: https://d8be86bc.girasole-diagpv.pages.dev/
-- **API Checklist SOL**: https://d8be86bc.girasole-diagpv.pages.dev/api/checklist/:mission_id
-- **API Checklist TOITURE (14 items)**: https://d8be86bc.girasole-diagpv.pages.dev/api/checklist-toiture/:mission_id
-- **Rapports HTML**: https://d8be86bc.girasole-diagpv.pages.dev/rapport/:rapport_id
+- **Interface Web**: https://a33315a9.girasole-diagpv.pages.dev
+- **Dashboard**: https://a33315a9.girasole-diagpv.pages.dev/
+- **API Checklist SOL**: https://a33315a9.girasole-diagpv.pages.dev/api/checklist/:mission_id
+- **API Checklist TOITURE (14 items)**: https://a33315a9.girasole-diagpv.pages.dev/api/checklist-toiture/:mission_id
+- **Rapports HTML**: https://a33315a9.girasole-diagpv.pages.dev/rapport/:rapport_id
 - **Status**: ✅ Opérationnel (Cloudflare Pages)
 
 ### **Dernière mise à jour**
-- **Date**: 27/11/2024 16:30 CET
-- **Version**: 2.1 (Checklist TOITURE 14 items)
-- **Migration**: 0013_ajout_distances_toiture.sql
-- **Item ajouté**: "Mesurer la distance Modules > Rives / Modules > Faitage"
+- **Date**: 27/11/2024 16:45 CET
+- **Version**: 2.2 (Fix statut NA)
+- **Migrations**: 0014_ajout_statut_na.sql, 0015_fix_statut_na_toiture.sql
+- **Bug fix**: Bouton "N/A" fonctionne maintenant (CHECK constraint corrigée)
 
 ### **Repository GitHub**
 - **URL**: https://github.com/pappalardoadrien-design/Girasole25
