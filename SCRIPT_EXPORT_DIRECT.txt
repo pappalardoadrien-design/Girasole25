@@ -1,0 +1,62 @@
+📱 SCRIPT EXPORT DIRECT - POUR iPHONE
+
+========================================
+🎯 INSTRUCTIONS
+========================================
+
+1. Ouvre Safari sur ton iPhone
+
+2. Va sur n'importe quelle page d'audit :
+   https://0da64170.girasole-diagpv.pages.dev/audit/24
+
+3. Tape dans la barre d'adresse et COLLE ce code :
+
+javascript:(function(){const MISSIONS=[{id:'7',name:'Pierre MOURGUES'},{id:'9',name:'BURGAT'},{id:'12',name:'Christian MIGNARD'},{id:'20',name:'VAN ZANTEN'},{id:'24',name:'Christophe CARRERE 2'},{id:'33',name:'Mathieu VINCENT'},{id:'44',name:'GOUNY'},{id:'45',name:'Maxime BAYLE'},{id:'46',name:'Commune de POMAS'}];let exportData={};let foundCount=0;MISSIONS.forEach(mission=>{const key='audit_mission_'+mission.id;const data=localStorage.getItem(key);if(data){try{const items=JSON.parse(data);const photosItems=[];items.forEach(item=>{const pk='audit_photos_item_'+mission.id+'_'+item.id;const photos=JSON.parse(localStorage.getItem(pk)||'[]');if(photos.length>0){photosItems.push({item_numero:item.item_numero,item_id:item.id,photos:photos});}});exportData[mission.id]={items:items,commentaire:localStorage.getItem('commentaire_final_'+mission.id)||'',photos_generales:JSON.parse(localStorage.getItem('photos_generales_'+mission.id)||'[]'),photos_items:photosItems};foundCount++;}catch(e){}}});if(foundCount>0){const json=JSON.stringify(exportData,null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='audits_'+foundCount+'missions_'+new Date().toISOString().split('T')[0]+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);alert('✅ '+foundCount+' audits exportés !\n\nEnvoie-moi le fichier JSON.');}else{alert('❌ Aucun audit trouvé.\n\nEs-tu sur le bon navigateur ?');}})();
+
+4. Appuie sur ENTRÉE
+
+5. Un fichier JSON va se télécharger
+
+6. Envoie-moi ce fichier
+
+
+========================================
+⚠️ IMPORTANT SUR iPHONE
+========================================
+
+Safari sur iPhone peut bloquer le "javascript:" au début.
+
+Si ça ne marche pas :
+
+1. Copie TOUT le code ci-dessus
+2. Colle-le dans la barre d'adresse
+3. AVANT d'appuyer sur Entrée, ajoute "javascript:" au DÉBUT manuellement
+4. Ensuite appuie sur Entrée
+
+
+========================================
+📋 VERSION LISIBLE DU CODE
+========================================
+
+Le script fait exactement ce que fait la page /export-simple,
+mais s'exécute directement dans la page d'audit où tu es.
+
+Il :
+1. Scan les 9 missions dans localStorage
+2. Récupère items + photos + commentaires
+3. Crée un fichier JSON
+4. Le télécharge automatiquement
+
+
+========================================
+✅ RÉSULTAT ATTENDU
+========================================
+
+Fichier téléchargé :
+audits_Xmissions_2025-11-27.json
+
+(X = nombre d'audits trouvés, normalement 9)
+
+
+--
+DiagPV Assistant

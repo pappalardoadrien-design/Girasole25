@@ -2757,6 +2757,105 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
 // PAGE AUDIT TERRAIN MOBILE
 // ========================================
 
+// Route EXPORT AUDITS (accessible depuis n'importe quelle URL)
+app.get('/audit-export', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Audits</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1a1a1a; color: white; padding: 20px; text-align: center;
+        }
+        h1 { font-size: 28px; margin: 30px 0; }
+        .btn {
+            background: #4ade80; color: #000; border: none;
+            padding: 25px 40px; font-size: 22px; font-weight: bold;
+            border-radius: 15px; cursor: pointer; margin: 20px 0; display: inline-block;
+        }
+        .result {
+            background: #2a2a2a; border: 2px solid #444; border-radius: 10px;
+            padding: 20px; margin: 20px 0; font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📦 Export Audits GIRASOLE</h1>
+    <button class="btn" onclick="exportAudits()">📥 EXPORTER MES AUDITS</button>
+    <div id="result" class="result" style="display:none;"></div>
+    <script>
+        function exportAudits() {
+            const MISSIONS = [
+                {id: '7', name: 'Pierre MOURGUES'}, {id: '9', name: 'BURGAT'},
+                {id: '12', name: 'Christian MIGNARD'}, {id: '20', name: 'VAN ZANTEN'},
+                {id: '24', name: 'Christophe CARRERE 2'}, {id: '33', name: 'Mathieu VINCENT'},
+                {id: '44', name: 'GOUNY'}, {id: '45', name: 'Maxime BAYLE'},
+                {id: '46', name: 'Commune de POMAS'}
+            ];
+            let exportData = {}, foundCount = 0, details = [];
+            MISSIONS.forEach(mission => {
+                const key = 'audit_mission_' + mission.id;
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const items = JSON.parse(data);
+                        const photosItems = [];
+                        items.forEach(item => {
+                            const pk = 'audit_photos_item_' + mission.id + '_' + item.id;
+                            const photos = JSON.parse(localStorage.getItem(pk) || '[]');
+                            if (photos.length > 0) {
+                                photosItems.push({
+                                    item_numero: item.item_numero,
+                                    item_id: item.id,
+                                    photos: photos
+                                });
+                            }
+                        });
+                        exportData[mission.id] = {
+                            items: items,
+                            commentaire: localStorage.getItem('commentaire_final_' + mission.id) || '',
+                            photos_generales: JSON.parse(localStorage.getItem('photos_generales_' + mission.id) || '[]'),
+                            photos_items: photosItems
+                        };
+                        foundCount++;
+                        details.push('✅ ' + mission.name + ' (' + items.length + ' items, ' + photosItems.length + ' photos)');
+                    } catch (e) {
+                        details.push('❌ ' + mission.name + ' (erreur)');
+                    }
+                } else {
+                    details.push('⚪ ' + mission.name + ' (vide)');
+                }
+            });
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            if (foundCount > 0) {
+                const json = JSON.stringify(exportData, null, 2);
+                const blob = new Blob([json], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'audits_' + foundCount + 'missions_' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                result.innerHTML = '<h2>✅ ' + foundCount + ' audits exportés !</h2>' +
+                    '<p style="text-align:left; margin-top:20px;">' + details.join('<br>') + '</p>' +
+                    '<p style="margin-top:20px; font-size:16px;">📤 Envoie-moi le fichier JSON téléchargé</p>';
+            } else {
+                result.innerHTML = '<h2>❌ Aucun audit trouvé</h2>' +
+                    '<p style="text-align:left; margin-top:20px;">' + details.join('<br>') + '</p>' +
+                    '<p style="margin-top:20px;">Es-tu sur le bon navigateur ?</p>';
+            }
+        }
+    </script>
+</body>
+</html>`)
+})
+
 app.get('/audit/:mission_id', async (c) => {
   const { DB } = c.env
   const missionId = c.req.param('mission_id')

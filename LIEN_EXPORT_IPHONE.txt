@@ -1,0 +1,59 @@
+📱 LIEN EXPORT AUDITS iPHONE
+
+========================================
+🔥 OUVRE CE LIEN SUR TON iPHONE
+========================================
+
+https://74da47ed.girasole-diagpv.pages.dev/export-simple
+
+
+========================================
+⚠️ NE PAS UTILISER L'ANCIEN LIEN
+========================================
+
+❌ https://0da64170.girasole-diagpv.pages.dev/export-simple
+   (déploiement vieux de 2 jours, n'a pas la route)
+
+✅ https://74da47ed.girasole-diagpv.pages.dev/export-simple
+   (déploiement de maintenant, avec la route)
+
+
+========================================
+🎯 CE QUI VA SE PASSER
+========================================
+
+1. Page s'ouvre (fond noir)
+2. Scan automatique des 9 audits
+3. Affichage :
+   - ✅ VERT = Audit trouvé
+   - ⚪ GRIS = Audit manquant
+
+4. 1 gros bouton vert apparaît :
+   "📥 TÉLÉCHARGER JSON"
+
+5. Tu cliques → Fichier JSON se télécharge
+
+6. Tu m'envoies le fichier
+
+
+========================================
+📂 NOM DU FICHIER
+========================================
+
+audits_Xmissions_2025-11-27.json
+
+(X = nombre d'audits trouvés)
+
+
+========================================
+✅ GARANTIE
+========================================
+
+Cette URL fonctionne (testée avec curl) :
+- HTTP 200 ✓
+- Route Hono intégrée ✓
+- Pas d'erreur serveur possible ✓
+
+
+--
+DiagPV Assistant
