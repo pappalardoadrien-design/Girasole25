@@ -8883,4 +8883,176 @@ app.get('/test-api', async (c) => {
   }
 })
 
+// ========================================
+// API - MIGRATION PHOTOS localStorage → DB
+// ========================================
+
+// POST /api/migrate-photos - Recevoir photos depuis localStorage
+app.post('/api/migrate-photos', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const data = await c.req.json()
+    const { mission_id, photos } = data
+    
+    if (!mission_id || !photos || !Array.isArray(photos)) {
+      return c.json({ success: false, error: 'Données invalides' }, 400)
+    }
+    
+    let imported = 0
+    
+    // Insérer chaque photo
+    for (const photo of photos) {
+      if (!photo.item_id || !photo.base64) continue
+      
+      await DB.prepare(`
+        INSERT INTO ordres_mission_item_photos 
+        (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, commentaire, ordre)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(
+        mission_id,
+        photo.item_id,
+        photo.base64,
+        photo.filename || 'photo.jpg',
+        photo.commentaire || '',
+        photo.ordre || 0
+      ).run()
+      
+      imported++
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: `${imported} photos importées pour mission ${mission_id}`,
+      count: imported
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /migrate-photos - Page HTML migration
+app.get('/migrate-photos', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Migration Photos DiagPV</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 p-8">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">📸 Migration Photos localStorage → DB Cloudflare</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+          <p class="text-gray-700 mb-4">
+            Cette page va extraire toutes les photos stockées dans localStorage et les sauvegarder 
+            définitivement dans la DB Cloudflare Production.
+          </p>
+          
+          <button onclick="migratePhotos()" class="bg-blue-600 text-white px-6 py-3 rounded-lg w-full font-bold">
+            🚀 LANCER MIGRATION
+          </button>
+        </div>
+        
+        <div id="log" class="bg-gray-800 text-green-400 rounded-lg p-4 font-mono text-sm h-96 overflow-y-auto"></div>
+      </div>
+      
+      <script>
+        function log(msg) {
+          const logDiv = document.getElementById('log');
+          logDiv.innerHTML += msg + '\\n';
+          logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        async function migratePhotos() {
+          log('🚀 DEBUT MIGRATION...');
+          log('');
+          
+          // Parcourir toutes les clés localStorage
+          const missions = {};
+          
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            
+            // Chercher clés format: audit_X_photos_item_Y
+            if (key && key.match(/audit_(\\d+)_photos_item_(\\d+)/)) {
+              const match = key.match(/audit_(\\d+)_photos_item_(\\d+)/);
+              const missionId = parseInt(match[1]);
+              const itemId = parseInt(match[2]);
+              
+              const photosData = localStorage.getItem(key);
+              if (!photosData) continue;
+              
+              try {
+                const photos = JSON.parse(photosData);
+                
+                if (!missions[missionId]) {
+                  missions[missionId] = [];
+                }
+                
+                // Ajouter photos avec item_id
+                if (Array.isArray(photos)) {
+                  photos.forEach((photo, idx) => {
+                    missions[missionId].push({
+                      item_id: itemId,
+                      base64: photo.base64 || photo.photo_base64 || photo,
+                      filename: photo.filename || photo.photo_filename || 'photo.jpg',
+                      commentaire: photo.commentaire || '',
+                      ordre: idx
+                    });
+                  });
+                }
+                
+                log(\`✅ Mission \${missionId} Item \${itemId}: \${photos.length} photo(s) trouvée(s)\`);
+              } catch (e) {
+                log(\`⚠️ Erreur parsing \${key}: \${e.message}\`);
+              }
+            }
+          }
+          
+          log('');
+          log(\`📊 Total missions avec photos: \${Object.keys(missions).length}\`);
+          log('');
+          
+          // Envoyer chaque mission
+          for (const [missionId, photos] of Object.entries(missions)) {
+            log(\`📤 Envoi Mission \${missionId}: \${photos.length} photos...\`);
+            
+            try {
+              const response = await fetch('/api/migrate-photos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  mission_id: parseInt(missionId),
+                  photos: photos
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (result.success) {
+                log(\`✅ Mission \${missionId}: \${result.count} photos importées\`);
+              } else {
+                log(\`❌ Mission \${missionId}: ERREUR - \${result.error}\`);
+              }
+            } catch (error) {
+              log(\`❌ Mission \${missionId}: ERREUR réseau - \${error.message}\`);
+            }
+          }
+          
+          log('');
+          log('🎉 MIGRATION TERMINÉE !');
+          log('');
+          log('✅ Toutes les photos sont maintenant dans la DB Cloudflare.');
+          log('✅ Elles sont accessibles sur https://1616a8d3.girasole-diagpv.pages.dev/');
+        }
+      </script>
+    </body>
+    </html>
+  `)
+})
+
 export default app
