@@ -7645,8 +7645,7 @@ app.get('/api/suivi-missions', async (c) => {
         st.nom_entreprise as sous_traitant,
         t.nom || ' ' || t.prenom as technicien_nom,
         COUNT(DISTINCT ci.id) as nb_points_total,
-        COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME') THEN ci.id END) as nb_points_completes,
-        COUNT(DISTINCT CASE WHEN ci.photo_base64 IS NOT NULL THEN ci.id END) as nb_photos
+        COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME', 'N/A') THEN ci.id END) as nb_points_completes
       FROM ordres_mission om
       JOIN centrales c ON om.centrale_id = c.id
       JOIN sous_traitants st ON om.sous_traitant_id = st.id
@@ -7656,7 +7655,28 @@ app.get('/api/suivi-missions', async (c) => {
       ORDER BY om.date_mission, c.nom
     `).all()
     
-    return c.json({ success: true, data: missions.results })
+    // Compter photos par mission depuis ordres_mission_item_photos
+    const missionsWithPhotos = await Promise.all(missions.results.map(async (mission) => {
+      const photosCount = await DB.prepare(`
+        SELECT COUNT(*) as count FROM ordres_mission_item_photos WHERE ordre_mission_id = ?
+      `).bind(mission.mission_id).first()
+      
+      const photosGeneralesCount = await DB.prepare(`
+        SELECT COUNT(*) as count FROM ordres_mission_photos_generales WHERE mission_id = ?
+      `).bind(mission.mission_id).first()
+      
+      const commentaireCount = await DB.prepare(`
+        SELECT COUNT(*) as count FROM ordres_mission_commentaires_finaux WHERE mission_id = ?
+      `).bind(mission.mission_id).first()
+      
+      return {
+        ...mission,
+        nb_photos: (photosCount?.count || 0) + (photosGeneralesCount?.count || 0),
+        nb_commentaires: commentaireCount?.count || 0
+      }
+    }))
+    
+    return c.json({ success: true, missions: missionsWithPhotos })
   } catch (error) {
     console.error('Erreur API suivi:', error)
     return c.json({ success: false, error: String(error) }, 500)
