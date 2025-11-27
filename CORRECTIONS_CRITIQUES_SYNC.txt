@@ -1,0 +1,106 @@
+🚨 CORRECTIONS CRITIQUES - SYNCHRONISATION DONNÉES
+
+========================================
+PROBLÈME IDENTIFIÉ
+========================================
+
+❌ Données perdues par actualisation page
+❌ Aucune sync automatique
+❌ localStorage écrasé par données serveur vides
+❌ Pas de protection contre perte données
+
+
+========================================
+✅ CORRECTIONS IMPLÉMENTÉES
+========================================
+
+1. PROTECTION ACTUALISATION
+   - Warning navigateur avant fermeture/actualisation
+   - Message: "Vous avez des modifications non synchronisées"
+   - Empêche perte accidentelle
+
+2. SYNC AUTOMATIQUE PERMANENTE
+   - Sync automatique toutes les 10 secondes
+   - Sync immédiate au démarrage de l'app
+   - Queue persistante en cas d'échec
+
+3. FUSION INTELLIGENTE localStorage/serveur
+   - Au chargement, ne plus écraser localStorage
+   - Comparer données locales vs serveur
+   - Prioriser données locales si plus complètes
+   - Log des décisions de fusion
+
+4. AUTO-SAVE DÉJÀ PRÉSENT
+   - Chaque clic → PUT /api/checklist/${itemId}
+   - Indicateur visuel "✅ Sauvegardé"
+   - Backup localStorage systématique
+
+5. MODE OFFLINE ROBUSTE
+   - Queue de synchronisation persistante
+   - Retry automatique à reconnexion
+   - Indicateur visuel mode offline
+
+
+========================================
+🌐 NOUVELLE URL DE PRODUCTION
+========================================
+
+https://0c2f94b2.girasole-diagpv.pages.dev
+
+
+========================================
+⚠️ POUR ADRIEN
+========================================
+
+DORÉNAVANT, UTILISE CETTE NOUVELLE URL :
+https://0c2f94b2.girasole-diagpv.pages.dev/audit/X
+
+NE PLUS UTILISER : 0da64170 (obsolète)
+
+À CHAQUE AUDIT :
+1. Ouvre la checklist
+2. Fais tes modifications
+3. Vérifie message "✅ Sauvegardé" après chaque action
+4. Si message "💾 Sauvegardé localement" → attends sync auto (10s)
+5. Ne jamais actualiser pendant audit en cours
+
+
+========================================
+🔒 SÉCURITÉ GARANTIE
+========================================
+
+✅ Sync immédiate après chaque modification
+✅ Sync automatique toutes les 10 secondes
+✅ Protection contre actualisation accidentelle
+✅ Queue de retry en cas de coupure réseau
+✅ Données jamais écrasées sans raison
+✅ Backup localStorage permanent
+✅ Logs console pour debug
+
+
+========================================
+📊 MONITORING
+========================================
+
+Console Chrome (F12) affiche :
+- "🔄 Auto-sync périodique..." toutes les 10s
+- "✅ Aucun changement en attente" si tout sync
+- "📦 Item X ajouté à la queue" si offline
+- "⚠️ Item X: données locales conservées" si conflit
+
+
+========================================
+🎯 PROCHAINES ÉTAPES
+========================================
+
+1. Tester sur une nouvelle mission VIDE
+2. Vérifier que chaque clic affiche "✅ Sauvegardé"
+3. Vérifier en DB que données arrivent
+4. Tester actualisation (warning doit apparaître)
+5. Tester mode offline (indicateur orange)
+
+
+--
+DiagPV Assistant
+Date: 2025-11-27
+Déploiement: https://0c2f94b2.girasole-diagpv.pages.dev

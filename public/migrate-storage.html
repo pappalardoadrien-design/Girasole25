@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration Audits GIRASOLE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: #e0e0e0;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #4ade80;
+            color: #000;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .step-desc {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+        .url-box {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #4ade80;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            word-break: break-all;
+            text-align: center;
+        }
+        .btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .warning {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .success {
+            background: rgba(74, 222, 128, 0.2);
+            border: 2px solid #4ade80;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #4ade80;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Migration Automatique</h1>
+        <div class="subtitle">Récupération de tes 9 audits terrain</div>
+
+        <div id="instructions">
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    État actuel
+                </div>
+                <div class="step-desc">
+                    Tu as rempli 9 checklists sur cette URL (iPhone Chrome) :
+                    <div class="url-box">0da64170.girasole-diagpv.pages.dev</div>
+                    Les données sont dans le <strong>localStorage de ton navigateur</strong>.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    Problème identifié
+                </div>
+                <div class="step-desc">
+                    L'ancienne version écrasait les données à chaque refresh. 
+                    La nouvelle version (0c2f94b2) corrige ça, mais elle ne peut pas accéder 
+                    aux données de l'ancienne URL.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    Solution
+                </div>
+                <div class="step-desc">
+                    Cette page va <strong>exporter automatiquement</strong> tes 9 audits 
+                    depuis le localStorage vers un fichier JSON.
+                </div>
+            </div>
+
+            <div class="warning">
+                ⚠️ <strong>IMPORTANT</strong> : Cette page doit être ouverte sur le 
+                <strong>même iPhone Chrome</strong> que celui utilisé pour remplir les audits.
+            </div>
+
+            <button id="btn-migrate" class="btn btn-primary">
+                🚀 EXPORTER MES 9 AUDITS
+            </button>
+        </div>
+
+        <div id="loading" style="display:none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Analyse du localStorage en cours...</p>
+            </div>
+        </div>
+
+        <div id="success" style="display:none;">
+            <div class="success">
+                <h2 style="margin-bottom:10px;">✅ Export réussi !</h2>
+                <p id="success-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MISSIONS = [
+            { id: '7', name: 'Pierre MOURGUES' },
+            { id: '9', name: 'BURGAT' },
+            { id: '12', name: 'Christian MIGNARD' },
+            { id: '20', name: 'VAN ZANTEN' },
+            { id: '24', name: 'Christophe CARRERE 2' },
+            { id: '33', name: 'Mathieu VINCENT' },
+            { id: '44', name: 'GOUNY' },
+            { id: '45', name: 'Maxime BAYLE' },
+            { id: '46', name: 'Commune de POMAS' }
+        ];
+
+        document.getElementById('btn-migrate').addEventListener('click', function() {
+            // Masquer instructions
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            setTimeout(function() {
+                try {
+                    let exportData = {};
+                    let foundCount = 0;
+                    let totalItems = 0;
+                    let totalPhotos = 0;
+
+                    MISSIONS.forEach(mission => {
+                        const key = 'audit_mission_' + mission.id;
+                        const data = localStorage.getItem(key);
+                        
+                        if (data) {
+                            try {
+                                const items = JSON.parse(data);
+                                const photosItems = [];
+                                
+                                // Récupérer photos par item
+                                items.forEach(item => {
+                                    const pk = 'audit_photos_item_' + mission.id + '_' + item.id;
+                                    const photos = JSON.parse(localStorage.getItem(pk) || '[]');
+                                    if (photos.length > 0) {
+                                        photosItems.push({
+                                            item_numero: item.item_numero,
+                                            item_id: item.id,
+                                            photos: photos
+                                        });
+                                        totalPhotos += photos.length;
+                                    }
+                                });
+                                
+                                // Photos générales
+                                const photosGenerales = JSON.parse(localStorage.getItem('photos_generales_' + mission.id) || '[]');
+                                totalPhotos += photosGenerales.length;
+                                
+                                exportData[mission.id] = {
+                                    items: items,
+                                    commentaire: localStorage.getItem('commentaire_final_' + mission.id) || '',
+                                    photos_generales: photosGenerales,
+                                    photos_items: photosItems
+                                };
+                                
+                                foundCount++;
+                                totalItems += items.length;
+                            } catch (e) {
+                                console.error('Erreur mission ' + mission.id, e);
+                            }
+                        }
+                    });
+
+                    // Export JSON
+                    if (foundCount > 0) {
+                        const json = JSON.stringify(exportData, null, 2);
+                        const blob = new Blob([json], {type: 'application/json'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'audits_GIRASOLE_' + foundCount + 'missions_' + new Date().toISOString().split('T')[0] + '.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        // Afficher succès
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('success').style.display = 'block';
+                        document.getElementById('success-message').innerHTML = `
+                            <strong>${foundCount} audits exportés</strong><br>
+                            ${totalItems} items de checklist<br>
+                            ${totalPhotos} photos incluses<br><br>
+                            📥 Fichier téléchargé !<br><br>
+                            <strong>➡️ Envoie-moi ce fichier JSON</strong><br>
+                            Je vais l'importer dans la DB en 2 min.
+                        `;
+                    } else {
+                        alert('❌ Aucun audit trouvé dans le localStorage.\n\nEs-tu sur le bon iPhone Chrome ?');
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('instructions').style.display = 'block';
+                    }
+                } catch (e) {
+                    alert('❌ Erreur export : ' + e.message);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('instructions').style.display = 'block';
+                }
+            }, 1500); // Délai visuel
+        });
+    </script>
+</body>
+</html>
