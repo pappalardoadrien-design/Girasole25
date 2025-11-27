@@ -7725,8 +7725,8 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
       photosToiture = { results: photosAllItems.results.filter(p => toitureIds.includes(p.item_checklist_id)) }
     }
     
-    const commentaireFinal = await DB.prepare(`SELECT * FROM ordres_mission_commentaires_finaux WHERE ordre_mission_id = ?`).bind(missionId).first()
-    const photosGenerales = await DB.prepare(`SELECT * FROM ordres_mission_photos_generales WHERE ordre_mission_id = ? ORDER BY ordre`).bind(missionId).all()
+    const commentaireFinal = await DB.prepare(`SELECT * FROM ordres_mission_commentaires_finaux WHERE mission_id = ?`).bind(missionId).first()
+    const photosGenerales = await DB.prepare(`SELECT * FROM ordres_mission_photos_generales WHERE mission_id = ?`).bind(missionId).all()
     
     const nbConformesSol = itemsSol.results.filter(i => i.statut === 'CONFORME').length
     const nbNonConformesSol = itemsSol.results.filter(i => i.statut === 'NON_CONFORME').length
@@ -7777,11 +7777,11 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
         stats: { conformes: nbConformesToiture, non_conformes: nbNonConformesToiture, na: nbNaToiture, total: itemsToiture.results.length }
       } : null,
       synthese: {
-        commentaire_final: commentaireFinal?.commentaire || '',
+        commentaire_final: commentaireFinal?.commentaire_final || '',
         photos_generales: photosGenerales.results.map(p => ({
-          filename: p.photo_filename,
+          filename: p.filename,
           base64: p.photo_base64,
-          legende: p.legende || ''
+          legende: p.description || ''
         }))
       }
     }
