@@ -12,10 +12,19 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 
 ## 🚀 URLs et Accès
 
-### **Environnement de Développement (Sandbox)**
-- **Interface Web**: https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev
-- **API Health**: https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/api/stats
-- **Status**: ✅ Opérationnel
+### **Environnement de Production**
+- **Interface Web**: https://d8be86bc.girasole-diagpv.pages.dev
+- **Dashboard**: https://d8be86bc.girasole-diagpv.pages.dev/
+- **API Checklist SOL**: https://d8be86bc.girasole-diagpv.pages.dev/api/checklist/:mission_id
+- **API Checklist TOITURE (14 items)**: https://d8be86bc.girasole-diagpv.pages.dev/api/checklist-toiture/:mission_id
+- **Rapports HTML**: https://d8be86bc.girasole-diagpv.pages.dev/rapport/:rapport_id
+- **Status**: ✅ Opérationnel (Cloudflare Pages)
+
+### **Dernière mise à jour**
+- **Date**: 27/11/2024 16:30 CET
+- **Version**: 2.1 (Checklist TOITURE 14 items)
+- **Migration**: 0013_ajout_distances_toiture.sql
+- **Item ajouté**: "Mesurer la distance Modules > Rives / Modules > Faitage"
 
 ### **Repository GitHub**
 - **URL**: https://github.com/pappalardoadrien-design/Girasole25
