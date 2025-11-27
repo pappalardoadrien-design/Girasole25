@@ -569,7 +569,7 @@ async function deletePhoto(photoId, itemId) {
   if (!confirm('Supprimer cette photo ?')) return;
   
   try {
-    const response = await fetch(`/api/checklist/item/photo/${photoId}`, {
+    const response = await fetch(`/api/checklist/item/${itemId}/photo/${photoId}`, {
       method: 'DELETE'
     });
     
