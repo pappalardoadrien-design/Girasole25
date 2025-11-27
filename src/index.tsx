@@ -3285,6 +3285,9 @@ app.get('/', (c) => {
                     <button onclick="showTab('docs')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-book mr-2"></i>Documentation
                     </button>
+                    <a href="/rapports" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-blue-600">
+                        <i class="fas fa-file-pdf mr-2"></i>Rapports
+                    </a>
                 </div>
             </div>
         </nav>
@@ -7124,6 +7127,923 @@ app.get('/om/:mission_id', async (c) => {
   } catch (error) {
     console.error('Erreur génération OM:', error)
     return c.html(`<h1>Erreur génération OM</h1><p>${String(error)}</p>`, 500)
+  }
+})
+
+// =======================
+// RAPPORTS AUDITS - GÉNÉRATION ET GESTION
+// =======================
+
+// POST /api/rapports/generer/:mission_id - Générer rapport factuel pour une mission
+app.post('/api/rapports/generer/:mission_id', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  
+  try {
+    // Récupérer info mission + centrale
+    const mission = await DB.prepare(`
+      SELECT om.*, c.nom, c.type_centrale, c.puissance_kwc, c.localisation, c.adresse, c.audit_toiture
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      WHERE om.id = ?
+    `).bind(missionId).first()
+    
+    if (!mission) {
+      return c.json({ success: false, error: 'Mission non trouvée' }, 404)
+    }
+    
+    // Récupérer items checklist SOL (40 points)
+    const itemsSol = await DB.prepare(`
+      SELECT * FROM checklist_items 
+      WHERE ordre_mission_id = ? 
+      ORDER BY item_numero
+    `).bind(missionId).all()
+    
+    // Récupérer photos pour chaque item SOL
+    const photosSol = await DB.prepare(`
+      SELECT * FROM ordres_mission_item_photos
+      WHERE ordre_mission_id = ?
+      ORDER BY item_id, ordre
+    `).bind(missionId).all()
+    
+    // Récupérer items checklist TOITURE (11 points) si applicable
+    let itemsToiture = { results: [] }
+    let photosToiture = { results: [] }
+    if (mission.audit_toiture === 'X') {
+      itemsToiture = await DB.prepare(`
+        SELECT * FROM checklist_items_toiture
+        WHERE ordre_mission_id = ?
+        ORDER BY item_numero
+      `).bind(missionId).all()
+      
+      photosToiture = await DB.prepare(`
+        SELECT * FROM ordres_mission_item_photos
+        WHERE ordre_mission_id = ? AND item_checklist_type = 'TOITURE'
+        ORDER BY item_id, ordre
+      `).bind(missionId).all()
+    }
+    
+    // Récupérer commentaire final
+    const commentaireFinal = await DB.prepare(`
+      SELECT * FROM ordres_mission_commentaires_finaux
+      WHERE ordre_mission_id = ?
+    `).bind(missionId).first()
+    
+    // Récupérer photos générales
+    const photosGenerales = await DB.prepare(`
+      SELECT * FROM ordres_mission_photos_generales
+      WHERE ordre_mission_id = ?
+      ORDER BY ordre
+    `).bind(missionId).all()
+    
+    // Calculer stats conformité
+    const nbConformesSol = itemsSol.results.filter(i => i.statut === 'CONFORME').length
+    const nbNonConformesSol = itemsSol.results.filter(i => i.statut === 'NON_CONFORME').length
+    const nbNaSol = itemsSol.results.filter(i => i.statut === 'N/A').length
+    
+    const nbConformesToiture = itemsToiture.results.filter(i => i.statut === 'CONFORME').length
+    const nbNonConformesToiture = itemsToiture.results.filter(i => i.statut === 'NON_CONFORME').length
+    const nbNaToiture = itemsToiture.results.filter(i => i.statut === 'N/A').length
+    
+    // Construire structure rapport JSON (sans calculs inventés, juste les faits)
+    const rapportData = {
+      mission: {
+        id: mission.id,
+        centrale_nom: mission.nom,
+        type: mission.type_centrale,
+        puissance_kwc: mission.puissance_kwc,
+        localisation: mission.localisation,
+        adresse: mission.adresse,
+        date_audit: mission.date_audit || new Date().toISOString().split('T')[0],
+        auditeur: `${mission.technicien_prenom} ${mission.technicien_nom}`
+      },
+      checklist_sol: {
+        items: itemsSol.results.map(item => ({
+          numero: item.item_numero,
+          libelle: item.item_texte,
+          categorie: item.categorie,
+          statut: item.statut,
+          commentaire: item.commentaire || '',
+          photos: photosSol.results
+            .filter(p => p.item_id === item.id)
+            .map(p => ({
+              filename: p.photo_filename,
+              base64: p.photo_base64,
+              commentaire: p.commentaire || ''
+            }))
+        })),
+        stats: {
+          conformes: nbConformesSol,
+          non_conformes: nbNonConformesSol,
+          na: nbNaSol,
+          total: itemsSol.results.length
+        }
+      },
+      checklist_toiture: mission.audit_toiture === 'X' ? {
+        items: itemsToiture.results.map(item => ({
+          numero: item.item_numero,
+          libelle: item.libelle,
+          statut: item.statut,
+          commentaire: item.commentaire || '',
+          photos: photosToiture.results
+            .filter(p => p.item_id === item.id)
+            .map(p => ({
+              filename: p.photo_filename,
+              base64: p.photo_base64,
+              commentaire: p.commentaire || ''
+            }))
+        })),
+        stats: {
+          conformes: nbConformesToiture,
+          non_conformes: nbNonConformesToiture,
+          na: nbNaToiture,
+          total: itemsToiture.results.length
+        }
+      } : null,
+      synthese: {
+        commentaire_final: commentaireFinal?.commentaire || '',
+        photos_generales: photosGenerales.results.map(p => ({
+          filename: p.photo_filename,
+          base64: p.photo_base64,
+          legende: p.legende || ''
+        }))
+      }
+    }
+    
+    // Insérer rapport dans DB
+    const typeRapport = mission.audit_toiture === 'X' ? 'AUDIT_COMPLET' : 'AUDIT_QUALITE'
+    
+    const insertRapport = await DB.prepare(`
+      INSERT INTO rapports_audits (
+        centrale_id, ordre_mission_id, titre, type_rapport, statut,
+        auditeur, date_audit,
+        nb_items_conformes, nb_items_non_conformes, nb_items_na,
+        donnees_rapport, auteur
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      mission.centrale_id,
+      missionId,
+      `Rapport Audit ${mission.nom}`,
+      typeRapport,
+      'TERMINE',
+      `${mission.technicien_prenom} ${mission.technicien_nom}`,
+      mission.date_audit || new Date().toISOString().split('T')[0],
+      nbConformesSol + nbConformesToiture,
+      nbNonConformesSol + nbNonConformesToiture,
+      nbNaSol + nbNaToiture,
+      JSON.stringify(rapportData),
+      'Système'
+    ).run()
+    
+    return c.json({
+      success: true,
+      rapport_id: insertRapport.meta.last_row_id,
+      message: 'Rapport généré avec succès (données factuelles uniquement)'
+    })
+    
+  } catch (error) {
+    console.error('Erreur génération rapport:', error)
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/rapports - Liste des rapports
+app.get('/api/rapports', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const rapports = await DB.prepare(`
+      SELECT 
+        r.*,
+        c.nom as centrale_nom,
+        c.type_centrale,
+        c.puissance_kwc
+      FROM rapports_audits r
+      JOIN centrales c ON r.centrale_id = c.id
+      ORDER BY r.date_generation DESC
+    `).all()
+    
+    return c.json({ success: true, data: rapports.results })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /api/rapports/:rapport_id - Détail rapport
+app.get('/api/rapports/:rapport_id', async (c) => {
+  const { DB } = c.env
+  const rapportId = c.req.param('rapport_id')
+  
+  try {
+    const rapport = await DB.prepare(`
+      SELECT 
+        r.*,
+        c.nom as centrale_nom,
+        c.type_centrale,
+        c.puissance_kwc,
+        c.localisation
+      FROM rapports_audits r
+      JOIN centrales c ON r.centrale_id = c.id
+      WHERE r.id = ?
+    `).bind(rapportId).first()
+    
+    if (!rapport) {
+      return c.json({ success: false, error: 'Rapport non trouvé' }, 404)
+    }
+    
+    // Récupérer compléments (photos/commentaires additionnels Adrien/Fabien)
+    const complements = await DB.prepare(`
+      SELECT * FROM rapports_complements
+      WHERE rapport_id = ?
+      ORDER BY ordre_affichage, created_at
+    `).bind(rapportId).all()
+    
+    return c.json({
+      success: true,
+      rapport: {
+        ...rapport,
+        donnees_rapport: JSON.parse(rapport.donnees_rapport),
+        complements: complements.results
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/rapports/:rapport_id/complements - Ajouter photo/commentaire post-audit
+app.post('/api/rapports/:rapport_id/complements', async (c) => {
+  const { DB } = c.env
+  const rapportId = c.req.param('rapport_id')
+  
+  try {
+    const body = await c.req.json()
+    const { type, contenu, titre, description, auteur, section_rapport } = body
+    
+    const result = await DB.prepare(`
+      INSERT INTO rapports_complements (
+        rapport_id, type, contenu, titre, description, auteur, section_rapport
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(rapportId, type, contenu, titre || null, description || null, auteur, section_rapport || null).run()
+    
+    return c.json({ success: true, complement_id: result.meta.last_row_id })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// GET /rapports - Interface gestion rapports (Adrien + Fabien)
+app.get('/rapports', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    // Récupérer tous les rapports
+    const rapports = await DB.prepare(`
+      SELECT 
+        r.*,
+        c.nom as centrale_nom,
+        c.type_centrale,
+        c.puissance_kwc,
+        c.dept,
+        om.technicien_nom,
+        om.technicien_prenom
+      FROM rapports_audits r
+      JOIN centrales c ON r.centrale_id = c.id
+      LEFT JOIN ordres_mission om ON r.ordre_mission_id = om.id
+      ORDER BY r.date_generation DESC
+    `).all()
+    
+    return c.html(`
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports Audits - GIRASOLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .rapport-card { 
+            transition: all 0.3s; 
+            cursor: pointer;
+        }
+        .rapport-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">
+                        <i class="fas fa-file-pdf mr-3"></i>
+                        Rapports Audits
+                    </h1>
+                    <p class="text-blue-100 mt-2">
+                        <i class="fas fa-building mr-2"></i>
+                        ${rapports.results.length} rapport(s) disponible(s)
+                    </p>
+                </div>
+                <div>
+                    <a href="/" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
+                        <i class="fas fa-home mr-2"></i>Accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-6 py-8">
+        
+        <!-- Stats rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Rapports terminés</p>
+                        <p class="text-2xl font-bold text-gray-800">${rapports.results.filter(r => r.statut === 'TERMINE' || r.statut === 'VALIDE').length}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <i class="fas fa-clipboard-list text-blue-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">En cours</p>
+                        <p class="text-2xl font-bold text-gray-800">${rapports.results.filter(r => r.statut === 'EN_COURS').length}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-orange-100 p-3 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-orange-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Non-conformités</p>
+                        <p class="text-2xl font-bold text-gray-800">${rapports.results.reduce((sum, r) => sum + (r.nb_items_non_conformes || 0), 0)}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 p-3 rounded-lg">
+                        <i class="fas fa-solar-panel text-purple-600 text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-600">Audits toiture</p>
+                        <p class="text-2xl font-bold text-gray-800">${rapports.results.filter(r => r.type_rapport === 'AUDIT_COMPLET').length}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des rapports -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-list mr-2"></i>
+                Tous les rapports
+            </h2>
+            
+            <div class="space-y-4" id="rapportsContainer">
+                ${rapports.results.length === 0 ? `
+                    <div class="text-center py-12">
+                        <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Aucun rapport disponible</p>
+                        <p class="text-sm text-gray-400 mt-2">Les rapports apparaîtront ici après génération</p>
+                    </div>
+                ` : rapports.results.map(r => `
+                    <div class="rapport-card bg-gray-50 rounded-lg p-5 border-l-4 ${
+                      r.statut === 'VALIDE' ? 'border-green-500' :
+                      r.statut === 'TERMINE' ? 'border-blue-500' :
+                      r.statut === 'EN_COURS' ? 'border-orange-500' :
+                      'border-gray-300'
+                    }" onclick="window.location.href='/rapports/${r.id}'">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h3 class="text-lg font-bold text-gray-800">
+                                        ${r.centrale_nom}
+                                    </h3>
+                                    <span class="badge ${
+                                      r.statut === 'VALIDE' ? 'bg-green-100 text-green-700' :
+                                      r.statut === 'TERMINE' ? 'bg-blue-100 text-blue-700' :
+                                      r.statut === 'EN_COURS' ? 'bg-orange-100 text-orange-700' :
+                                      'bg-gray-100 text-gray-700'
+                                    }">
+                                        ${r.statut === 'VALIDE' ? '✅ Validé' :
+                                          r.statut === 'TERMINE' ? '📄 Terminé' :
+                                          r.statut === 'EN_COURS' ? '⏳ En cours' :
+                                          '📝 Brouillon'}
+                                    </span>
+                                    ${r.type_rapport === 'AUDIT_COMPLET' ? `
+                                        <span class="badge bg-purple-100 text-purple-700">
+                                            🏠 Toiture
+                                        </span>
+                                    ` : ''}
+                                </div>
+                                
+                                <div class="flex items-center space-x-6 text-sm text-gray-600 mb-3">
+                                    <span>
+                                        <i class="fas fa-bolt text-yellow-600 mr-1"></i>
+                                        ${r.puissance_kwc} kWc
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-map-marker-alt text-red-600 mr-1"></i>
+                                        ${r.dept || 'N/A'}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-calendar text-blue-600 mr-1"></i>
+                                        ${new Date(r.date_audit).toLocaleDateString('fr-FR')}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-user text-gray-600 mr-1"></i>
+                                        ${r.auditeur}
+                                    </span>
+                                </div>
+                                
+                                <!-- Stats conformité -->
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                        <span class="text-gray-700">${r.nb_items_conformes || 0} conformes</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                        <span class="text-gray-700">${r.nb_items_non_conformes || 0} non-conformes</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-gray-400 mr-2"></div>
+                                        <span class="text-gray-700">${r.nb_items_na || 0} N/A</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col items-end space-y-2">
+                                <button onclick="event.stopPropagation(); telechargerRapport(${r.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                    <i class="fas fa-download mr-2"></i>PDF
+                                </button>
+                                <button onclick="event.stopPropagation(); ajouterCommentaire(${r.id})" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                    <i class="fas fa-plus mr-2"></i>Complément
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        function telechargerRapport(rapportId) {
+            alert('Téléchargement PDF rapport ' + rapportId + ' (à implémenter)')
+            // TODO: Générer et télécharger PDF
+        }
+        
+        function ajouterCommentaire(rapportId) {
+            const commentaire = prompt('Ajouter un commentaire ou une observation :')
+            if (commentaire) {
+                fetch('/api/rapports/' + rapportId + '/complements', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'COMMENTAIRE',
+                        contenu: commentaire,
+                        auteur: 'Adrien' // TODO: Authentification
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Commentaire ajouté !')
+                        location.reload()
+                    }
+                })
+            }
+        }
+    </script>
+</body>
+</html>
+    `)
+    
+  } catch (error) {
+    return c.html(`<h1>Erreur</h1><p>${String(error)}</p>`, 500)
+  }
+})
+
+// GET /rapports/:rapport_id - Détail rapport avec items + photos
+app.get('/rapports/:rapport_id', async (c) => {
+  const { DB } = c.env
+  const rapportId = c.req.param('rapport_id')
+  
+  try {
+    // Récupérer rapport
+    const rapport = await DB.prepare(`
+      SELECT 
+        r.*,
+        c.nom as centrale_nom,
+        c.type_centrale,
+        c.puissance_kwc,
+        c.localisation,
+        c.adresse,
+        c.dept
+      FROM rapports_audits r
+      JOIN centrales c ON r.centrale_id = c.id
+      WHERE r.id = ?
+    `).bind(rapportId).first()
+    
+    if (!rapport) {
+      return c.html('<h1 style="text-align:center;margin-top:50px;">❌ Rapport non trouvé</h1>')
+    }
+    
+    // Récupérer compléments
+    const complements = await DB.prepare(`
+      SELECT * FROM rapports_complements
+      WHERE rapport_id = ?
+      ORDER BY ordre_affichage, created_at
+    `).bind(rapportId).all()
+    
+    const donneesRapport = JSON.parse(rapport.donnees_rapport)
+    
+    return c.html(`
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport ${rapport.centrale_nom}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .item-card {
+            page-break-inside: avoid;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg no-print">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">
+                        <i class="fas fa-file-pdf mr-3"></i>
+                        ${rapport.centrale_nom}
+                    </h1>
+                    <p class="text-blue-100 mt-2">
+                        ${rapport.type_centrale} • ${rapport.puissance_kwc} kWc • ${rapport.adresse || rapport.localisation}
+                    </p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="/rapports" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Retour
+                    </a>
+                    <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                        <i class="fas fa-print mr-2"></i>Imprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu rapport -->
+    <main class="container mx-auto px-6 py-8">
+        
+        <!-- EN-TÊTE RAPPORT -->
+        <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">RAPPORT AUDIT QUALITÉ</h2>
+                <p class="text-gray-600">${rapport.centrale_nom}</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-6 text-sm">
+                <div>
+                    <p class="text-gray-600"><strong>Type installation :</strong> ${rapport.type_centrale}</p>
+                    <p class="text-gray-600"><strong>Puissance :</strong> ${rapport.puissance_kwc} kWc</p>
+                    <p class="text-gray-600"><strong>Localisation :</strong> ${rapport.adresse || rapport.localisation}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600"><strong>Date audit :</strong> ${new Date(rapport.date_audit).toLocaleDateString('fr-FR')}</p>
+                    <p class="text-gray-600"><strong>Auditeur :</strong> ${rapport.auditeur}</p>
+                    <p class="text-gray-600"><strong>Type audit :</strong> ${rapport.type_rapport === 'AUDIT_COMPLET' ? 'Visuel + Toiture' : 'Visuel électrique'}</p>
+                </div>
+            </div>
+            
+            <!-- Stats conformité -->
+            <div class="mt-6 grid grid-cols-3 gap-4 text-center">
+                <div class="bg-green-50 rounded-lg p-4">
+                    <p class="text-3xl font-bold text-green-600">${rapport.nb_items_conformes}</p>
+                    <p class="text-sm text-gray-600">Conformes</p>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                    <p class="text-3xl font-bold text-red-600">${rapport.nb_items_non_conformes}</p>
+                    <p class="text-sm text-gray-600">Non-conformes</p>
+                </div>
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <p class="text-3xl font-bold text-gray-600">${rapport.nb_items_na}</p>
+                    <p class="text-sm text-gray-600">N/A</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHECKLIST SOL (40 points) -->
+        <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-list-check mr-3 text-blue-600"></i>
+                CHECKLIST AUDIT VISUEL & MÉCANIQUE (40 points)
+            </h3>
+            
+            <div class="space-y-6">
+                ${donneesRapport.checklist_sol.items.map((item, idx) => `
+                    <div class="item-card border-l-4 ${
+                      item.statut === 'CONFORME' ? 'border-green-500 bg-green-50' :
+                      item.statut === 'NON_CONFORME' ? 'border-red-500 bg-red-50' :
+                      'border-gray-300 bg-gray-50'
+                    } rounded-lg p-5">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    <span class="text-blue-600">${item.numero}.</span> ${item.libelle}
+                                </h4>
+                                <p class="text-xs text-gray-500">${item.categorie}</p>
+                            </div>
+                            <span class="ml-4 px-4 py-1 rounded-full text-sm font-semibold ${
+                              item.statut === 'CONFORME' ? 'bg-green-200 text-green-800' :
+                              item.statut === 'NON_CONFORME' ? 'bg-red-200 text-red-800' :
+                              'bg-gray-200 text-gray-800'
+                            }">
+                                ${item.statut === 'CONFORME' ? '✅ Conforme' :
+                                  item.statut === 'NON_CONFORME' ? '❌ Non conforme' :
+                                  '⚠️ N/A'}
+                            </span>
+                        </div>
+                        
+                        ${item.commentaire ? `
+                            <div class="bg-white rounded-lg p-4 mb-3">
+                                <p class="text-sm text-gray-700"><strong>💬 Commentaire terrain :</strong></p>
+                                <p class="text-sm text-gray-600 mt-1">${item.commentaire}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${item.photos.length > 0 ? `
+                            <div class="photo-grid mt-3">
+                                ${item.photos.map((photo, photoIdx) => `
+                                    <div class="photo-item">
+                                        <img src="${photo.base64}" alt="${photo.filename}" onclick="window.open(this.src)">
+                                        ${photo.commentaire ? `
+                                            <p class="text-xs text-gray-600 mt-1">${photo.commentaire}</p>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- CHECKLIST TOITURE (11 points) - Si applicable -->
+        ${donneesRapport.checklist_toiture ? `
+            <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-home mr-3 text-orange-600"></i>
+                    CHECKLIST AUDIT EN TOITURE (11 points)
+                </h3>
+                
+                <div class="space-y-6">
+                    ${donneesRapport.checklist_toiture.items.map((item, idx) => `
+                        <div class="item-card border-l-4 ${
+                          item.statut === 'CONFORME' ? 'border-green-500 bg-green-50' :
+                          item.statut === 'NON_CONFORME' ? 'border-red-500 bg-red-50' :
+                          'border-gray-300 bg-gray-50'
+                        } rounded-lg p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-1">
+                                        <span class="text-orange-600">T${item.numero}.</span> ${item.libelle}
+                                    </h4>
+                                </div>
+                                <span class="ml-4 px-4 py-1 rounded-full text-sm font-semibold ${
+                                  item.statut === 'CONFORME' ? 'bg-green-200 text-green-800' :
+                                  item.statut === 'NON_CONFORME' ? 'bg-red-200 text-red-800' :
+                                  'bg-gray-200 text-gray-800'
+                                }">
+                                    ${item.statut === 'CONFORME' ? '✅ Conforme' :
+                                      item.statut === 'NON_CONFORME' ? '❌ Non conforme' :
+                                      '⚠️ N/A'}
+                                </span>
+                            </div>
+                            
+                            ${item.commentaire ? `
+                                <div class="bg-white rounded-lg p-4 mb-3">
+                                    <p class="text-sm text-gray-700"><strong>💬 Commentaire terrain :</strong></p>
+                                    <p class="text-sm text-gray-600 mt-1">${item.commentaire}</p>
+                                </div>
+                            ` : ''}
+                            
+                            ${item.photos.length > 0 ? `
+                                <div class="photo-grid mt-3">
+                                    ${item.photos.map((photo, photoIdx) => `
+                                        <div class="photo-item">
+                                            <img src="${photo.base64}" alt="${photo.filename}" onclick="window.open(this.src)">
+                                            ${photo.commentaire ? `
+                                                <p class="text-xs text-gray-600 mt-1">${photo.commentaire}</p>
+                                            ` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+
+        <!-- SYNTHÈSE GÉNÉRALE -->
+        <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-clipboard-check mr-3 text-purple-600"></i>
+                SYNTHÈSE GÉNÉRALE DE L'AUDIT
+            </h3>
+            
+            ${donneesRapport.synthese.commentaire_final ? `
+                <div class="bg-blue-50 rounded-lg p-6 mb-6">
+                    <p class="text-sm font-semibold text-blue-800 mb-2">💬 Commentaire général auditeur :</p>
+                    <p class="text-sm text-gray-700">${donneesRapport.synthese.commentaire_final}</p>
+                </div>
+            ` : ''}
+            
+            ${donneesRapport.synthese.photos_generales.length > 0 ? `
+                <div>
+                    <p class="text-sm font-semibold text-gray-800 mb-3">📸 Photos générales :</p>
+                    <div class="photo-grid">
+                        ${donneesRapport.synthese.photos_generales.map(photo => `
+                            <div class="photo-item">
+                                <img src="${photo.base64}" alt="${photo.filename}" onclick="window.open(this.src)">
+                                ${photo.legende ? `
+                                    <p class="text-xs text-gray-600 mt-1">${photo.legende}</p>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+
+        <!-- COMPLÉMENTS POST-AUDIT (Adrien/Fabien) -->
+        ${complements.results.length > 0 ? `
+            <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-plus-circle mr-3 text-green-600"></i>
+                    COMPLÉMENTS POST-AUDIT
+                </h3>
+                
+                <div class="space-y-4">
+                    ${complements.results.map(comp => `
+                        <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-5">
+                            <div class="flex items-start justify-between mb-2">
+                                <p class="text-sm font-semibold text-green-800">
+                                    ${comp.type === 'PHOTO' ? '📸 Photo' :
+                                      comp.type === 'COMMENTAIRE' ? '💬 Commentaire' :
+                                      comp.type === 'OBSERVATION' ? '🔍 Observation' :
+                                      '📝 Note'} 
+                                    ${comp.titre ? `- ${comp.titre}` : ''}
+                                </p>
+                                <span class="text-xs text-gray-600">${comp.auteur} • ${new Date(comp.created_at).toLocaleDateString('fr-FR')}</span>
+                            </div>
+                            ${comp.type === 'PHOTO' ? `
+                                <img src="${comp.contenu}" alt="Complément" class="w-full max-w-md rounded-lg">
+                            ` : `
+                                <p class="text-sm text-gray-700">${comp.contenu}</p>
+                            `}
+                            ${comp.description ? `
+                                <p class="text-xs text-gray-600 mt-2">${comp.description}</p>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+
+        <!-- Boutons action -->
+        <div class="bg-white rounded-lg shadow-md p-8 no-print">
+            <div class="flex space-x-4">
+                <button onclick="ajouterComplementPhoto()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                    <i class="fas fa-camera mr-2"></i>Ajouter une photo
+                </button>
+                <button onclick="ajouterComplementCommentaire()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                    <i class="fas fa-comment mr-2"></i>Ajouter un commentaire
+                </button>
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        function ajouterComplementPhoto() {
+            const input = document.createElement('input')
+            input.type = 'file'
+            input.accept = 'image/*'
+            input.onchange = (e) => {
+                const file = e.target.files[0]
+                if (file) {
+                    const reader = new FileReader()
+                    reader.onload = (event) => {
+                        const titre = prompt('Titre de la photo (optionnel):')
+                        const description = prompt('Description (optionnel):')
+                        
+                        fetch('/api/rapports/${rapportId}/complements', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: 'PHOTO',
+                                contenu: event.target.result,
+                                titre: titre,
+                                description: description,
+                                auteur: 'Adrien' // TODO: Auth
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Photo ajoutée !')
+                                location.reload()
+                            }
+                        })
+                    }
+                    reader.readAsDataURL(file)
+                }
+            }
+            input.click()
+        }
+        
+        function ajouterComplementCommentaire() {
+            const titre = prompt('Titre du commentaire (optionnel):')
+            const contenu = prompt('Commentaire:')
+            if (contenu) {
+                fetch('/api/rapports/${rapportId}/complements', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'COMMENTAIRE',
+                        contenu: contenu,
+                        titre: titre,
+                        auteur: 'Adrien' // TODO: Auth
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Commentaire ajouté !')
+                        location.reload()
+                    }
+                })
+            }
+        }
+    </script>
+</body>
+</html>
+    `)
+    
+  } catch (error) {
+    return c.html(`<h1>Erreur</h1><p>${String(error)}</p>`, 500)
   }
 })
 
