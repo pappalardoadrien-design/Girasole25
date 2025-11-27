@@ -489,28 +489,72 @@ function renderItemPhotos(itemId, photos) {
   
   container.innerHTML = `
     <div class="grid grid-cols-3 gap-2 mt-2">
-      ${photos.map((photo, idx) => `
-        <div class="relative group">
-          <img 
-            src="data:image/jpeg;base64,${photo.photo_base64}" 
-            class="w-full h-24 object-cover rounded-lg border-2 border-gray-300 cursor-pointer hover:border-blue-500 transition"
-            onclick="openPhotoModal(${itemId}, ${idx})"
-            alt="Photo ${idx + 1}"
-          />
-          <button 
-            onclick="deletePhoto(${photo.id}, ${itemId})"
-            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 opacity-0 group-hover:opacity-100 transition"
-            title="Supprimer photo"
-          >×</button>
-        </div>
-      `).join('')}
+      ${photos.map((photo, idx) => {
+        // Retirer préfixe data:image si déjà présent
+        const base64 = photo.photo_base64?.startsWith('data:') 
+          ? photo.photo_base64 
+          : `data:image/jpeg;base64,${photo.photo_base64}`;
+        return `
+          <div class="relative group">
+            <img 
+              src="${base64}" 
+              class="w-full h-24 object-cover rounded-lg border-2 border-gray-300 cursor-pointer hover:border-blue-500 transition"
+              onclick="openPhotoModal(${itemId}, ${idx})"
+              alt="Photo ${idx + 1}"
+            />
+            <button 
+              onclick="deletePhoto(${photo.id}, ${itemId})"
+              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 opacity-0 group-hover:opacity-100 transition"
+              title="Supprimer photo"
+            >×</button>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
 }
 
 function openPhotoModal(itemId, photoIndex) {
-  // TODO: Implémenter modal photo
-  alert('Visualisation photo à implémenter');
+  // Créer modal si n'existe pas
+  let modal = document.getElementById('photoModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'photoModal';
+    modal.style.cssText = `
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    `;
+    modal.innerHTML = `
+      <img id="photoModalImg" style="max-width: 90%; max-height: 90vh; border-radius: 8px;" />
+      <button onclick="closePhotoModal()" style="position: absolute; top: 20px; right: 20px; color: white; font-size: 32px; background: none; border: none; cursor: pointer;">×</button>
+    `;
+    document.body.appendChild(modal);
+  }
+  
+  // Charger photo depuis API
+  fetch(`/api/checklist/${missionId}/item/${itemId}/photos`)
+    .then(r => r.json())
+    .then(data => {
+      const photo = data.photos[photoIndex];
+      const base64 = photo.photo_base64?.startsWith('data:') 
+        ? photo.photo_base64 
+        : `data:image/jpeg;base64,${photo.photo_base64}`;
+      document.getElementById('photoModalImg').src = base64;
+      modal.style.display = 'flex';
+    });
+}
+
+window.closePhotoModal = function() {
+  const modal = document.getElementById('photoModal');
+  if (modal) modal.style.display = 'none';
 }
 
 async function deletePhoto(photoId, itemId) {
