@@ -1,0 +1,51 @@
+🚨 SOLUTION ALTERNATIVE - EXPORT JSON PUIS IMPORT MANUEL
+
+L'API a un problème en production. On va exporter tes données en JSON depuis ton téléphone, puis je les importerai manuellement.
+
+═══════════════════════════════════════════════════════════════
+
+📱 SUR TON TÉLÉPHONE - COPIE CE CODE DANS LA CONSOLE :
+
+(Ouvre n'importe quel audit puis Console Chrome)
+
+═══════════════════════════════════════════════════════════════
+
+// EXPORT TOUTES LES DONNÉES
+function exportData() {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('audit_'));
+  const data = {};
+  keys.forEach(k => {
+    try {
+      data[k] = localStorage.getItem(k);
+    } catch (e) {
+      console.error('Erreur clé', k);
+    }
+  });
+  const json = JSON.stringify(data, null, 2);
+  console.log('═══════════════════════════════════════');
+  console.log('📦 COPIE CE JSON COMPLET :');
+  console.log('═══════════════════════════════════════');
+  console.log(json);
+  console.log('═══════════════════════════════════════');
+  console.log('✅ Copie TOUT le texte ci-dessus');
+  console.log('✅ Envoie-le moi par message');
+  return json;
+}
+exportData();
+
+═══════════════════════════════════════════════════════════════
+
+ÉTAPES :
+
+1. Colle le code ci-dessus dans la console
+2. Appuie Entrée
+3. La console affiche un GROS JSON
+4. SÉLECTIONNE ET COPIE tout le JSON (entre les lignes ═══)
+5. ENVOIE-MOI le JSON par message
+6. Je le réinjecte dans la base de données
+
+═══════════════════════════════════════════════════════════════
+
+⏰ TEMPS : 2 minutes max
+
+✅ GARANTIE : Toutes tes données seront sauvegardées

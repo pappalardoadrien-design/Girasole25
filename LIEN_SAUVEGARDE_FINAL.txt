@@ -1,0 +1,60 @@
+🚨🚨🚨 LIEN SAUVEGARDE URGENCE - SUR TON TÉLÉPHONE 🚨🚨🚨
+
+═══════════════════════════════════════════════════════════════
+
+📱 OUVRE CE LIEN SUR TON TÉLÉPHONE (celui avec les audits) :
+
+https://0da64170.girasole-diagpv.pages.dev/backup-urgence
+
+═══════════════════════════════════════════════════════════════
+
+ÉTAPES :
+
+1. Ouvre le lien ci-dessus
+2. La page va scanner tes audits localStorage
+3. CLIQUE SUR LE GROS BOUTON VERT
+4. Attends 2-5 minutes
+5. Message "✅ X mission(s) sauvegardée(s) !"
+
+═══════════════════════════════════════════════════════════════
+
+ALTERNATIVE SI ÇA NE MARCHE PAS :
+
+Sur ton téléphone, ouvre N'IMPORTE QUEL audit :
+https://0da64170.girasole-diagpv.pages.dev/audit/24
+
+Puis ouvre Console Chrome et colle ce code :
+
+async function save() {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('audit_mission_'));
+  let saved = 0;
+  for (const key of keys) {
+    const id = key.replace('audit_mission_', '');
+    const items = JSON.parse(localStorage.getItem(key) || '[]');
+    const photosItems = [];
+    for (const item of items) {
+      const pk = 'audit_photos_item_' + id + '_' + item.id;
+      const photos = JSON.parse(localStorage.getItem(pk) || '[]');
+      if (photos.length > 0) photosItems.push({item_numero: item.item_numero, photos});
+    }
+    const res = await fetch('/api/audit/sync-bulk', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        mission_id: id,
+        checklist_items: items,
+        photos_items: photosItems,
+        commentaire_final: localStorage.getItem('commentaire_final_' + id) || '',
+        photos_generales: JSON.parse(localStorage.getItem('photos_generales_' + id) || '[]')
+      })
+    });
+    const result = await res.json();
+    if (result.success) saved++;
+  }
+  alert('✅ ' + saved + ' sauvegardées !');
+}
+save();
+
+═══════════════════════════════════════════════════════════════
+
+🔥 FAIS ÇA MAINTENANT ! 🔥

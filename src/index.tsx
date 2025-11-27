@@ -5854,6 +5854,34 @@ app.post('/api/audit/sync-bulk', async (c) => {
       photos: photos_items?.length || 0
     })
     
+    // 0. VÉRIFIER QUE L'ORDRE DE MISSION EXISTE (sinon créer)
+    const missionExist = await DB.prepare(`SELECT id FROM ordres_mission WHERE id = ?`).bind(mission_id).first()
+    
+    if (!missionExist) {
+      // Récupérer info centrale depuis mission_id
+      const centrale = await DB.prepare(`SELECT * FROM centrales WHERE id = ?`).bind(mission_id).first()
+      
+      if (centrale) {
+        // Créer ordre de mission
+        await DB.prepare(`
+          INSERT INTO ordres_mission (
+            id, centrale_id, centrale_nom, centrale_type, puissance_kwc, 
+            technicien_nom, technicien_prenom, statut
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          mission_id,
+          centrale.id,
+          centrale.nom,
+          centrale.type || 'SOL',
+          centrale.puissance_kwc,
+          'Adrien',
+          'Pappalardo',
+          'EN_COURS'
+        ).run()
+        console.log(`✅ Ordre mission ${mission_id} créé`)
+      }
+    }
+    
     // 1. Sync items checklist SOL
     if (checklist_items && Array.isArray(checklist_items)) {
       for (const item of checklist_items) {
