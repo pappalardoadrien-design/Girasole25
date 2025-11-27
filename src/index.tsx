@@ -2071,7 +2071,7 @@ app.get('/api/checklist-toiture/:mission_id', async (c) => {
       return c.json({ 
         success: true, 
         audit_toiture_requis: false, 
-        items: [], 
+        data: [], 
         message: 'Audit toiture non requis pour cette centrale' 
       })
     }
@@ -2114,7 +2114,7 @@ app.get('/api/checklist-toiture/:mission_id', async (c) => {
     return c.json({ 
       success: true, 
       audit_toiture_requis: true,
-      items: items.results || [],
+      data: items.results || [],
       count: items.results?.length || 0
     })
   } catch (error) {
