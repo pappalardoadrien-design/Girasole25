@@ -1,0 +1,64 @@
+🚨 VÉRIFICATION URGENTE - OÙ SONT TES AUDITS ?
+
+========================================
+🔍 TEST 1 : VÉRIFIE SI TU VOIS LES DONNÉES
+========================================
+
+Sur ton iPhone/ordinateur, ouvre ces liens et DIS-MOI CE QUE TU VOIS :
+
+1. https://0da64170.girasole-diagpv.pages.dev/audit/24
+   → Vois-tu des cases COCHÉES ? Des COMMENTAIRES ? Des PHOTOS ?
+
+2. https://0da64170.girasole-diagpv.pages.dev/audit/44
+   → Vois-tu des cases COCHÉES ? Des COMMENTAIRES ? Des PHOTOS ?
+
+3. https://0da64170.girasole-diagpv.pages.dev/audit/9
+   → Vois-tu des cases COCHÉES ? Des COMMENTAIRES ? Des PHOTOS ?
+
+
+========================================
+❓ RÉPONSE ATTENDUE
+========================================
+
+Option A : OUI, je vois mes audits remplis
+→ Les données sont là, le script d'export a un bug
+
+Option B : NON, tout est vide
+→ Les données ne sont PAS dans ce navigateur/appareil
+
+
+========================================
+🔍 TEST 2 : VÉRIFIER SUR QUEL APPAREIL
+========================================
+
+Tu as fait les 9 audits sur :
+- iPhone ? (quel navigateur : Safari ou Chrome ?)
+- Ordinateur ? (quel navigateur ?)
+- Tablette ?
+
+Tu es ACTUELLEMENT sur :
+- iPhone ? (quel navigateur ?)
+- Ordinateur ? (quel navigateur ?)
+
+C'est le MÊME appareil et MÊME navigateur ?
+
+
+========================================
+🔍 TEST 3 : VÉRIFIER SI DONNÉES EN DB
+========================================
+
+Si les données ont déjà été synchronisées, elles sont dans la DB.
+
+Je vais vérifier immédiatement.
+
+
+========================================
+⏰ RÉPONDS-MOI
+========================================
+
+1. Vois-tu tes audits remplis sur les liens ci-dessus ? (OUI/NON)
+2. Sur quel appareil/navigateur as-tu FAIT les audits ?
+3. Sur quel appareil/navigateur es-tu MAINTENANT ?
+
+--
+DiagPV Assistant
