@@ -3570,9 +3570,9 @@ app.get('/', (c) => {
                         console.log('✅ Response:', response.status, response.ok);
                         
                         const data = await response.json();
-                        console.log('📦 Data:', data.success, 'missions:', data.data?.length);
+                        console.log('📦 Data:', data.success, 'missions:', data.missions?.length);
                         
-                        const missions = data.data;
+                        const missions = data.missions;
                         const container = document.getElementById('missions-container');
                         console.log('📍 Container:', container ? 'trouvé' : 'INTROUVABLE');
                         
@@ -3959,7 +3959,7 @@ app.get('/', (c) => {
                                 return;
                             }
                             
-                            allMissions = data.data;
+                            allMissions = data.missions;
                             console.log(\`✅ \${allMissions.length} missions chargées\`);
                             
                             // Charger coordonnées GPS réelles depuis centrales
@@ -4658,7 +4658,7 @@ app.get('/', (c) => {
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script src="/static/app.js"></script>
+        <!-- app.js supprimé - Code inline dans Dashboard -->
         <script src="/static/planning.js"></script>
         <script src="/static/attribution.js"></script>
     </body>
@@ -7874,7 +7874,8 @@ app.post('/api/rapports/:rapport_id/complements', async (c) => {
   }
 })
 
-// Route /export-simple - Export audits localStorage (iPhone)
+// Route /export-simple - OBSOLÈTE (utilisait localStorage)
+/* COMMENTÉE - audit-v2-serveronly.js utilise 100% Cloudflare DB
 app.get('/export-simple', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="fr">
@@ -8091,7 +8092,7 @@ app.get('/export-simple', (c) => {
     </script>
 </body>
 </html>`)
-})
+}) */
 
 // Route /rapports - Liste rapports (HTML simple avec fetch client-side)
 app.get('/rapports', (c) => {
@@ -8198,7 +8199,8 @@ app.get('/rapports', (c) => {
 </html>`)
 })
 
-// Route /backup-urgence - Page sauvegarde urgence localStorage
+// Route /backup-urgence - OBSOLÈTE (utilisait localStorage)
+/* COMMENTÉE - audit-v2-serveronly.js utilise 100% Cloudflare DB
 app.get('/backup-urgence', async (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="fr">
@@ -8315,7 +8317,7 @@ app.get('/backup-urgence', async (c) => {
     </script>
 </body>
 </html>`)
-})
+}) */
 
 // Route /migrate-storage - Migration localStorage iPhone vers export JSON
 app.get('/migrate-storage', (c) => {
