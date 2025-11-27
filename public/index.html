@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIRASOLE 2025 - DiagPV Mission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-7xl mx-auto p-6">
+        <h1 class="text-4xl font-bold text-blue-900 mb-8">
+            <i class="fas fa-solar-panel mr-3"></i>
+            GIRASOLE 2025 - Diagnostic Photovoltaïque
+        </h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-tools mr-2"></i>
+                Outils Disponibles
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="/test-api" class="block p-6 bg-blue-50 border-2 border-blue-300 rounded-lg hover:bg-blue-100 transition">
+                    <h3 class="text-xl font-bold text-blue-900 mb-2">
+                        <i class="fas fa-vial mr-2"></i>
+                        Test API - 7 Missions Critiques
+                    </h3>
+                    <p class="text-gray-700">
+                        Vérifier progression des audits directement depuis Cloudflare DB
+                    </p>
+                </a>
+                
+                <a href="/migrate-all" class="block p-6 bg-green-50 border-2 border-green-300 rounded-lg hover:bg-green-100 transition">
+                    <h3 class="text-xl font-bold text-green-900 mb-2">
+                        <i class="fas fa-database mr-2"></i>
+                        Migration localStorage → DB
+                    </h3>
+                    <p class="text-gray-700">
+                        Extraire TOUS les audits depuis localStorage et sauvegarder dans Cloudflare DB
+                    </p>
+                </a>
+            </div>
+        </div>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded">
+            <h3 class="text-lg font-bold text-yellow-900 mb-2">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Version Simplifiée
+            </h3>
+            <p class="text-yellow-800">
+                Cette page est une version simplifiée pour résoudre les problèmes de build TypeScript.
+                Les fonctionnalités complètes (Dashboard, Planning, Audits) seront réintégrées progressivement.
+            </p>
+        </div>
+        
+        <div class="mt-8 text-center text-gray-600">
+            <p>&copy; 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+            <p class="text-sm mt-2">Mission GIRASOLE 2025 - Version API simplifiée</p>
+        </div>
+    </div>
+</body>
+</html>
