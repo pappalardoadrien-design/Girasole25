@@ -169,9 +169,7 @@ async function saveItemStatus(itemId, statut, conformite = null) {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        statut,
-        conformite,
-        mission_id: missionId
+        statut
       })
     });
     
@@ -214,8 +212,7 @@ async function saveItemComment(itemId, commentaire) {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        commentaire,
-        mission_id: missionId
+        commentaire
       })
     });
     

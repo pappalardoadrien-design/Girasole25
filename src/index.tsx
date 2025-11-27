@@ -2021,14 +2021,14 @@ app.put('/api/checklist/item/:itemId/comment', async (c) => {
   const itemId = c.req.param('itemId')
   
   try {
-    const { commentaire, mission_id } = await c.req.json()
+    const { commentaire } = await c.req.json()
     
     await DB.prepare(`
       UPDATE checklist_items 
       SET commentaire = ?,
           date_modification = CURRENT_TIMESTAMP
-      WHERE id = ? AND ordre_mission_id = ?
-    `).bind(commentaire, itemId, mission_id).run()
+      WHERE id = ?
+    `).bind(commentaire, itemId).run()
     
     return c.json({ success: true })
   } catch (error) {
