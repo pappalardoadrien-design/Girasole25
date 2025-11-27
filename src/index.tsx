@@ -8962,11 +8962,11 @@ app.post('/api/migrate-all', async (c) => {
         for (const item of checklist_items) {
           if (!item.id) continue
           
-          await DB.prepare(\`
+          await DB.prepare(`
             UPDATE checklist_items 
             SET statut = ?, commentaire = ?, date_modification = CURRENT_TIMESTAMP
             WHERE id = ? AND ordre_mission_id = ?
-          \`).bind(
+          `).bind(
             item.statut || 'NON_VERIFIE',
             item.commentaire || '',
             item.id,
@@ -8980,11 +8980,11 @@ app.post('/api/migrate-all', async (c) => {
       
       // 2. Commentaire final mission
       if (commentaire_final) {
-        await DB.prepare(\`
+        await DB.prepare(`
           INSERT OR REPLACE INTO ordres_mission_commentaires_finaux 
           (ordre_mission_id, commentaire, updated_at)
           VALUES (?, ?, CURRENT_TIMESTAMP)
-        \`).bind(mission_id, commentaire_final).run()
+        `).bind(mission_id, commentaire_final).run()
       }
       
       // 3. Photos par item
@@ -8992,11 +8992,11 @@ app.post('/api/migrate-all', async (c) => {
         for (const photo of item_photos) {
           if (!photo.item_id || !photo.base64) continue
           
-          await DB.prepare(\`
+          await DB.prepare(`
             INSERT INTO ordres_mission_item_photos 
             (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, commentaire, ordre)
             VALUES (?, ?, ?, ?, ?, ?)
-          \`).bind(
+          `).bind(
             mission_id,
             photo.item_id,
             photo.base64,
@@ -9014,11 +9014,11 @@ app.post('/api/migrate-all', async (c) => {
         for (const photo of photos_generales) {
           if (!photo.base64) continue
           
-          await DB.prepare(\`
+          await DB.prepare(`
             INSERT INTO ordres_mission_photos_generales 
             (ordre_mission_id, photo_base64, photo_filename, legende, ordre)
             VALUES (?, ?, ?, ?, ?)
-          \`).bind(
+          `).bind(
             mission_id,
             photo.base64,
             photo.filename || 'photo.jpg',
