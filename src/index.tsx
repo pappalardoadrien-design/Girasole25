@@ -7504,6 +7504,111 @@ app.post('/api/rapports/:rapport_id/complements', async (c) => {
   }
 })
 
+// Route /rapports - Liste rapports (HTML simple avec fetch client-side)
+app.get('/rapports', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports Audits - GIRASOLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <header class="bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold"><i class="fas fa-file-pdf mr-3"></i>Rapports Audits GIRASOLE</h1>
+                    <p class="text-blue-100 mt-2" id="subheader"><i class="fas fa-building mr-2"></i>Chargement...</p>
+                </div>
+                <div>
+                    <a href="/" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50">
+                        <i class="fas fa-home mr-2"></i>Accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6"><i class="fas fa-list mr-2"></i>Rapports disponibles</h2>
+            <div id="rapportsContainer">
+                <div class="text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p class="text-gray-600">Chargement des rapports...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function loadRapports() {
+            try {
+                const response = await fetch('/api/rapports')
+                const result = await response.json()
+                if (!result.success) throw new Error(result.error)
+                
+                const rapports = result.data
+                document.getElementById('subheader').innerHTML = \`<i class="fas fa-building mr-2"></i>\${rapports.length} rapport(s) disponible(s)\`
+                
+                const container = document.getElementById('rapportsContainer')
+                if (rapports.length === 0) {
+                    container.innerHTML = \`
+                        <div class="text-center py-12">
+                            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">Aucun rapport disponible</p>
+                            <p class="text-sm text-gray-400 mt-2">Les rapports apparaîtront après génération depuis audits terrain</p>
+                        </div>\`
+                    return
+                }
+                
+                container.innerHTML = rapports.map(r => {
+                    const badgeColor = r.statut === 'VALIDE' ? 'bg-green-100 text-green-700' :
+                                     r.statut === 'TERMINE' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                    const badgeText = r.statut === 'VALIDE' ? '✅ Validé' :
+                                    r.statut === 'TERMINE' ? '📄 Terminé' : '📝 Brouillon'
+                    const dateStr = new Date(r.date_audit).toLocaleDateString('fr-FR')
+                    
+                    return \`
+                        <div class="bg-gray-50 rounded-lg p-5 border-l-4 border-blue-500 mb-4 hover:shadow-lg transition cursor-pointer">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <h3 class="text-lg font-bold text-gray-800">\${r.centrale_nom}</h3>
+                                        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold \${badgeColor}">\${badgeText}</span>
+                                        \${r.type_rapport === 'AUDIT_COMPLET' ? '<span class="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-700">🏠 Toiture</span>' : ''}
+                                    </div>
+                                    <div class="flex items-center space-x-6 text-sm text-gray-600 mb-2">
+                                        <span><i class="fas fa-bolt text-yellow-600 mr-1"></i>\${r.puissance_kwc} kWc</span>
+                                        <span><i class="fas fa-calendar text-blue-600 mr-1"></i>\${dateStr}</span>
+                                        <span><i class="fas fa-user text-gray-600 mr-1"></i>\${r.auditeur}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <span class="text-green-600">✅ \${r.nb_items_conformes || 0} conformes</span>
+                                        <span class="text-red-600">❌ \${r.nb_items_non_conformes || 0} non-conformes</span>
+                                        <span class="text-gray-500">⚠️ \${r.nb_items_na || 0} N/A</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>\`
+                }).join('')
+            } catch (error) {
+                console.error('Erreur:', error)
+                document.getElementById('rapportsContainer').innerHTML = \`
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6">
+                        <p class="text-red-700"><strong>Erreur:</strong> \${error.message}</p>
+                    </div>\`
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadRapports)
+    </script>
+</body>
+</html>`)
+})
+
 // Route favicon pour éviter erreur 500
 app.get('/favicon.ico', (c) => {
   return new Response(null, { status: 204 })
