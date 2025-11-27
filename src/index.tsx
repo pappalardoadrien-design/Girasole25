@@ -7901,7 +7901,7 @@ app.get('/api/rapports/:rapport_id', async (c) => {
     const complements = await DB.prepare(`SELECT * FROM rapports_complements WHERE rapport_id = ? ORDER BY ordre_affichage, created_at`).bind(rapportId).all()
     return c.json({
       success: true,
-      rapport: {
+      data: {
         ...rapport,
         donnees_rapport: JSON.parse(rapport.donnees_rapport),
         complements: complements.results
