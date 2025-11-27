@@ -3710,9 +3710,9 @@ app.get('/', (c) => {
                                         <a href="/om/\${m.mission_id}" target="_blank" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition text-center text-sm font-semibold">
                                             <i class="fas fa-file-pdf mr-2"></i>Ordre Mission
                                         </a>
-                                        <a href="/api/ordres-mission/\${m.mission_id}/rapport-final" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition text-center text-sm font-semibold">
+                                        <button onclick="genererEtOuvrirRapport(\${m.mission_id})" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition text-center text-sm font-semibold w-full">
                                             <i class="fas fa-file-alt mr-2"></i>📄 Rapport
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             \`;
@@ -3733,6 +3733,29 @@ app.get('/', (c) => {
                         if (container) {
                             container.innerHTML = '<div class="text-center py-12 text-red-500">❌ Erreur: ' + error.message + '</div>';
                         }
+                    }
+                };
+                
+                // Fonction globale pour générer et ouvrir rapport HTML
+                window.genererEtOuvrirRapport = async function(missionId) {
+                    try {
+                        // Générer rapport
+                        const response = await fetch(\`/api/rapports/generer/\${missionId}\`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success && data.rapport_id) {
+                            // Ouvrir rapport HTML dans nouvel onglet
+                            window.open(\`/rapport/\${data.rapport_id}\`, '_blank');
+                        } else {
+                            alert('❌ Erreur génération rapport: ' + (data.error || 'Erreur inconnue'));
+                        }
+                    } catch (error) {
+                        console.error('Erreur génération rapport:', error);
+                        alert('❌ Erreur réseau lors de la génération du rapport');
                     }
                 };
                 
