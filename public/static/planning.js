@@ -23,7 +23,10 @@ function loadPlanningData() {
 // Stats Planning
 async function loadPlanningStats() {
   try {
-    const response = await axios.get('/api/stats/planning');
+    const response = await axios.get('/api/stats/planning', {
+      params: { v: '2.0', t: Date.now() },
+      headers: { 'Cache-Control': 'no-cache' }
+    });
     if (response.data.success) {
       const stats = response.data.data;
       document.getElementById('planning-stat-non-attribuees').textContent = stats.centrales_non_attribuees || 0;
@@ -47,7 +50,10 @@ async function loadPlanningStats() {
 
 async function loadSousTraitants() {
   try {
-    const response = await axios.get('/api/sous-traitants');
+    const response = await axios.get('/api/sous-traitants', {
+      params: { v: '2.0', t: Date.now() },
+      headers: { 'Cache-Control': 'no-cache' }
+    });
     if (response.data.success) {
       sousTraitantsData = response.data.data;
       displaySousTraitants(sousTraitantsData);
@@ -133,7 +139,7 @@ async function createSousTraitant(formData) {
 
 async function loadTechniciens() {
   try {
-    const response = await axios.get('/api/techniciens');
+    const response = await axios.get('/api/techniciens', { params: { v: '2.0', t: Date.now() }, headers: { 'Cache-Control': 'no-cache' } });
     if (response.data.success) {
       techniciensData = response.data.data;
       displayTechniciens(techniciensData);
@@ -237,7 +243,7 @@ async function createTechnicien(formData) {
 
 async function loadMissions() {
   try {
-    const response = await axios.get('/api/ordres-mission');
+    const response = await axios.get('/api/ordres-mission', { params: { v: '2.0', t: Date.now() }, headers: { 'Cache-Control': 'no-cache' } });
     if (response.data.success) {
       missionsData = response.data.data;
       displayMissions(missionsData);
@@ -395,7 +401,7 @@ async function changeMissionStatut(missionId, newStatut) {
 
 async function loadCentralesDisponibles() {
   try {
-    const response = await axios.get('/api/centrales');
+    const response = await axios.get('/api/centrales', { params: { v: '2.0', t: Date.now() }, headers: { 'Cache-Control': 'no-cache' } });
     if (response.data.success) {
       // Filtrer centrales sans ordre de mission
       const missionsActives = missionsData.filter(m => m.statut !== 'ANNULE').map(m => m.centrale_id);

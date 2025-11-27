@@ -3575,19 +3575,28 @@ app.get('/', (c) => {
             </div>
 
             <script>
-                // Fonction globale pour charger les missions
+                // ============================================
+                // FONCTION UTILITAIRE - FETCH ANTI-CACHE
+                // ============================================
+                window.fetchNoCache = async function(url) {
+                    return fetch(url + (url.includes('?') ? '&' : '?') + 'v=2.0&t=' + Date.now(), {
+                        cache: 'no-cache',
+                        headers: { 
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
+                        }
+                    });
+                };
+                
+                // ============================================
+                // MISSIONS - Fonction globale pour charger les missions
+                // ============================================
                 window.loadMissionsGlobal = async function() {
                     console.log('🚀 loadMissionsGlobal() appelée');
                     try {
                         console.log('📡 Fetching /api/suivi-missions...');
-                        const response = await fetch('/api/suivi-missions?v=2.0&t=' + Date.now(), {
-                            cache: 'no-cache',
-                            headers: { 
-                                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                'Pragma': 'no-cache',
-                                'Expires': '0'
-                            }
-                        });
+                        const response = await window.fetchNoCache('/api/suivi-missions');
                         console.log('✅ Response:', response.status, response.ok);
                         
                         const data = await response.json();
@@ -3727,35 +3736,55 @@ app.get('/', (c) => {
                         event.target.classList.remove('border-transparent', 'text-gray-600');
                     }
                     
-                    // Charger le contenu de l'onglet
-                    if (tabName === 'dashboard' && typeof loadDashboard === 'function') {
-                        loadDashboard();
-                    } else if (tabName === 'centrales' && typeof loadCentrales === 'function') {
-                        loadCentrales();
+                    // 🔥 RECHARGEMENT DYNAMIQUE - À chaque changement d'onglet
+                    console.log('🔄 showTab(' + tabName + ') - Rechargement données depuis DB Cloudflare');
+                    
+                    // Charger le contenu de l'onglet avec REFRESH FORCÉ
+                    if (tabName === 'dashboard') {
+                        console.log('📊 Rechargement Dashboard');
+                        if (typeof loadDashboard === 'function') {
+                            loadDashboard();
+                        }
+                    } else if (tabName === 'centrales') {
+                        console.log('🏭 Rechargement Centrales');
+                        if (typeof loadCentrales === 'function') {
+                            loadCentrales();
+                        }
                     } else if (tabName === 'missions') {
-                        console.log('🔄 showTab(missions) - Appel loadMissionsGlobal()');
-                        window.loadMissionsGlobal();
-                        // Auto-refresh toutes les 30s
-                        if (!window.missionsInterval) {
-                            window.missionsInterval = setInterval(window.loadMissionsGlobal, 30000);
+                        console.log('📋 Rechargement Missions');
+                        if (window.loadMissionsGlobal) {
+                            window.loadMissionsGlobal();
                         }
                     } else if (tabName === 'carte') {
-                        console.log('🗺️ showTab(carte) - Initialisation carte');
+                        console.log('🗺️ Rechargement Carte');
                         if (typeof initCarte === 'function') {
                             initCarte();
+                        } else if (typeof loadMissionsCarte === 'function') {
+                            loadMissionsCarte();
                         }
-                    } else if (tabName === 'upload' && typeof loadUploadForm === 'function') {
-                        loadUploadForm();
-                    } else if (tabName === 'planning' && typeof loadPlanningData === 'function') {
-                        loadPlanningData();
+                    } else if (tabName === 'upload') {
+                        console.log('📤 Rechargement Upload');
+                        if (typeof loadUploadForm === 'function') {
+                            loadUploadForm();
+                        }
+                    } else if (tabName === 'planning') {
+                        console.log('📅 Rechargement Planning');
+                        if (typeof loadPlanningData === 'function') {
+                            loadPlanningData();
+                        }
                     } else if (tabName === 'attribution') {
-                        console.log('🤝 showTab(attribution) - Chargement attribution');
+                        console.log('🤝 Rechargement Attribution');
                         if (typeof loadAttributionData === 'function') {
                             loadAttributionData();
                         }
-                    } else if (tabName === 'analytics' && typeof loadAnalytics === 'function') {
-                        loadAnalytics();
+                    } else if (tabName === 'analytics') {
+                        console.log('📈 Rechargement Analytics');
+                        if (typeof loadAnalytics === 'function') {
+                            loadAnalytics();
+                        }
                     }
+                    
+                    console.log('✅ Onglet ' + tabName + ' activé et données rechargées');
                 }
             </script>
 
@@ -3972,14 +4001,7 @@ app.get('/', (c) => {
                     async function loadMissionsCarte() {
                         try {
                             console.log('📡 Chargement missions pour carte...');
-                            const response = await fetch('/api/suivi-missions?v=2.0&t=' + Date.now(), {
-                                cache: 'no-cache',
-                                headers: { 
-                                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                    'Pragma': 'no-cache',
-                                    'Expires': '0'
-                                }
-                            });
+                            const response = await window.fetchNoCache('/api/suivi-missions');
                             const data = await response.json();
                             
                             if (!data.success || !data.data) {
@@ -3991,7 +4013,7 @@ app.get('/', (c) => {
                             console.log(\`✅ \${allMissions.length} missions chargées\`);
                             
                             // Charger coordonnées GPS réelles depuis centrales
-                            const responseCentrales = await fetch('/api/centrales');
+                            const responseCentrales = await window.fetchNoCache('/api/centrales');
                             const dataCentrales = await responseCentrales.json();
                             const centralesMap = {};
                             
