@@ -3580,7 +3580,10 @@ app.get('/', (c) => {
                     console.log('🚀 loadMissionsGlobal() appelée');
                     try {
                         console.log('📡 Fetching /api/suivi-missions...');
-                        const response = await fetch('/api/suivi-missions');
+                        const response = await fetch('/api/suivi-missions?t=' + Date.now(), {
+                            cache: 'no-cache',
+                            headers: { 'Cache-Control': 'no-cache' }
+                        });
                         console.log('✅ Response:', response.status, response.ok);
                         
                         const data = await response.json();
@@ -3965,7 +3968,10 @@ app.get('/', (c) => {
                     async function loadMissionsCarte() {
                         try {
                             console.log('📡 Chargement missions pour carte...');
-                            const response = await fetch('/api/suivi-missions');
+                            const response = await fetch('/api/suivi-missions?t=' + Date.now(), {
+                                cache: 'no-cache',
+                                headers: { 'Cache-Control': 'no-cache' }
+                            });
                             const data = await response.json();
                             
                             if (!data.success || !data.data) {
