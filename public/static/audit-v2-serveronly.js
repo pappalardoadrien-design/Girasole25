@@ -672,7 +672,7 @@ function renderCommentaireFinal() {
           class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg flex items-center justify-center gap-3 font-bold text-lg"
         >
           <i class="fas fa-file-pdf text-2xl"></i>
-          📄 GÉNÉRER RAPPORT FINAL (JSON)
+          📄 GÉNÉRER RAPPORT HTML/PDF
         </button>
         
         <p class="text-xs text-gray-500 mt-3 text-center">
@@ -982,7 +982,7 @@ async function terminerAudit() {
 }
 
 async function genererRapportFinal() {
-  if (!confirm('Générer le rapport final de cet audit ?\n\nCela créera un document JSON complet avec checklist, photos et commentaires.')) {
+  if (!confirm('Générer le rapport final de cet audit ?\n\nCela créera un rapport HTML professionnel avec checklist, photos et commentaires.\n\nVous pourrez l\'imprimer ou le sauvegarder en PDF.')) {
     return;
   }
   
@@ -997,12 +997,10 @@ async function genererRapportFinal() {
     const data = await response.json();
     
     if (data.success) {
-      alert('✅ RAPPORT GÉNÉRÉ\n\nRapport ID: ' + data.rapport_id + '\n\nLe rapport a été sauvegardé et est accessible via /api/rapports/' + data.rapport_id);
+      alert('✅ RAPPORT GÉNÉRÉ\n\nRapport ID: ' + data.rapport_id + '\n\nOuverture du rapport HTML dans un nouvel onglet...');
       
-      // Optionnel : télécharger le JSON
-      if (confirm('Télécharger les données du rapport (JSON) ?')) {
-        await telechargerRapportJSON(data.rapport_id);
-      }
+      // Ouvrir rapport HTML dans nouvel onglet
+      window.open(`/rapport/${data.rapport_id}`, '_blank');
     } else {
       alert('❌ ERREUR\n\n' + (data.error || 'Impossible de générer le rapport'));
     }

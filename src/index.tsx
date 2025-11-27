@@ -7816,8 +7816,8 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
           statut: item.statut,
           commentaire: item.commentaire || '',
           photos: photosSol.results.filter(p => p.item_checklist_id === item.id).map(p => ({
+            id: p.id,
             filename: p.photo_filename,
-            base64: p.photo_base64,
             commentaire: p.commentaire || ''
           }))
         })),
@@ -7830,8 +7830,8 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
           statut: item.statut,
           commentaire: item.commentaire || '',
           photos: photosToiture.results.filter(p => p.item_checklist_id === item.id).map(p => ({
+            id: p.id,
             filename: p.photo_filename,
-            base64: p.photo_base64,
             commentaire: p.commentaire || ''
           }))
         })),
@@ -7840,8 +7840,8 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
       synthese: {
         commentaire_final: commentaireFinal?.commentaire_final || '',
         photos_generales: photosGenerales.results.map(p => ({
+          id: p.id,
           filename: p.filename,
-          base64: p.photo_base64,
           legende: p.description || ''
         }))
       }
@@ -7935,6 +7935,42 @@ app.get('/rapport/:rapport_id', async (c) => {
     }
     
     const donnees = JSON.parse(rapport.donnees_rapport)
+    
+    // Charger photos base64 depuis DB (items SOL)
+    for (const item of donnees.checklist_sol.items) {
+      if (item.photos && item.photos.length > 0) {
+        for (const photo of item.photos) {
+          const photoData = await DB.prepare(`
+            SELECT photo_base64 FROM ordres_mission_item_photos WHERE id = ?
+          `).bind(photo.id).first()
+          photo.base64 = photoData?.photo_base64 || ''
+        }
+      }
+    }
+    
+    // Charger photos base64 depuis DB (items TOITURE)
+    if (donnees.checklist_toiture) {
+      for (const item of donnees.checklist_toiture.items) {
+        if (item.photos && item.photos.length > 0) {
+          for (const photo of item.photos) {
+            const photoData = await DB.prepare(`
+              SELECT photo_base64 FROM ordres_mission_item_photos WHERE id = ?
+            `).bind(photo.id).first()
+            photo.base64 = photoData?.photo_base64 || ''
+          }
+        }
+      }
+    }
+    
+    // Charger photos générales base64 depuis DB
+    if (donnees.synthese.photos_generales && donnees.synthese.photos_generales.length > 0) {
+      for (const photo of donnees.synthese.photos_generales) {
+        const photoData = await DB.prepare(`
+          SELECT photo_base64 FROM ordres_mission_photos_generales WHERE id = ?
+        `).bind(photo.id).first()
+        photo.base64 = photoData?.photo_base64 || ''
+      }
+    }
     
     // Générer HTML complet avec style DiagPV
     const htmlContent = `
