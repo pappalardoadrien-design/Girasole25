@@ -3159,12 +3159,20 @@ app.get('/photos-audit/:mission_id', async (c) => {
       return c.html('<h1 style="text-align:center;margin-top:50px;">❌ Mission non trouvée</h1>')
     }
     
-    // Récupérer photos avec items checklist
+    // Récupérer photos depuis ordres_mission_item_photos
     const photos = await DB.prepare(`
-      SELECT ci.id, ci.categorie, ci.item_texte, ci.photo_base64, ci.date_modification
-      FROM checklist_items ci
-      WHERE ci.ordre_mission_id = ? AND ci.photo_base64 IS NOT NULL
-      ORDER BY ci.categorie, ci.item_numero
+      SELECT 
+        p.id,
+        p.photo_filename,
+        p.photo_base64,
+        p.commentaire,
+        p.date_creation,
+        ci.categorie,
+        ci.item_texte
+      FROM ordres_mission_item_photos p
+      JOIN checklist_items ci ON p.item_checklist_id = ci.id
+      WHERE p.ordre_mission_id = ?
+      ORDER BY ci.categorie, ci.item_numero, p.ordre
     `).bind(missionId).all()
     
     return c.html(`
@@ -3267,7 +3275,7 @@ app.get('/photos-audit/:mission_id', async (c) => {
               ${photos.results.map((photo, idx) => `
                 <div class="photo-card bg-white">
                   <img 
-                    src="${photo.photo_base64}" 
+                    src="data:image/jpeg;base64,${photo.photo_base64}" 
                     alt="${photo.item_texte}"
                     class="photo-img"
                     onclick="openLightbox(${idx})"
@@ -3279,8 +3287,9 @@ app.get('/photos-audit/:mission_id', async (c) => {
                     <h3 class="font-bold text-gray-800 mb-2">${photo.item_texte}</h3>
                     <p class="text-xs text-gray-500">
                       <i class="fas fa-calendar mr-1"></i>
-                      ${new Date(photo.date_modification).toLocaleString('fr-FR')}
+                      ${photo.date_creation ? new Date(photo.date_creation).toLocaleString('fr-FR') : 'N/A'}
                     </p>
+                    ${photo.commentaire ? `<p class="text-sm text-gray-600 mt-2 italic">"${photo.commentaire}"</p>` : ''}
                   </div>
                 </div>
               `).join('')}
@@ -3316,7 +3325,8 @@ app.get('/photos-audit/:mission_id', async (c) => {
           
           function openLightbox(index) {
             currentPhotoIndex = index;
-            document.getElementById('lightbox-img').src = photos[index].photo_base64;
+            const photo = photos[index];
+            document.getElementById('lightbox-img').src = 'data:image/jpeg;base64,' + photo.photo_base64;
             document.getElementById('lightbox').style.display = 'flex';
           }
           
@@ -3327,17 +3337,62 @@ app.get('/photos-audit/:mission_id', async (c) => {
           function prevPhoto() {
             event.stopPropagation();
             currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
-            document.getElementById('lightbox-img').src = photos[currentPhotoIndex].photo_base64;
+            const photo = photos[currentPhotoIndex];
+            document.getElementById('lightbox-img').src = 'data:image/jpeg;base64,' + photo.photo_base64;
           }
           
           function nextPhoto() {
             event.stopPropagation();
             currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
-            document.getElementById('lightbox-img').src = photos[currentPhotoIndex].photo_base64;
+            const photo = photos[currentPhotoIndex];
+            document.getElementById('lightbox-img').src = 'data:image/jpeg;base64,' + photo.photo_base64;
           }
           
-          function downloadAll() {
-            alert('Fonctionnalité ZIP en développement\\n\\nPour l\\'instant, vous pouvez:\\n1. Clic droit > Enregistrer sur chaque photo\\n2. Utiliser l\\'export PDF depuis la checklist');
+          async function downloadAll() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Génération ZIP...';
+            
+            try {
+              // Importer JSZip depuis CDN
+              if (!window.JSZip) {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                document.head.appendChild(script);
+                await new Promise(resolve => script.onload = resolve);
+              }
+              
+              const zip = new JSZip();
+              const photos = ${JSON.stringify(photos.results || [])};
+              
+              // Ajouter chaque photo au ZIP
+              for (let i = 0; i < photos.length; i++) {
+                const photo = photos[i];
+                const base64Data = photo.photo_base64.split(',')[1] || photo.photo_base64;
+                const filename = \`photo_\${i + 1}_\${photo.categorie.replace(/\\s+/g, '_')}.jpg\`;
+                zip.file(filename, base64Data, { base64: true });
+              }
+              
+              // Générer et télécharger ZIP
+              const content = await zip.generateAsync({ type: 'blob' });
+              const url = URL.createObjectURL(content);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'audit_${mission.centrale_nom.replace(/\s+/g, '_')}_photos.zip';
+              a.click();
+              URL.revokeObjectURL(url);
+              
+              btn.innerHTML = '<i class="fas fa-check mr-2"></i>Téléchargé !';
+              setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-download mr-2"></i>Télécharger Toutes (ZIP)';
+                btn.disabled = false;
+              }, 2000);
+            } catch (error) {
+              console.error('Erreur téléchargement:', error);
+              alert('Erreur lors de la génération du ZIP');
+              btn.innerHTML = '<i class="fas fa-download mr-2"></i>Télécharger Toutes (ZIP)';
+              btn.disabled = false;
+            }
           }
           
           // Navigation clavier
