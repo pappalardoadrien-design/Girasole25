@@ -1989,6 +1989,76 @@ app.put('/api/checklist/item/photo/:photo_id', async (c) => {
 })
 
 // ========================================
+// API ROUTES - SAUVEGARDE IMMÉDIATE (100% SERVEUR)
+// ========================================
+
+// PUT /api/checklist/item/:itemId - Modifier statut item
+app.put('/api/checklist/item/:itemId', async (c) => {
+  const { DB } = c.env
+  const itemId = c.req.param('itemId')
+  
+  try {
+    const { statut, conformite, mission_id } = await c.req.json()
+    
+    await DB.prepare(`
+      UPDATE checklist_items 
+      SET statut = ?, 
+          conformite = ?,
+          date_modification = CURRENT_TIMESTAMP
+      WHERE id = ? AND ordre_mission_id = ?
+    `).bind(statut, conformite, itemId, mission_id).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Erreur update statut:', error)
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// PUT /api/checklist/item/:itemId/comment - Modifier commentaire item
+app.put('/api/checklist/item/:itemId/comment', async (c) => {
+  const { DB } = c.env
+  const itemId = c.req.param('itemId')
+  
+  try {
+    const { commentaire, mission_id } = await c.req.json()
+    
+    await DB.prepare(`
+      UPDATE checklist_items 
+      SET commentaire = ?,
+          date_modification = CURRENT_TIMESTAMP
+      WHERE id = ? AND ordre_mission_id = ?
+    `).bind(commentaire, itemId, mission_id).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Erreur update commentaire:', error)
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/checklist/item/:itemId/photo - Ajouter photo à item
+app.post('/api/checklist/item/:itemId/photo', async (c) => {
+  const { DB } = c.env
+  const itemId = c.req.param('itemId')
+  
+  try {
+    const { photo_base64, photo_filename, mission_id } = await c.req.json()
+    
+    await DB.prepare(`
+      INSERT INTO ordres_mission_item_photos 
+      (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, created_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `).bind(mission_id, itemId, photo_base64, photo_filename).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    console.error('Erreur ajout photo:', error)
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// ========================================
 // API ROUTES - CHECKLIST TOITURE (AUDIT EN TOITURE)
 // ========================================
 
