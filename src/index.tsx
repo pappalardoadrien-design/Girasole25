@@ -1878,7 +1878,7 @@ app.get('/api/checklist/:mission_id/item/:item_id/photos', async (c) => {
   
   try {
     const photos = await DB.prepare(`
-      SELECT id, ordre, photo_filename, commentaire, date_creation
+      SELECT id, ordre, photo_filename, photo_base64, commentaire, date_creation
       FROM ordres_mission_item_photos
       WHERE ordre_mission_id = ? AND item_checklist_id = ?
       ORDER BY ordre ASC
