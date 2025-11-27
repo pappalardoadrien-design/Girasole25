@@ -8804,99 +8804,69 @@ app.get('/favicon.ico', (c) => {
   return new Response(null, { status: 204 })
 })
 
-// Route test API (debug cache)
+// Route test API (debug cache) - Version JSON simple
 app.get('/test-api', async (c) => {
-  return c.html(`
-    <!DOCTYPE html>
-    <html>
-    <head>
+  try {
+    const { DB } = c.env
+    
+    // Missions critiques
+    const missions = await DB.prepare(`
+      SELECT 
+        om.id as mission_id,
+        c.nom as centrale_nom,
+        COUNT(DISTINCT ci.id) as nb_points_total,
+        COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME', 'N/A') THEN ci.id END) as nb_points_completes
+      FROM ordres_mission om
+      JOIN centrales c ON om.centrale_id = c.id
+      LEFT JOIN checklist_items ci ON om.id = ci.ordre_mission_id
+      WHERE om.id IN (7, 12, 20, 24, 33, 45, 46)
+      GROUP BY om.id
+      ORDER BY om.id
+    `).all()
+    
+    return c.html(`
+      <!DOCTYPE html>
+      <html>
+      <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>🔍 Test API - DiagPV GIRASOLE</title>
+        <title>Test API DiagPV</title>
         <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="bg-gray-100 p-4">
+      </head>
+      <body class="bg-gray-100 p-8">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">🔍 Test API Suivi Missions</h1>
-            
-            <button onclick="testAPI()" class="bg-blue-600 text-white px-6 py-3 rounded-lg mb-4 w-full">
-                🔄 Recharger données (bypass cache)
-            </button>
-            
-            <div id="result" class="bg-white rounded-lg shadow p-4">
-                <p class="text-gray-500">Chargement automatique...</p>
-            </div>
+          <h1 class="text-3xl font-bold mb-6">🔍 Test API - Missions Critiques</h1>
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Résultats directs DB Cloudflare :</h2>
+            ${missions.results.map((m: any) => {
+              const progression = m.nb_points_total > 0 
+                ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
+                : 0
+              return `
+                <div class="border-l-4 border-blue-500 pl-4 mb-4">
+                  <p class="font-bold text-lg">Mission ${m.mission_id} - ${m.centrale_nom}</p>
+                  <p class="text-sm text-gray-600">
+                    <strong class="text-blue-600">${m.nb_points_completes}/${m.nb_points_total}</strong> points (${progression}%)
+                  </p>
+                  <div class="w-full bg-gray-200 rounded-full h-3 mt-2">
+                    <div class="bg-blue-600 h-3 rounded-full" style="width: ${progression}%"></div>
+                  </div>
+                  <a href="/audit/${m.mission_id}" class="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm">
+                    📋 Ouvrir Checklist
+                  </a>
+                </div>
+              `
+            }).join('')}
+            <p class="text-xs text-gray-500 mt-4">
+              ⏰ Généré à: ${new Date().toLocaleTimeString('fr-FR')}
+            </p>
+          </div>
         </div>
-        
-        <script>
-            async function testAPI() {
-                const resultDiv = document.getElementById('result');
-                resultDiv.innerHTML = '<p class="text-blue-600 animate-pulse">⏳ Chargement...</p>';
-                
-                try {
-                    // Force no-cache avec timestamp
-                    const response = await fetch('/api/suivi-missions?t=' + Date.now(), {
-                        cache: 'no-cache',
-                        headers: { 'Cache-Control': 'no-cache' }
-                    });
-                    const data = await response.json();
-                    
-                    if (!data.success || !data.data) {
-                        resultDiv.innerHTML = '<p class="text-red-600">❌ Erreur API</p>';
-                        return;
-                    }
-                    
-                    // Filtrer missions critiques
-                    const missionsCritiques = data.data.filter(m => 
-                        [7, 12, 20, 24, 33, 45, 46].includes(m.mission_id)
-                    );
-                    
-                    resultDiv.innerHTML = \`
-                        <h2 class="text-xl font-bold mb-4">✅ ${missionsCritiques.length} missions critiques trouvées :</h2>
-                        <div class="space-y-3">
-                            \${missionsCritiques.map(m => {
-                                const progression = m.nb_points_total > 0 
-                                    ? Math.round((m.nb_points_completes / m.nb_points_total) * 100) 
-                                    : 0;
-                                
-                                let color = 'gray';
-                                if (progression === 100) color = 'green';
-                                else if (progression > 0) color = 'blue';
-                                
-                                return \`
-                                    <div class="border-l-4 border-\${color}-500 pl-4 pb-3">
-                                        <p class="font-bold text-lg">Mission \${m.mission_id} - \${m.centrale_nom}</p>
-                                        <p class="text-sm text-gray-600 mb-2">
-                                            <strong class="text-\${color}-600">\${m.nb_points_completes}/\${m.nb_points_total}</strong> points 
-                                            (\${progression}%) - 
-                                            \${m.nb_photos || 0} photos
-                                        </p>
-                                        <div class="w-full bg-gray-200 rounded-full h-3">
-                                            <div class="bg-\${color}-600 h-3 rounded-full transition-all" style="width: \${progression}%"></div>
-                                        </div>
-                                        <a href="/audit/\${m.mission_id}" target="_blank" 
-                                           class="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm">
-                                            📋 Ouvrir Checklist
-                                        </a>
-                                    </div>
-                                \`;
-                            }).join('')}
-                        </div>
-                        <p class="text-xs text-gray-500 mt-4">
-                            ⏰ Chargé à: \${new Date().toLocaleTimeString('fr-FR')}
-                        </p>
-                    \`;
-                } catch (error) {
-                    resultDiv.innerHTML = \`<p class="text-red-600">❌ Erreur: \${error.message}</p>\`;
-                }
-            }
-            
-            // Charger automatiquement
-            window.addEventListener('DOMContentLoaded', testAPI);
-        </script>
-    </body>
-    </html>
-  `)
+      </body>
+      </html>
+    `)
+  } catch (error) {
+    return c.html(`<h1>Erreur</h1><p>${String(error)}</p>`, 500)
+  }
 })
 
 export default app
