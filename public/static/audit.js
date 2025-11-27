@@ -2,6 +2,8 @@
 
 const missionId = parseInt(window.location.pathname.split('/')[2]);
 let checklistItems = [];
+let checklistItemsToiture = []; // NOUVEAU : Items checklist TOITURE
+let auditToitureRequis = false; // NOUVEAU : Flag audit toiture
 let commentaireFinal = '';
 let photosGenerales = [];
 let autoSaveTimer = null;
@@ -10,6 +12,7 @@ let pendingSyncQueue = [];
 
 // LocalStorage keys
 const STORAGE_KEY = `audit_mission_${missionId}`;
+const STORAGE_KEY_TOITURE = `audit_mission_toiture_${missionId}`; // NOUVEAU
 const SYNC_QUEUE_KEY = `sync_queue_${missionId}`;
 const COMMENTAIRE_FINAL_KEY = `commentaire_final_${missionId}`;
 const PHOTOS_GENERALES_KEY = `photos_generales_${missionId}`;
@@ -116,6 +119,9 @@ async function loadChecklist() {
     // Charger commentaire final et photos générales
     await loadCommentaireFinal();
     await loadPhotosGenerales();
+    
+    // NOUVEAU : Charger checklist TOITURE si nécessaire
+    await loadChecklistToiture();
     
     // Sync changements en attente si connexion rétablie
     if (isOnline) {
@@ -974,6 +980,250 @@ async function deletePhotoGenerale(photoId) {
     alert('Erreur suppression photo');
   }
 }
+
+// ========================================
+// CHECKLIST TOITURE (AUDIT EN TOITURE)
+// ========================================
+
+// Charger checklist TOITURE
+async function loadChecklistToiture() {
+  try {
+    // Charger depuis localStorage si offline
+    const stored = localStorage.getItem(STORAGE_KEY_TOITURE);
+    if (!isOnline && stored) {
+      const data = JSON.parse(stored);
+      checklistItemsToiture = data.items || [];
+      auditToitureRequis = data.audit_toiture_requis || false;
+      if (auditToitureRequis) {
+        renderChecklistToiture();
+        updateProgress(); // Mettre à jour progression globale
+      }
+      return;
+    }
+    
+    // Charger depuis API
+    const response = await fetch(`/api/checklist-toiture/${missionId}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      auditToitureRequis = data.audit_toiture_requis;
+      checklistItemsToiture = data.items || [];
+      
+      // Sauvegarder en localStorage
+      localStorage.setItem(STORAGE_KEY_TOITURE, JSON.stringify({
+        audit_toiture_requis: auditToitureRequis,
+        items: checklistItemsToiture
+      }));
+      
+      if (auditToitureRequis) {
+        // Afficher section toiture
+        renderChecklistToiture();
+        
+        // Charger photos pour chaque item toiture
+        for (const item of checklistItemsToiture) {
+          await loadItemPhotos(item.id);
+        }
+        
+        // Mettre à jour progression globale
+        updateProgress();
+      }
+    }
+  } catch (error) {
+    console.error('Erreur chargement checklist toiture:', error);
+    // Mode offline : utiliser données locales si disponibles
+    const stored = localStorage.getItem(STORAGE_KEY_TOITURE);
+    if (stored) {
+      const data = JSON.parse(stored);
+      checklistItemsToiture = data.items || [];
+      auditToitureRequis = data.audit_toiture_requis || false;
+      if (auditToitureRequis) {
+        renderChecklistToiture();
+        updateProgress();
+      }
+    }
+  }
+}
+
+// Render checklist TOITURE
+function renderChecklistToiture() {
+  const container = document.getElementById('checklistToitureContainer');
+  if (!container || !auditToitureRequis) return;
+  
+  const html = `
+    <div class="mb-6">
+      <div class="bg-gradient-to-r from-orange-500 to-orange-700 text-white p-4 rounded-t-2xl shadow-lg">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-3xl">🏗️</span>
+            <div>
+              <span class="font-bold text-xl">AUDIT EN TOITURE</span>
+              <p class="text-xs text-orange-200 mt-1">Démontage ~25 panneaux + Vérifications DTU 40.35</p>
+            </div>
+          </div>
+          <span class="text-sm opacity-90">${checklistItemsToiture.length} points</span>
+        </div>
+      </div>
+      
+      <div class="space-y-3 mt-4">
+        ${checklistItemsToiture.map(item => renderChecklistItemToiture(item)).join('')}
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// Render un item checklist TOITURE
+function renderChecklistItemToiture(item) {
+  const isSaved = item.statut !== 'NON_VERIFIE';
+  
+  return `
+    <div class="bg-white rounded-xl shadow-md p-4 border-l-4 ${isSaved ? 'border-green-500' : 'border-gray-300'}">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex-1">
+          <div class="flex items-center space-x-2 mb-2">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-700 text-xs font-bold">
+              ${item.item_numero}
+            </span>
+            <span class="font-semibold text-gray-800 text-sm">${item.libelle}</span>
+          </div>
+          ${isSaved ? `<div class="text-xs text-green-600 font-medium">✓ Vérifié</div>` : ''}
+        </div>
+      </div>
+      
+      <!-- Statut -->
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <button 
+          class="status-btn ${item.statut === 'CONFORME' ? 'active bg-green-500 text-white' : 'bg-gray-100 text-gray-700'}"
+          onclick="updateStatusToiture(${item.id}, 'CONFORME', 'RAS')"
+        >
+          <i class="fas fa-check mr-1"></i>Conforme
+        </button>
+        <button 
+          class="status-btn ${item.statut === 'NON_CONFORME' ? 'active bg-red-500 text-white' : 'bg-gray-100 text-gray-700'}"
+          onclick="updateStatusToiture(${item.id}, 'NON_CONFORME', 'ANOMALIE')"
+        >
+          <i class="fas fa-times mr-1"></i>Non conforme
+        </button>
+        <button 
+          class="status-btn ${item.statut === 'N/A' ? 'active bg-gray-400 text-white' : 'bg-gray-100 text-gray-700'}"
+          onclick="updateStatusToiture(${item.id}, 'N/A', 'N/A')"
+        >
+          N/A
+        </button>
+      </div>
+      
+      <!-- Commentaire -->
+      <textarea 
+        id="comment-toiture-${item.id}"
+        class="w-full p-2 border border-gray-300 rounded-lg text-sm"
+        placeholder="Commentaire (optionnel)..."
+        rows="2"
+        onchange="scheduleAutoSaveToiture(${item.id})"
+      >${item.commentaire || ''}</textarea>
+      
+      <!-- Photos Multiples -->
+      <div class="mt-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">
+            <i class="fas fa-images mr-1"></i>Photos (<span id="photo-count-toiture-${item.id}">0</span>)
+          </span>
+          <button class="photo-btn inline-flex items-center" onclick="openPhotoUploader(${item.id})">
+            <i class="fas fa-camera mr-2"></i>Ajouter photos
+          </button>
+        </div>
+        <input type="file" id="photo-input-${item.id}" accept="image/*" capture="environment" 
+               multiple onchange="handleMultiPhotoUpload(${item.id}, event)" style="display:none">
+        <div id="photos-gallery-${item.id}" class="grid grid-cols-3 gap-2">
+          <!-- Photos chargées dynamiquement -->
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Mettre à jour statut item TOITURE
+async function updateStatusToiture(itemId, statut, conformite) {
+  try {
+    // Trouver item
+    const item = checklistItemsToiture.find(i => i.id === itemId);
+    if (!item) return;
+    
+    // Mettre à jour localement
+    item.statut = statut;
+    item.conformite = conformite;
+    item.date_verification = new Date().toISOString();
+    
+    // Récupérer commentaire
+    const commentaire = document.getElementById(`comment-toiture-${itemId}`)?.value || null;
+    item.commentaire = commentaire;
+    
+    // Récupérer nom technicien depuis header
+    const technicienElement = document.querySelector('[data-technicien-nom]');
+    const technicien = technicienElement?.getAttribute('data-technicien-nom') || 'Technicien';
+    item.technicien = technicien;
+    
+    // Sauvegarder en localStorage
+    localStorage.setItem(STORAGE_KEY_TOITURE, JSON.stringify({
+      audit_toiture_requis: auditToitureRequis,
+      items: checklistItemsToiture
+    }));
+    
+    // Afficher indicateur sauvegarde
+    showSaveIndicator();
+    
+    // Sync avec serveur si online
+    if (isOnline) {
+      const response = await fetch(`/api/checklist-toiture/${missionId}/item/${itemId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statut, conformite, commentaire, technicien })
+      });
+      
+      if (!response.ok) throw new Error('Erreur sauvegarde');
+    } else {
+      // Ajouter à la queue de sync
+      pendingSyncQueue.push({
+        type: 'checklist_toiture',
+        itemId,
+        data: { statut, conformite, commentaire, technicien }
+      });
+      localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(pendingSyncQueue));
+    }
+    
+    // Re-render
+    renderChecklistToiture();
+    updateProgress();
+    
+  } catch (error) {
+    console.error('Erreur sauvegarde item toiture:', error);
+    alert('⚠️ Erreur sauvegarde. Données conservées localement.');
+  }
+}
+
+// Planifier auto-save pour commentaire TOITURE
+function scheduleAutoSaveToiture(itemId) {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(async () => {
+    const item = checklistItemsToiture.find(i => i.id === itemId);
+    if (item && item.statut !== 'NON_VERIFIE') {
+      await updateStatusToiture(itemId, item.statut, item.conformite);
+    }
+  }, 3000);
+}
+
+// Mise à jour fonction updateProgress pour inclure toiture
+const originalUpdateProgress = window.updateProgress;
+window.updateProgress = function() {
+  const totalItems = checklistItems.length + (auditToitureRequis ? checklistItemsToiture.length : 0);
+  const completedItems = checklistItems.filter(i => i.statut !== 'NON_VERIFIE').length + 
+                         (auditToitureRequis ? checklistItemsToiture.filter(i => i.statut !== 'NON_VERIFIE').length : 0);
+  
+  const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+  
+  document.getElementById('progressBar').style.width = `${percentage}%`;
+  document.getElementById('progressText').textContent = `${completedItems}/${totalItems} vérifications`;
+};
 
 // Charger au démarrage page
 if (document.readyState === 'loading') {

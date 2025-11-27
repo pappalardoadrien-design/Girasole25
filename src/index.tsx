@@ -1988,6 +1988,122 @@ app.put('/api/checklist/item/photo/:photo_id', async (c) => {
   }
 })
 
+// ========================================
+// API ROUTES - CHECKLIST TOITURE (AUDIT EN TOITURE)
+// ========================================
+
+// GET /api/checklist-toiture/:mission_id - Récupérer checklist TOITURE d'une mission
+app.get('/api/checklist-toiture/:mission_id', async (c) => {
+  const { DB } = c.env
+  const missionId = c.req.param('mission_id')
+  
+  try {
+    // Vérifier si la centrale nécessite un audit toiture
+    const centrale = await DB.prepare(`
+      SELECT c.audit_toiture, c.nom, om.id
+      FROM ordres_mission om
+      JOIN centrales c ON c.id = om.centrale_id
+      WHERE om.id = ?
+    `).bind(missionId).first()
+    
+    if (!centrale) {
+      return c.json({ success: false, error: 'Mission non trouvée' }, 404)
+    }
+    
+    // Si pas d'audit toiture requis
+    if (centrale.audit_toiture !== 'X') {
+      return c.json({ 
+        success: true, 
+        audit_toiture_requis: false, 
+        items: [], 
+        message: 'Audit toiture non requis pour cette centrale' 
+      })
+    }
+    
+    // Récupérer items checklist toiture
+    let items = await DB.prepare(`
+      SELECT * FROM checklist_items_toiture 
+      WHERE ordre_mission_id = ?
+      ORDER BY item_numero ASC
+    `).bind(missionId).all()
+    
+    // Si aucun item existe, initialiser depuis le template
+    if (!items.results || items.results.length === 0) {
+      const template = await DB.prepare(`
+        SELECT * FROM checklist_toiture_template ORDER BY item_numero ASC
+      `).all()
+      
+      // Insérer items depuis template
+      for (const item of template.results || []) {
+        await DB.prepare(`
+          INSERT INTO checklist_items_toiture 
+          (ordre_mission_id, item_numero, libelle, categorie, statut)
+          VALUES (?, ?, ?, ?, 'NON_VERIFIE')
+        `).bind(
+          missionId,
+          item.item_numero,
+          item.libelle,
+          item.categorie || 'AUDIT_TOITURE'
+        ).run()
+      }
+      
+      // Re-récupérer les items créés
+      items = await DB.prepare(`
+        SELECT * FROM checklist_items_toiture 
+        WHERE ordre_mission_id = ?
+        ORDER BY item_numero ASC
+      `).bind(missionId).all()
+    }
+    
+    return c.json({ 
+      success: true, 
+      audit_toiture_requis: true,
+      items: items.results || [],
+      count: items.results?.length || 0
+    })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// POST /api/checklist-toiture/:mission_id/item/:item_id - Sauvegarder item TOITURE
+app.post('/api/checklist-toiture/:mission_id/item/:item_id', async (c) => {
+  const { DB } = c.env
+  const missionId = parseInt(c.req.param('mission_id'))
+  const itemId = parseInt(c.req.param('item_id'))
+  
+  try {
+    const body = await c.req.json()
+    const { statut, conformite, commentaire, technicien } = body
+    
+    if (!statut) {
+      return c.json({ success: false, error: 'Statut requis' }, 400)
+    }
+    
+    // Mettre à jour l'item toiture
+    await DB.prepare(`
+      UPDATE checklist_items_toiture 
+      SET statut = ?, conformite = ?, commentaire = ?, technicien = ?, date_verification = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND ordre_mission_id = ?
+    `).bind(
+      statut,
+      conformite || null,
+      commentaire || null,
+      technicien || null,
+      itemId,
+      missionId
+    ).run()
+    
+    return c.json({ success: true, message: 'Item toiture sauvegardé' })
+  } catch (error) {
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
+// Les photos pour items TOITURE utilisent les mêmes APIs que checklist normale
+// car la table ordres_mission_item_photos supporte tous les types d'items
+// Les routes /api/checklist/:mission_id/item/:item_id/photos fonctionnent pour TOITURE aussi
+
 // ==========================================
 // ROUTES COMMENTAIRE FINAL MISSION
 // ==========================================
@@ -2845,6 +2961,11 @@ app.get('/audit/:mission_id', async (c) => {
               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <p class="text-gray-600">Chargement checklist...</p>
             </div>
+          </div>
+          
+          <!-- Section Checklist TOITURE (si audit toiture requis) -->
+          <div id="checklistToitureContainer" class="mt-8">
+            <!-- Sera rempli par audit.js si audit_toiture = 'X' -->
           </div>
           
           <!-- Section Commentaire Final Mission -->

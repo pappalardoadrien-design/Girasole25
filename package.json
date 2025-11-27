@@ -23,7 +23,13 @@
     "git:status": "git status",
     "git:log": "git log --oneline"
   },
-  "keywords": ["hono", "cloudflare-pages", "photovoltaique", "audit", "girasole"],
+  "keywords": [
+    "hono",
+    "cloudflare-pages",
+    "photovoltaique",
+    "audit",
+    "girasole"
+  ],
   "author": "Adrien Pappalardo - Diagnostic Photovoltaïque",
   "license": "MIT",
   "devDependencies": {
@@ -34,6 +40,7 @@
     "wrangler": "^3.97.0"
   },
   "dependencies": {
+    "exifr": "^7.1.3",
     "hono": "^4.7.11"
   }
 }
