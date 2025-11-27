@@ -8706,7 +8706,7 @@ app.get('/st/:sous_traitant_id', async (c) => {
       </html>
     `)
   } catch (error: any) {
-    return c.html(\`<h1>Erreur: \${error.message}</h1>\`, 500)
+    return c.html(`<h1>Erreur: ${error.message}</h1>`, 500)
   }
 })
 
