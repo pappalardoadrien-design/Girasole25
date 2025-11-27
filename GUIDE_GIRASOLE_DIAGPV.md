@@ -6,10 +6,10 @@
 
 ## 🔗 **ACCÈS APPLICATION**
 
-### **URL Production** : https://652b0338.girasole-diagpv.pages.dev
+### **URL Production** : https://girasole-diagpv.pages.dev
 
-- **Dashboard** : https://652b0338.girasole-diagpv.pages.dev/
-- **Planning missions** : https://652b0338.girasole-diagpv.pages.dev/planning
+- **Dashboard** : https://girasole-diagpv.pages.dev/
+- **Planning missions** : https://girasole-diagpv.pages.dev/planning
 
 ---
 
@@ -19,62 +19,62 @@
 
 | N° | Centrale | Mission | Audit SOL | Audit TOITURE | Lien direct |
 |----|----------|---------|-----------|---------------|-------------|
-| 1 | Antunez - SCI ANAUJA | Mission 1 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/1) |
-| 2 | EARL CADOT | Mission 2 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/2) |
-| 3 | Azemar | Mission 3 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/3) |
-| 4 | Mathieu Montet | Mission 4 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/4) |
-| 5 | Hangar Laurent ROUX | Mission 5 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/5) |
-| 6 | Hangar Bernard MAGE | Mission 6 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/6) |
-| 7 | Hangar Pierre MOURGUES | Mission 7 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/7) |
-| 8 | Hangar Karl Biteau | Mission 8 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/8) |
-| 9 | Burgat Et Fils Tp | Mission 9 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/9) |
-| 10 | HANGAR Angelina SIMMONET | Mission 10 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/10) |
-| 11 | Maymat | Mission 11 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/11) |
-| 12 | HANGAR Christian MIGNARD | Mission 12 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/12) |
-| 13 | DUMONT GUY | Mission 13 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/13) |
-| 14 | MARTEL 184 Construction | Mission 14 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/14) |
-| 15 | BOUCHARDY 203 LOC | Mission 15 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/15) |
-| 16 | BOULOIR 206 LOC | Mission 16 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/16) |
-| 17 | Hangar Renaud Sonnard | Mission 17 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/17) |
-| 18 | Hangar Fabrice COMBY | Mission 18 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/18) |
-| 19 | Hangar Julien Vaudin | Mission 19 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/19) |
-| 20 | Hangar Richard VAN ZANTEN | Mission 20 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/20) |
-| 21 | HANGAR Benoit BERTELOOT | Mission 21 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/21) |
-| 22 | Hangar Laurent ROUX (2) | Mission 22 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/22) |
-| 23 | Serge Maltaverne | Mission 23 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/23) |
-| 24 | Hangar Christophe CARRERE n°2 | Mission 24 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/24) |
-| 25 | Hangar Frédéric CASTET | Mission 25 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/25) |
-| 17 | Hangar Renaud Sonnard | Mission 17 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/17) |
-| 18 | Hangar Fabrice COMBY | Mission 18 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/18) |
-| 21 | HANGAR Benoit BERTELOOT | Mission 21 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/21) |
-| 25 | Hangar Frédéric CASTET | Mission 25 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/25) |
-| 26 | MARTEL 183 LOC | Mission 26 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/26) |
-| 27 | Hangar Frederic Sinaud | Mission 27 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/27) |
-| 28 | Hangar Frederic Sinaud (2) | Mission 28 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/28) |
-| 29 | HARAS DE LA MAJORIE/MANOHA | Mission 29 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/29) |
-| 30 | Hangar Yannick CLEMENT | Mission 30 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/30) |
-| 31 | Concept-TY Chambray 2 | Mission 31 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/31) |
-| 32 | Hangar Patrick BLANCHET | Mission 32 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/32) |
-| 33 | MATHIEU Vincent | Mission 33 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/33) |
-| 34 | Cheraud | Mission 34 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/34) |
-| 35 | Hangar Frédéric CASTET (2) | Mission 35 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/35) |
-| 36 | Didier - PRIEUR | Mission 36 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/36) |
-| 37 | Hangar Eric LOGNON | Mission 37 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/37) |
-| 38 | Hangar LAMIOT | Mission 38 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/38) |
-| 39 | VIEL | Mission 39 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/39) |
-| 40 | Serge Maltaverne (2) | Mission 40 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/40) |
-| 41 | SCI KILJOR | Mission 41 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/41) |
-| 42 | Hangar Benjamin CHASSON | Mission 42 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/42) |
-| 43 | Bourgeois | Mission 43 | ✅ | ✅ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/43) |
-| 44 | EARL GOUNY | Mission 44 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/44) |
-| 45 | Hangar Maxime Bayle | Mission 45 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/45) |
-| 46 | Commune De Pomas | Mission 46 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/46) |
-| 47 | CHATEAU PASCAUD | Mission 47 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/47) |
-| 48 | GAEC SAINT JEAN | Mission 48 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/48) |
-| 49 | EARL SOUMAGNE | Mission 49 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/49) |
-| 50 | SCEA CANTAGRIL | Mission 50 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/50) |
-| 51 | Perez Christian | Mission 51 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/51) |
-| 52 | Payet Pierre André | Mission 52 | ✅ | ❌ | [Ouvrir audit](https://652b0338.girasole-diagpv.pages.dev/audit/52) |
+| 1 | Antunez - SCI ANAUJA | Mission 1 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/1) |
+| 2 | EARL CADOT | Mission 2 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/2) |
+| 3 | Azemar | Mission 3 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/3) |
+| 4 | Mathieu Montet | Mission 4 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/4) |
+| 5 | Hangar Laurent ROUX | Mission 5 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/5) |
+| 6 | Hangar Bernard MAGE | Mission 6 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/6) |
+| 7 | Hangar Pierre MOURGUES | Mission 7 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/7) |
+| 8 | Hangar Karl Biteau | Mission 8 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/8) |
+| 9 | Burgat Et Fils Tp | Mission 9 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/9) |
+| 10 | HANGAR Angelina SIMMONET | Mission 10 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/10) |
+| 11 | Maymat | Mission 11 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/11) |
+| 12 | HANGAR Christian MIGNARD | Mission 12 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/12) |
+| 13 | DUMONT GUY | Mission 13 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/13) |
+| 14 | MARTEL 184 Construction | Mission 14 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/14) |
+| 15 | BOUCHARDY 203 LOC | Mission 15 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/15) |
+| 16 | BOULOIR 206 LOC | Mission 16 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/16) |
+| 17 | Hangar Renaud Sonnard | Mission 17 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/17) |
+| 18 | Hangar Fabrice COMBY | Mission 18 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/18) |
+| 19 | Hangar Julien Vaudin | Mission 19 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/19) |
+| 20 | Hangar Richard VAN ZANTEN | Mission 20 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/20) |
+| 21 | HANGAR Benoit BERTELOOT | Mission 21 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/21) |
+| 22 | Hangar Laurent ROUX (2) | Mission 22 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/22) |
+| 23 | Serge Maltaverne | Mission 23 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/23) |
+| 24 | Hangar Christophe CARRERE n°2 | Mission 24 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/24) |
+| 25 | Hangar Frédéric CASTET | Mission 25 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/25) |
+| 17 | Hangar Renaud Sonnard | Mission 17 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/17) |
+| 18 | Hangar Fabrice COMBY | Mission 18 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/18) |
+| 21 | HANGAR Benoit BERTELOOT | Mission 21 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/21) |
+| 25 | Hangar Frédéric CASTET | Mission 25 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/25) |
+| 26 | MARTEL 183 LOC | Mission 26 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/26) |
+| 27 | Hangar Frederic Sinaud | Mission 27 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/27) |
+| 28 | Hangar Frederic Sinaud (2) | Mission 28 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/28) |
+| 29 | HARAS DE LA MAJORIE/MANOHA | Mission 29 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/29) |
+| 30 | Hangar Yannick CLEMENT | Mission 30 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/30) |
+| 31 | Concept-TY Chambray 2 | Mission 31 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/31) |
+| 32 | Hangar Patrick BLANCHET | Mission 32 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/32) |
+| 33 | MATHIEU Vincent | Mission 33 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/33) |
+| 34 | Cheraud | Mission 34 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/34) |
+| 35 | Hangar Frédéric CASTET (2) | Mission 35 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/35) |
+| 36 | Didier - PRIEUR | Mission 36 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/36) |
+| 37 | Hangar Eric LOGNON | Mission 37 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/37) |
+| 38 | Hangar LAMIOT | Mission 38 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/38) |
+| 39 | VIEL | Mission 39 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/39) |
+| 40 | Serge Maltaverne (2) | Mission 40 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/40) |
+| 41 | SCI KILJOR | Mission 41 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/41) |
+| 42 | Hangar Benjamin CHASSON | Mission 42 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/42) |
+| 43 | Bourgeois | Mission 43 | ✅ | ✅ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/43) |
+| 44 | EARL GOUNY | Mission 44 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/44) |
+| 45 | Hangar Maxime Bayle | Mission 45 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/45) |
+| 46 | Commune De Pomas | Mission 46 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/46) |
+| 47 | CHATEAU PASCAUD | Mission 47 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/47) |
+| 48 | GAEC SAINT JEAN | Mission 48 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/48) |
+| 49 | EARL SOUMAGNE | Mission 49 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/49) |
+| 50 | SCEA CANTAGRIL | Mission 50 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/50) |
+| 51 | Perez Christian | Mission 51 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/51) |
+| 52 | Payet Pierre André | Mission 52 | ✅ | ❌ | [Ouvrir audit](https://girasole-diagpv.pages.dev/audit/52) |
 
 **Légende** :
 - ✅ **Audit SOL** : Checklist 40 points (systématique pour toutes les missions)
@@ -85,7 +85,7 @@
 ## 🚀 **WORKFLOW TERRAIN**
 
 ### **1️⃣ Avant la mission**
-1. Ouvrir le **Dashboard** : https://652b0338.girasole-diagpv.pages.dev/
+1. Ouvrir le **Dashboard** : https://girasole-diagpv.pages.dev/
 2. Chercher la centrale (ex: "Burgat")
 3. Cliquer sur **"🔧 Checklist"** pour ouvrir l'audit
 
@@ -211,11 +211,11 @@ Uniquement si `audit_toiture = 'X'` (Missions 2, 6, 8, 12, 17, 18, 21, 25, 36, 3
 
 | Fonction | Lien |
 |----------|------|
-| **Dashboard** | https://652b0338.girasole-diagpv.pages.dev/ |
-| **Planning** | https://652b0338.girasole-diagpv.pages.dev/planning |
-| **Exemple audit Mission 9** | https://652b0338.girasole-diagpv.pages.dev/audit/9 |
-| **Exemple rapport Mission 9** | https://652b0338.girasole-diagpv.pages.dev/rapport/17 |
-| **Photos Mission 9** | https://652b0338.girasole-diagpv.pages.dev/photos-audit/9 |
+| **Dashboard** | https://girasole-diagpv.pages.dev/ |
+| **Planning** | https://girasole-diagpv.pages.dev/planning |
+| **Exemple audit Mission 9** | https://girasole-diagpv.pages.dev/audit/9 |
+| **Exemple rapport Mission 9** | https://girasole-diagpv.pages.dev/rapport/17 |
+| **Photos Mission 9** | https://girasole-diagpv.pages.dev/photos-audit/9 |
 
 ---
 
@@ -230,7 +230,7 @@ Uniquement si `audit_toiture = 'X'` (Missions 2, 6, 8, 12, 17, 18, 21, 25, 36, 3
 
 ## 🔧 **SUPPORT TECHNIQUE**
 
-- **URL Production** : https://652b0338.girasole-diagpv.pages.dev
+- **URL Production** : https://girasole-diagpv.pages.dev
 - **Base de données** : Cloudflare D1 `girasole-db-production`
 - **GitHub** : Code source versionné
 - **Logs** : Cloudflare Workers dashboard
