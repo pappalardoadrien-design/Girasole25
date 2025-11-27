@@ -447,7 +447,10 @@ function renderChecklist() {
   document.getElementById('checklistContainer').innerHTML = html;
   
   // Setup listeners
-  checklistItems.forEach(item => setupCommentListener(item.id));
+  checklistItems.forEach(item => {
+    setupCommentListener(item.id);
+    loadItemPhotos(item.id); // Charger photos pour chaque item
+  });
 }
 
 function updateProgress() {
@@ -463,7 +466,68 @@ function updateProgress() {
 }
 
 async function loadItemPhotos(itemId) {
-  // TODO: Implémenter chargement photos depuis serveur
+  try {
+    const response = await fetch(`/api/checklist/${missionId}/item/${itemId}/photos`);
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      renderItemPhotos(itemId, data.data);
+    }
+  } catch (error) {
+    console.error('Erreur chargement photos item:', error);
+  }
+}
+
+function renderItemPhotos(itemId, photos) {
+  const container = document.getElementById(`photos-${itemId}`);
+  if (!container) return;
+  
+  if (photos.length === 0) {
+    container.innerHTML = '<p class="text-gray-500 text-sm italic">Aucune photo</p>';
+    return;
+  }
+  
+  container.innerHTML = `
+    <div class="grid grid-cols-3 gap-2 mt-2">
+      ${photos.map((photo, idx) => `
+        <div class="relative group">
+          <img 
+            src="data:image/jpeg;base64,${photo.photo_base64}" 
+            class="w-full h-24 object-cover rounded-lg border-2 border-gray-300 cursor-pointer hover:border-blue-500 transition"
+            onclick="openPhotoModal(${itemId}, ${idx})"
+            alt="Photo ${idx + 1}"
+          />
+          <button 
+            onclick="deletePhoto(${photo.id}, ${itemId})"
+            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 opacity-0 group-hover:opacity-100 transition"
+            title="Supprimer photo"
+          >×</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function openPhotoModal(itemId, photoIndex) {
+  // TODO: Implémenter modal photo
+  alert('Visualisation photo à implémenter');
+}
+
+async function deletePhoto(photoId, itemId) {
+  if (!confirm('Supprimer cette photo ?')) return;
+  
+  try {
+    const response = await fetch(`/api/checklist/item/photo/${photoId}`, {
+      method: 'DELETE'
+    });
+    
+    if (response.ok) {
+      alert('Photo supprimée');
+      await loadItemPhotos(itemId);
+    }
+  } catch (error) {
+    console.error('Erreur suppression photo:', error);
+  }
 }
 
 // ============================================
@@ -591,7 +655,7 @@ async function loadPhotosGenerales() {
   try {
     const response = await fetch(`/api/ordres-mission/${missionId}/photos-generales`);
     const data = await response.json();
-    photosGenerales = data.photos || [];
+    photosGenerales = data.data || [];
     renderPhotosGenerales();
   } catch (error) {
     console.error('Erreur chargement photos générales:', error);
@@ -604,7 +668,7 @@ function renderPhotosGenerales() {
   
   gallery.innerHTML = photosGenerales.map((photo, index) => `
     <div class="relative">
-      <img src="${photo.photo_base64}" class="w-full h-32 object-cover rounded-lg shadow">
+      <img src="data:image/jpeg;base64,${photo.photo_base64}" class="w-full h-32 object-cover rounded-lg shadow">
       <button 
         onclick="deletePhotoGenerale(${photo.id})"
         class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
