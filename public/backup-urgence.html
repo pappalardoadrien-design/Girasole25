@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 SAUVEGARDE URGENCE - Audits GIRASOLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-red-500 mb-4">🚨 SAUVEGARDE URGENCE AUDITS</h1>
+        <p class="text-gray-300 mb-6">Cette page va extraire TOUTES les données localStorage et les sauvegarder sur le serveur.</p>
+        
+        <div id="status" class="bg-gray-800 p-6 rounded-lg mb-4">
+            <p class="text-yellow-400">⏳ Prêt à sauvegarder...</p>
+        </div>
+        
+        <button onclick="sauvegarderTout()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg text-xl mb-4">
+            🚨 SAUVEGARDER TOUT MAINTENANT
+        </button>
+        
+        <div id="logs" class="bg-gray-800 p-6 rounded-lg overflow-auto max-h-96">
+            <p class="text-gray-400">Logs apparaîtront ici...</p>
+        </div>
+    </div>
+
+    <script>
+        function log(message, color = 'text-gray-300') {
+            const logsDiv = document.getElementById('logs');
+            const p = document.createElement('p');
+            p.className = color;
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(p);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message, color = 'text-yellow-400') {
+            document.getElementById('status').innerHTML = `<p class="${color}">${message}</p>`;
+        }
+        
+        async function sauvegarderTout() {
+            try {
+                updateStatus('🔄 Extraction données localStorage...', 'text-blue-400');
+                log('Début sauvegarde urgence', 'text-blue-400');
+                
+                // Extraire TOUTES les clés localStorage
+                const allKeys = Object.keys(localStorage);
+                log(`📦 ${allKeys.length} clés localStorage trouvées`, 'text-blue-400');
+                
+                // Trouver toutes les missions
+                const missionKeys = allKeys.filter(k => k.startsWith('audit_mission_'));
+                log(`📋 ${missionKeys.length} missions trouvées`, 'text-green-400');
+                
+                let totalSaved = 0;
+                let totalErrors = 0;
+                
+                for (const missionKey of missionKeys) {
+                    const missionId = missionKey.replace('audit_mission_', '');
+                    log(`\n🔄 Sauvegarde Mission ${missionId}...`, 'text-yellow-400');
+                    
+                    try {
+                        // 1. Récupérer items checklist
+                        const checklistItems = JSON.parse(localStorage.getItem(missionKey) || '[]');
+                        log(`  ✓ ${checklistItems.length} items checklist`, 'text-gray-300');
+                        
+                        // 2. Récupérer photos par item
+                        const photosItems = [];
+                        for (const item of checklistItems) {
+                            const photosKey = `audit_photos_item_${missionId}_${item.id}`;
+                            const photos = JSON.parse(localStorage.getItem(photosKey) || '[]');
+                            if (photos.length > 0) {
+                                photosItems.push({
+                                    item_numero: item.item_numero,
+                                    photos: photos
+                                });
+                                log(`  ✓ Item ${item.item_numero}: ${photos.length} photo(s)`, 'text-gray-300');
+                            }
+                        }
+                        
+                        // 3. Récupérer commentaire final
+                        const commentaireFinal = localStorage.getItem(`commentaire_final_${missionId}`) || '';
+                        if (commentaireFinal) {
+                            log(`  ✓ Commentaire final présent`, 'text-gray-300');
+                        }
+                        
+                        // 4. Récupérer photos générales
+                        const photosGenerales = JSON.parse(localStorage.getItem(`photos_generales_${missionId}`) || '[]');
+                        if (photosGenerales.length > 0) {
+                            log(`  ✓ ${photosGenerales.length} photo(s) générale(s)`, 'text-gray-300');
+                        }
+                        
+                        // 5. SYNCHRONISER avec serveur
+                        log(`  📤 Envoi au serveur...`, 'text-blue-400');
+                        
+                        const response = await fetch('/api/audit/sync-bulk', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                mission_id: missionId,
+                                checklist_items: checklistItems,
+                                photos_items: photosItems,
+                                commentaire_final: commentaireFinal,
+                                photos_generales: photosGenerales
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            log(`  ✅ Mission ${missionId} SAUVEGARDÉE !`, 'text-green-400');
+                            log(`     - ${result.synced.checklist_items} items`, 'text-gray-400');
+                            log(`     - ${result.synced.photos_items} groupes photos`, 'text-gray-400');
+                            log(`     - ${result.synced.commentaire_final} commentaire final`, 'text-gray-400');
+                            log(`     - ${result.synced.photos_generales} photos générales`, 'text-gray-400');
+                            totalSaved++;
+                        } else {
+                            throw new Error(result.error || 'Erreur inconnue');
+                        }
+                        
+                    } catch (error) {
+                        log(`  ❌ ERREUR Mission ${missionId}: ${error.message}`, 'text-red-400');
+                        totalErrors++;
+                    }
+                }
+                
+                // Résumé final
+                log(`\n${'='.repeat(60)}`, 'text-white');
+                log(`✅ SAUVEGARDE TERMINÉE`, 'text-green-400');
+                log(`   ${totalSaved} mission(s) sauvegardée(s)`, 'text-green-400');
+                if (totalErrors > 0) {
+                    log(`   ${totalErrors} erreur(s)`, 'text-red-400');
+                }
+                log(`${'='.repeat(60)}`, 'text-white');
+                
+                updateStatus(`✅ ${totalSaved} mission(s) sauvegardée(s) ! ${totalErrors > 0 ? '⚠️ ' + totalErrors + ' erreur(s)' : ''}`, totalErrors > 0 ? 'text-yellow-400' : 'text-green-400');
+                
+                if (totalSaved > 0) {
+                    if (confirm(`✅ ${totalSaved} mission(s) sauvegardée(s) !\n\n📊 Voulez-vous voir les rapports générés ?`)) {
+                        window.location.href = '/rapports';
+                    }
+                }
+                
+            } catch (error) {
+                log(`❌ ERREUR CRITIQUE: ${error.message}`, 'text-red-400');
+                updateStatus(`❌ ERREUR: ${error.message}`, 'text-red-400');
+            }
+        }
+        
+        // Auto-scan au chargement page
+        window.addEventListener('DOMContentLoaded', () => {
+            const allKeys = Object.keys(localStorage);
+            const missionKeys = allKeys.filter(k => k.startsWith('audit_mission_'));
+            
+            if (missionKeys.length > 0) {
+                log(`📦 ${missionKeys.length} mission(s) détectée(s) en localStorage :`, 'text-blue-400');
+                missionKeys.forEach((key, i) => {
+                    const missionId = key.replace('audit_mission_', '');
+                    const data = JSON.parse(localStorage.getItem(key) || '[]');
+                    log(`  ${i+1}. Mission ${missionId} - ${data.length} items`, 'text-gray-300');
+                });
+                log('\n🚨 CLIQUE SUR LE BOUTON ROUGE POUR SAUVEGARDER !', 'text-red-400');
+            } else {
+                log('⚠️ Aucune mission trouvée en localStorage', 'text-yellow-400');
+                log('Assure-toi d\'ouvrir cette page sur le téléphone/appareil qui contient les audits !', 'text-yellow-400');
+            }
+        });
+    </script>
+</body>
+</html>

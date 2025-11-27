@@ -7759,6 +7759,125 @@ app.get('/rapports', (c) => {
 </html>`)
 })
 
+// Route /backup-urgence - Page sauvegarde urgence localStorage
+app.get('/backup-urgence', async (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 SAUVEGARDE URGENCE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-red-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-4">🚨 SAUVEGARDE URGENCE</h1>
+        <div class="bg-red-800 p-6 rounded-lg mb-6">
+            <p class="text-xl mb-4">⚠️ Cette page extrait TOUTES les données localStorage (audits terrain) et les envoie au serveur.</p>
+            <p class="text-yellow-300">📱 IMPORTANT : Ouvre cette page sur le téléphone/appareil qui contient les audits !</p>
+        </div>
+        <button onclick="sauvegarder()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-12 rounded-lg text-2xl mb-6 w-full">
+            🚨 SAUVEGARDER MAINTENANT
+        </button>
+        <div id="status" class="bg-gray-900 p-6 rounded-lg mb-4 text-center">
+            <p id="statusText" class="text-xl">⏳ Prêt...</p>
+        </div>
+        <div id="logs" class="bg-gray-900 p-6 rounded-lg overflow-auto" style="max-height:500px;font-family:monospace;font-size:14px;"></div>
+    </div>
+    <script>
+        function log(msg, color='white') {
+            const div = document.getElementById('logs');
+            const p = document.createElement('p');
+            p.style.color = color;
+            p.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+            div.appendChild(p);
+            div.scrollTop = div.scrollHeight;
+        }
+        function status(msg, color='yellow') {
+            document.getElementById('statusText').textContent = msg;
+            document.getElementById('statusText').style.color = color;
+        }
+        async function sauvegarder() {
+            try {
+                status('🔄 Extraction localStorage...', 'cyan');
+                const keys = Object.keys(localStorage).filter(k => k.startsWith('audit_mission_'));
+                log('📦 ' + keys.length + ' mission(s) trouvée(s)', 'cyan');
+                if (keys.length === 0) {
+                    status('❌ Aucune mission trouvée !', 'red');
+                    log('⚠️ Assure-toi d\\'ouvrir cette page sur le bon appareil !', 'orange');
+                    return;
+                }
+                let saved = 0, errors = 0;
+                for (const key of keys) {
+                    const missionId = key.replace('audit_mission_', '');
+                    log('🔄 Mission ' + missionId + '...', 'yellow');
+                    const items = JSON.parse(localStorage.getItem(key) || '[]');
+                    const photosItems = [];
+                    for (const item of items) {
+                        const pk = 'audit_photos_item_' + missionId + '_' + item.id;
+                        const photos = JSON.parse(localStorage.getItem(pk) || '[]');
+                        if (photos.length > 0) photosItems.push({item_numero: item.item_numero, photos});
+                    }
+                    const commentaire = localStorage.getItem('commentaire_final_' + missionId) || '';
+                    const photosGen = JSON.parse(localStorage.getItem('photos_generales_' + missionId) || '[]');
+                    log('  Items: ' + items.length + ', Photos: ' + photosItems.length + ', Générale: ' + photosGen.length, 'lightgray');
+                    try {
+                        const res = await fetch('/api/audit/sync-bulk', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                mission_id: missionId,
+                                checklist_items: items,
+                                photos_items: photosItems,
+                                commentaire_final: commentaire,
+                                photos_generales: photosGen
+                            })
+                        });
+                        const result = await res.json();
+                        if (result.success) {
+                            log('  ✅ Mission ' + missionId + ' SAUVEGARDÉE !', 'lime');
+                            saved++;
+                        } else {
+                            throw new Error(result.error);
+                        }
+                    } catch (e) {
+                        log('  ❌ Erreur: ' + e.message, 'red');
+                        errors++;
+                    }
+                }
+                log('='.repeat(60), 'white');
+                log('✅ TERMINÉ: ' + saved + ' sauvegardée(s), ' + errors + ' erreur(s)', saved > 0 ? 'lime' : 'red');
+                log('='.repeat(60), 'white');
+                status('✅ ' + saved + ' mission(s) sauvegardée(s) !', 'lime');
+                if (saved > 0 && confirm('✅ Sauvegarde réussie !\\n\\nVoir les rapports ?')) {
+                    window.location.href = '/rapports';
+                }
+            } catch (e) {
+                log('❌ ERREUR CRITIQUE: ' + e.message, 'red');
+                status('❌ ERREUR: ' + e.message, 'red');
+            }
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const keys = Object.keys(localStorage).filter(k => k.startsWith('audit_mission_'));
+            log('🔍 Scan localStorage...', 'cyan');
+            if (keys.length > 0) {
+                log('📦 ' + keys.length + ' mission(s) détectée(s) :', 'lime');
+                keys.forEach((k, i) => {
+                    const id = k.replace('audit_mission_', '');
+                    const data = JSON.parse(localStorage.getItem(k) || '[]');
+                    log('  ' + (i+1) + '. Mission ' + id + ' - ' + data.length + ' items', 'lightgray');
+                });
+                log('🚨 CLIQUE SUR LE BOUTON VERT !', 'yellow');
+            } else {
+                log('⚠️ Aucune mission en localStorage', 'orange');
+                log('📱 Ouvre cette page sur le téléphone/appareil qui contient les audits !', 'orange');
+            }
+        });
+    </script>
+</body>
+</html>`)
+})
+
 // Route favicon pour éviter erreur 500
 app.get('/favicon.ico', (c) => {
   return new Response(null, { status: 204 })
