@@ -754,8 +754,8 @@ async function handlePhotosGeneralesUpload(event) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             photo_base64: base64,
-            photo_filename: file.name,
-            legende: ''
+            filename: file.name,
+            description: ''
           })
         });
         
