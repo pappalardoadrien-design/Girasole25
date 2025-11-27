@@ -1998,19 +1998,19 @@ app.put('/api/checklist/item/:itemId', async (c) => {
   const itemId = c.req.param('itemId')
   
   try {
-    const { statut, conformite, mission_id } = await c.req.json()
+    const { statut, commentaire } = await c.req.json()
     
     await DB.prepare(`
       UPDATE checklist_items 
       SET statut = ?, 
-          conformite = ?,
+          commentaire = COALESCE(?, commentaire),
           date_modification = CURRENT_TIMESTAMP
-      WHERE id = ? AND ordre_mission_id = ?
-    `).bind(statut, conformite, itemId, mission_id).run()
+      WHERE id = ?
+    `).bind(statut, commentaire, itemId).run()
     
     return c.json({ success: true })
   } catch (error) {
-    console.error('Erreur update statut:', error)
+    console.error('Erreur update item:', error)
     return c.json({ success: false, error: String(error) }, 500)
   }
 })
