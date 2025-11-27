@@ -3275,7 +3275,7 @@ app.get('/photos-audit/:mission_id', async (c) => {
               ${photos.results.map((photo, idx) => `
                 <div class="photo-card bg-white">
                   <img 
-                    src="data:image/jpeg;base64,${photo.photo_base64}" 
+                    src="${photo.photo_base64?.startsWith('data:') ? photo.photo_base64 : 'data:image/jpeg;base64,' + photo.photo_base64}" 
                     alt="${photo.item_texte}"
                     class="photo-img"
                     onclick="openLightbox(${idx})"
@@ -3326,7 +3326,8 @@ app.get('/photos-audit/:mission_id', async (c) => {
           function openLightbox(index) {
             currentPhotoIndex = index;
             const photo = photos[index];
-            document.getElementById('lightbox-img').src = 'data:image/jpeg;base64,' + photo.photo_base64;
+            const photoSrc = photo.photo_base64?.startsWith('data:') ? photo.photo_base64 : 'data:image/jpeg;base64,' + photo.photo_base64;
+            document.getElementById('lightbox-img').src = photoSrc;
             document.getElementById('lightbox').style.display = 'flex';
           }
           
@@ -3345,7 +3346,8 @@ app.get('/photos-audit/:mission_id', async (c) => {
             event.stopPropagation();
             currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
             const photo = photos[currentPhotoIndex];
-            document.getElementById('lightbox-img').src = 'data:image/jpeg;base64,' + photo.photo_base64;
+            const photoSrc = photo.photo_base64?.startsWith('data:') ? photo.photo_base64 : 'data:image/jpeg;base64,' + photo.photo_base64;
+            document.getElementById('lightbox-img').src = photoSrc;
           }
           
           async function downloadAll() {
