@@ -470,16 +470,368 @@ async function loadItemPhotos(itemId) {
   // TODO: Implémenter chargement photos depuis serveur
 }
 
+// ============================================
+// COMMENTAIRE FINAL MISSION
+// ============================================
+
+let commentaireFinal = '';
+
 async function loadCommentaireFinal() {
-  // TODO: Implémenter
+  try {
+    const response = await fetch(`/api/ordres-mission/${missionId}/commentaire-final`);
+    const data = await response.json();
+    commentaireFinal = data.data?.commentaire_final || '';
+    renderCommentaireFinal();
+  } catch (error) {
+    console.error('Erreur chargement commentaire final:', error);
+  }
 }
+
+function renderCommentaireFinal() {
+  const container = document.getElementById('commentaireFinalSection');
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-2xl shadow-lg border-2 border-blue-200 mb-6">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-comment-dots mr-3 text-blue-600"></i>
+        📋 SYNTHÈSE GÉNÉRALE MISSION
+      </h3>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Commentaire général sur la centrale :
+        </label>
+        <textarea 
+          id="commentaire-final-textarea"
+          rows="6" 
+          class="w-full p-4 border-2 border-blue-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-y"
+          placeholder="Vue d'ensemble installation, conditions météo, accès chantier, sécurité, observations générales..."
+        >${commentaireFinal}</textarea>
+        <p class="text-xs text-gray-500 mt-2">
+          💡 Ce commentaire sera inclus dans le rapport final PDF
+        </p>
+      </div>
+      
+      <div id="photosGeneralesContainer">
+        <div class="flex items-center justify-between mb-3">
+          <label class="block text-sm font-medium text-gray-700">
+            Photos générales (contexte, vue d'ensemble) :
+          </label>
+          <span id="photosGeneralesCount" class="text-xs text-gray-500">0 photo(s)</span>
+        </div>
+        
+        <input 
+          type="file" 
+          id="photosGeneralesInput" 
+          accept="image/*" 
+          multiple 
+          capture="environment"
+          class="hidden"
+        >
+        
+        <button 
+          onclick="document.getElementById('photosGeneralesInput').click()" 
+          class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition-all mb-4 flex items-center justify-center gap-2"
+        >
+          <i class="fas fa-camera"></i>
+          📸 Ajouter photos générales
+        </button>
+        
+        <div id="photosGeneralesGallery" class="grid grid-cols-3 gap-3 mt-3">
+          <!-- Photos générales ici -->
+        </div>
+      </div>
+      
+      <!-- BOUTON GÉNÉRATION RAPPORT -->
+      <div class="mt-6 border-t-2 border-blue-300 pt-6">
+        <button 
+          onclick="genererRapportFinal()" 
+          class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg flex items-center justify-center gap-3 font-bold text-lg"
+        >
+          <i class="fas fa-file-pdf text-2xl"></i>
+          📄 GÉNÉRER RAPPORT FINAL (PDF)
+        </button>
+        <p class="text-xs text-gray-500 mt-3 text-center">
+          ✅ Checklist complète + Photos + Commentaires item par item
+        </p>
+      </div>
+    </div>
+  `;
+  
+  // Event listener textarea auto-save
+  const textarea = document.getElementById('commentaire-final-textarea');
+  textarea?.addEventListener('input', async (e) => {
+    commentaireFinal = e.target.value;
+    await saveCommentaireFinal();
+  });
+  
+  // Event listener upload photos
+  const input = document.getElementById('photosGeneralesInput');
+  input?.addEventListener('change', handlePhotosGeneralesUpload);
+  
+  loadPhotosGenerales();
+}
+
+async function saveCommentaireFinal() {
+  try {
+    await fetch(`/api/ordres-mission/${missionId}/commentaire-final`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commentaire_final: commentaireFinal })
+    });
+  } catch (error) {
+    console.error('Erreur sauvegarde commentaire final:', error);
+  }
+}
+
+// ============================================
+// PHOTOS GÉNÉRALES
+// ============================================
+
+let photosGenerales = [];
 
 async function loadPhotosGenerales() {
-  // TODO: Implémenter
+  try {
+    const response = await fetch(`/api/ordres-mission/${missionId}/photos-generales`);
+    const data = await response.json();
+    photosGenerales = data.photos || [];
+    renderPhotosGenerales();
+  } catch (error) {
+    console.error('Erreur chargement photos générales:', error);
+  }
 }
 
+function renderPhotosGenerales() {
+  const gallery = document.getElementById('photosGeneralesGallery');
+  if (!gallery) return;
+  
+  gallery.innerHTML = photosGenerales.map((photo, index) => `
+    <div class="relative">
+      <img src="${photo.photo_base64}" class="w-full h-32 object-cover rounded-lg shadow">
+      <button 
+        onclick="deletePhotoGenerale(${photo.id})"
+        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+      >
+        <i class="fas fa-times text-xs"></i>
+      </button>
+    </div>
+  `).join('');
+  
+  const countSpan = document.getElementById('photosGeneralesCount');
+  if (countSpan) countSpan.textContent = `${photosGenerales.length} photo(s)`;
+}
+
+async function handlePhotosGeneralesUpload(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+  
+  showSyncIndicator('photos');
+  
+  for (let file of files) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result;
+      
+      try {
+        const response = await fetch(`/api/ordres-mission/${missionId}/photos-generales`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            photo_base64: base64,
+            photo_filename: file.name,
+            legende: ''
+          })
+        });
+        
+        if (response.ok) {
+          await loadPhotosGenerales();
+        }
+      } catch (error) {
+        console.error('Erreur upload photo générale:', error);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  hideSyncIndicator();
+  event.target.value = '';
+}
+
+async function deletePhotoGenerale(photoId) {
+  if (!confirm('Supprimer cette photo ?')) return;
+  
+  try {
+    await fetch(`/api/ordres-mission/photos-generales/${photoId}`, {
+      method: 'DELETE'
+    });
+    await loadPhotosGenerales();
+  } catch (error) {
+    console.error('Erreur suppression photo générale:', error);
+  }
+}
+
+// ============================================
+// CHECKLIST TOITURE
+// ============================================
+
 async function loadChecklistToiture() {
-  // TODO: Implémenter
+  try {
+    const response = await fetch(`/api/checklist-toiture/${missionId}`);
+    const data = await response.json();
+    
+    if (data.success && data.audit_toiture_requis) {
+      auditToitureRequis = true;
+      checklistItemsToiture = data.items || [];
+      renderChecklistToiture();
+      
+      // Charger photos pour chaque item toiture
+      for (const item of checklistItemsToiture) {
+        await loadItemPhotos(item.id);
+      }
+    }
+  } catch (error) {
+    console.error('Erreur chargement checklist toiture:', error);
+  }
+}
+
+function renderChecklistToiture() {
+  const container = document.getElementById('checklistToitureContainer');
+  if (!container || !auditToitureRequis) return;
+  
+  const html = `
+    <div class="mb-6">
+      <div class="bg-gradient-to-r from-orange-500 to-orange-700 text-white p-4 rounded-t-2xl shadow-lg">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-3xl">🏗️</span>
+            <div>
+              <span class="font-bold text-xl">AUDIT EN TOITURE</span>
+              <p class="text-xs text-orange-200 mt-1">Démontage ~25 panneaux + Vérifications DTU 40.35</p>
+            </div>
+          </div>
+          <span class="text-sm opacity-90">${checklistItemsToiture.length} points</span>
+        </div>
+      </div>
+      
+      <div class="space-y-3 mt-4">
+        ${checklistItemsToiture.map(item => renderChecklistItemToiture(item)).join('')}
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+function renderChecklistItemToiture(item) {
+  const isSaved = item.statut !== 'NON_VERIFIE';
+  
+  return `
+    <div class="bg-white rounded-xl shadow-md p-4 border-l-4 ${isSaved ? 'border-green-500' : 'border-gray-300'}">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex-1">
+          <div class="flex items-center space-x-2 mb-2">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-700 text-xs font-bold">
+              ${item.item_numero}
+            </span>
+            <span class="font-semibold text-gray-800 text-sm">${item.libelle}</span>
+          </div>
+          ${isSaved ? `<div class="text-xs text-green-600 font-medium">✓ Vérifié</div>` : ''}
+        </div>
+      </div>
+      
+      <!-- Statut -->
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <button 
+          class="status-btn ${item.statut === 'CONFORME' ? 'active bg-green-500 text-white' : 'bg-gray-100 text-gray-700'}"
+          onclick="updateStatusToiture(${item.id}, 'CONFORME', 'RAS')"
+        >
+          <i class="fas fa-check mr-1"></i>Conforme
+        </button>
+        <button 
+          class="status-btn ${item.statut === 'NON_CONFORME' ? 'active bg-red-500 text-white' : 'bg-gray-100 text-gray-700'}"
+          onclick="updateStatusToiture(${item.id}, 'NON_CONFORME', 'ANOMALIE')"
+        >
+          <i class="fas fa-times mr-1"></i>Non conforme
+        </button>
+        <button 
+          class="status-btn ${item.statut === 'N/A' ? 'active bg-gray-400 text-white' : 'bg-gray-100 text-gray-700'}"
+          onclick="updateStatusToiture(${item.id}, 'N/A', 'N/A')"
+        >
+          N/A
+        </button>
+      </div>
+      
+      <!-- Commentaire -->
+      <textarea 
+        id="comment-toiture-${item.id}"
+        class="w-full p-2 border border-gray-300 rounded-lg text-sm"
+        placeholder="Commentaire (optionnel)..."
+        rows="2"
+        onchange="saveCommentToiture(${item.id})"
+      >${item.commentaire || ''}</textarea>
+      
+      <!-- Photos -->
+      <div class="mt-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">
+            <i class="fas fa-images mr-1"></i>Photos (<span id="photo-count-toiture-${item.id}">0</span>)
+          </span>
+          <button class="photo-btn inline-flex items-center" onclick="openPhotoUploader(${item.id})">
+            <i class="fas fa-camera mr-2"></i>Ajouter photos
+          </button>
+        </div>
+        <input type="file" id="photo-input-${item.id}" accept="image/*" capture="environment" 
+               multiple onchange="handleMultiPhotoUpload(${item.id}, event)" style="display:none">
+        <div id="photos-gallery-${item.id}" class="grid grid-cols-3 gap-2">
+          <!-- Photos chargées dynamiquement -->
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function updateStatusToiture(itemId, statut, conformite) {
+  try {
+    const item = checklistItemsToiture.find(i => i.id === itemId);
+    if (!item) return;
+    
+    item.statut = statut;
+    item.conformite = conformite;
+    
+    await fetch(`/api/checklist-toiture/${missionId}/item/${itemId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ statut, conformite, technicien: 'Audit' })
+    });
+    
+    renderChecklistToiture();
+  } catch (error) {
+    console.error('Erreur sauvegarde statut toiture:', error);
+  }
+}
+
+async function saveCommentToiture(itemId) {
+  try {
+    const textarea = document.getElementById(`comment-toiture-${itemId}`);
+    const commentaire = textarea?.value || '';
+    
+    const item = checklistItemsToiture.find(i => i.id === itemId);
+    if (item) {
+      item.commentaire = commentaire;
+    }
+    
+    await fetch(`/api/checklist-toiture/${missionId}/item/${itemId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        statut: item.statut || 'NON_VERIFIE', 
+        commentaire 
+      })
+    });
+  } catch (error) {
+    console.error('Erreur sauvegarde commentaire toiture:', error);
+  }
 }
 
 // ============================================
@@ -495,6 +847,74 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// ============================================
+// GÉNÉRATION RAPPORT FINAL
+// ============================================
+
+async function genererRapportFinal() {
+  if (!confirm('Générer le rapport final de cet audit ?\n\nCela créera un document PDF complet avec checklist, photos et commentaires.')) {
+    return;
+  }
+  
+  showSyncIndicator('rapport');
+  
+  try {
+    const response = await fetch(`/api/rapports/generer/${missionId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      hideSyncIndicator();
+      alert('✅ RAPPORT GÉNÉRÉ\n\nRapport ID: ' + data.rapport_id + '\n\nLe rapport a été sauvegardé et est accessible via /api/rapports/' + data.rapport_id);
+      
+      // Optionnel : télécharger le JSON
+      if (confirm('Télécharger les données du rapport (JSON) ?')) {
+        await telechargerRapportJSON(data.rapport_id);
+      }
+    } else {
+      hideSyncIndicator();
+      alert('❌ ERREUR\n\n' + (data.error || 'Impossible de générer le rapport'));
+    }
+  } catch (error) {
+    hideSyncIndicator();
+    console.error('Erreur génération rapport:', error);
+    alert('❌ ERREUR RÉSEAU\n\nImpossible de générer le rapport.\nVérifiez votre connexion.');
+  }
+}
+
+async function telechargerRapportJSON(rapportId) {
+  try {
+    const response = await fetch(`/api/rapports/${rapportId}`);
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      const rapport = data.data;
+      const donnees = JSON.parse(rapport.donnees_rapport);
+      
+      // Créer un blob JSON
+      const blob = new Blob([JSON.stringify(donnees, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      // Télécharger
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rapport_mission_${missionId}_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      
+      URL.revokeObjectURL(url);
+    }
+  } catch (error) {
+    console.error('Erreur téléchargement rapport:', error);
+  }
+}
+
+// ============================================
+// DÉMARRAGE
+// ============================================
 
 // Charger au démarrage
 document.addEventListener('DOMContentLoaded', loadChecklist);

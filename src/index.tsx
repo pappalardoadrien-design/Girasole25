@@ -3144,7 +3144,7 @@ app.get('/audit/:mission_id', async (c) => {
         </main>
 
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script src="/static/audit.js"></script>
+        <script src="/static/audit-v2-serveronly.js"></script>
       </body>
       </html>
     `)
