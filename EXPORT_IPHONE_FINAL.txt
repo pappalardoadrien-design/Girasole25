@@ -1,0 +1,76 @@
+🔄 SOLUTION FINALE - Export localStorage iPhone
+=================================================
+
+📍 PROBLÈME IDENTIFIÉ :
+- Tes 9 audits (commentaires + photos) sont dans le localStorage de ton iPhone Chrome
+- L'URL utilisée pour les audits était : https://0da64170.girasole-diagpv.pages.dev/
+- localStorage est lié à l'URL spécifique du domaine
+- Les nouvelles versions déployées ont des URLs différentes (0c2f94b2, 80eb6e9a, 1f1f3331, etc.)
+- localStorage n'est PAS partagé entre les URLs différentes
+
+✅ SOLUTION DÉPLOYÉE :
+Page de migration automatique créée spécialement pour iPhone Chrome
+
+📱 INSTRUCTIONS POUR IPHONE CHROME :
+
+Étape 1 : Ouvre cette URL sur ton iPhone Chrome
+--------------------------------------------
+https://1f1f3331.girasole-diagpv.pages.dev/migrate-storage
+
+⚠️ IMPORTANT : 
+- Utilise le MÊME iPhone Chrome qui a servi à remplir les audits
+- Si tu as utilisé Safari au lieu de Chrome, la page ne trouvera rien
+- Si tu as utilisé un autre appareil, ouvre cette page sur CET appareil
+
+Étape 2 : Clique sur le bouton vert
+-----------------------------------
+"🚀 EXPORTER MES 9 AUDITS"
+
+La page va :
+✓ Scanner le localStorage du navigateur
+✓ Extraire les 9 audits (7, 9, 12, 20, 24, 33, 44, 45, 46)
+✓ Compiler items, commentaires, photos générales, photos par item
+✓ Télécharger automatiquement un fichier JSON
+
+Étape 3 : M'envoyer le fichier JSON
+-----------------------------------
+Le fichier téléchargé s'appellera :
+audits_GIRASOLE_Xmissions_2025-11-27.json
+
+Où X = nombre d'audits trouvés (normalement 5 à 9)
+
+📤 ENVOIE-MOI CE FICHIER
+
+Je vais :
+✓ Importer les données dans la DB production
+✓ Restaurer tous les statuts, commentaires, photos
+✓ Générer les 9 rapports PDF
+✓ Donner accès à Fabien
+✓ Garantir 0 perte de données
+
+🎯 URLS ALTERNATIVES (au cas où 1f1f3331 ne marche pas) :
+- https://80eb6e9a.girasole-diagpv.pages.dev/migrate-storage
+- https://0c2f94b2.girasole-diagpv.pages.dev/migrate-storage
+
+📊 AUDITS ATTENDUS (9 missions terrain) :
+1. Mission 7  - Pierre MOURGUES
+2. Mission 9  - BURGAT
+3. Mission 12 - Christian MIGNARD
+4. Mission 20 - VAN ZANTEN
+5. Mission 24 - Christophe CARRERE 2
+6. Mission 33 - Mathieu VINCENT
+7. Mission 44 - GOUNY
+8. Mission 45 - Maxime BAYLE
+9. Mission 46 - Commune de POMAS
+
+⚠️ SI LA PAGE AFFICHE "0 audits trouvés" :
+- Tu es sur le mauvais navigateur/appareil
+- Vérifie quel navigateur (Chrome/Safari) a été utilisé pour les audits terrain
+- Ouvre la page /migrate-storage sur CE navigateur
+
+🕐 TEMPS ESTIMÉ :
+- Export : 30 secondes
+- Import en DB : 2 minutes après réception du JSON
+
+📧 APRÈS L'EXPORT :
+Envoie-moi le JSON téléchargé, je fais le reste !
