@@ -3593,18 +3593,30 @@ app.get('/', (c) => {
                 // MISSIONS - Fonction globale pour charger les missions
                 // ============================================
                 window.loadMissionsGlobal = async function() {
-                    console.log('🚀 loadMissionsGlobal() appelée');
+                    console.log('🚀 loadMissionsGlobal() appelée - DEBUT');
                     try {
                         console.log('📡 Fetching /api/suivi-missions...');
                         const response = await window.fetchNoCache('/api/suivi-missions');
-                        console.log('✅ Response:', response.status, response.ok);
+                        console.log('✅ Response status:', response.status, 'ok:', response.ok);
                         
                         const data = await response.json();
-                        console.log('📦 Data:', data.success, 'missions:', data.data?.length);
+                        console.log('📦 Data reçue:', {
+                            success: data.success,
+                            nb_missions: data.data?.length,
+                            premiere_mission: data.data?.[0]?.centrale_nom,
+                            mission_7: data.data?.find(m => m.mission_id === 7)
+                        });
                         
                         const missions = data.data;
                         const container = document.getElementById('missions-container');
-                        console.log('📍 Container:', container ? 'trouvé' : 'INTROUVABLE');
+                        console.log('📍 Container missions-container:', container ? 'TROUVE' : '❌ INTROUVABLE');
+                        
+                        if (!container) {
+                            console.error('❌❌❌ ERREUR CRITIQUE: Container missions-container introuvable !');
+                            alert('ERREUR: Container missions-container introuvable');
+                            return;
+                        }
+                        console.log('📍 Container innerHTML avant:', container.innerHTML.substring(0, 100));
                         
                         if (!container) {
                             console.error('❌ Container missions-container INTROUVABLE');
@@ -3694,13 +3706,15 @@ app.get('/', (c) => {
                         }).join('');
                         
                         console.log('✅ HTML généré, longueur:', container.innerHTML.length, 'caractères');
+                        console.log('✅ Exemple HTML Mission 7:', container.innerHTML.substring(container.innerHTML.indexOf('Mission 7') - 50, container.innerHTML.indexOf('Mission 7') + 200));
                         
                         // ✅ Attacher les event listeners APRÈS génération du HTML
                         document.getElementById('filter-st-missions')?.addEventListener('change', filterMissions);
                         document.getElementById('filter-statut-missions')?.addEventListener('change', filterMissions);
                         document.getElementById('search-centrale-missions')?.addEventListener('input', filterMissions);
                         
-                        console.log('🎉 loadMissionsGlobal() terminée avec succès + event listeners attachés');
+                        console.log('🎉 loadMissionsGlobal() TERMINE - HTML injecté dans DOM');
+                        console.log('📍 Container innerHTML après (100 premiers char):', container.innerHTML.substring(0, 100));
                         
                     } catch (error) {
                         console.error('❌ Erreur chargement missions:', error);
@@ -4708,7 +4722,7 @@ app.get('/', (c) => {
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script src="/static/app.js"></script>
+        <!-- app.js désactivé - conflit avec loadMissionsGlobal() -->
         <script src="/static/planning.js"></script>
         <script src="/static/attribution.js"></script>
     </body>
