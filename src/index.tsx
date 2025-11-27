@@ -7519,9 +7519,11 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
   
   try {
     const mission = await DB.prepare(`
-      SELECT om.*, c.nom, c.type_centrale, c.puissance_kwc, c.localisation, c.adresse, c.audit_toiture
+      SELECT om.*, c.nom, c.type_centrale, c.puissance_kwc, c.localisation, c.adresse, c.audit_toiture,
+             t.prenom as technicien_prenom, t.nom as technicien_nom
       FROM ordres_mission om
       JOIN centrales c ON om.centrale_id = c.id
+      LEFT JOIN techniciens t ON om.technicien_id = t.id
       WHERE om.id = ?
     `).bind(missionId).first()
     
@@ -7530,13 +7532,17 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
     }
     
     const itemsSol = await DB.prepare(`SELECT * FROM checklist_items WHERE ordre_mission_id = ? ORDER BY item_numero`).bind(missionId).all()
-    const photosSol = await DB.prepare(`SELECT * FROM ordres_mission_item_photos WHERE ordre_mission_id = ? ORDER BY item_id, ordre`).bind(missionId).all()
+    const photosSol = await DB.prepare(`SELECT * FROM ordres_mission_item_photos WHERE ordre_mission_id = ? ORDER BY item_checklist_id, ordre`).bind(missionId).all()
     
     let itemsToiture = { results: [] }
     let photosToiture = { results: [] }
     if (mission.audit_toiture === 'X') {
       itemsToiture = await DB.prepare(`SELECT * FROM checklist_items_toiture WHERE ordre_mission_id = ? ORDER BY item_numero`).bind(missionId).all()
-      photosToiture = await DB.prepare(`SELECT * FROM ordres_mission_item_photos WHERE ordre_mission_id = ? AND item_checklist_type = 'TOITURE' ORDER BY item_id, ordre`).bind(missionId).all()
+      // Photos toiture : filtrage côté code (item_checklist_type n'existe pas en DB)
+      const photosAllItems = await DB.prepare(`SELECT * FROM ordres_mission_item_photos WHERE ordre_mission_id = ? ORDER BY item_checklist_id, ordre`).bind(missionId).all()
+      // Filtrer uniquement items correspondant à checklist toiture
+      const toitureIds = itemsToiture.results.map(i => i.id)
+      photosToiture = { results: photosAllItems.results.filter(p => toitureIds.includes(p.item_checklist_id)) }
     }
     
     const commentaireFinal = await DB.prepare(`SELECT * FROM ordres_mission_commentaires_finaux WHERE ordre_mission_id = ?`).bind(missionId).first()
@@ -7568,7 +7574,7 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
           categorie: item.categorie,
           statut: item.statut,
           commentaire: item.commentaire || '',
-          photos: photosSol.results.filter(p => p.item_id === item.id).map(p => ({
+          photos: photosSol.results.filter(p => p.item_checklist_id === item.id).map(p => ({
             filename: p.photo_filename,
             base64: p.photo_base64,
             commentaire: p.commentaire || ''
@@ -7582,7 +7588,7 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
           libelle: item.libelle,
           statut: item.statut,
           commentaire: item.commentaire || '',
-          photos: photosToiture.results.filter(p => p.item_id === item.id).map(p => ({
+          photos: photosToiture.results.filter(p => p.item_checklist_id === item.id).map(p => ({
             filename: p.photo_filename,
             base64: p.photo_base64,
             commentaire: p.commentaire || ''
