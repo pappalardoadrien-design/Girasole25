@@ -2049,11 +2049,20 @@ app.post('/api/checklist/item/:itemId/photo', async (c) => {
   try {
     const { photo_base64, photo_filename, mission_id } = await c.req.json()
     
-    await DB.prepare(`
-      INSERT INTO ordres_mission_item_photos 
-      (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, created_at)
-      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-    `).bind(mission_id, itemId, photo_base64, photo_filename).run()
+    if (!photo_base64 || !mission_id) {
+      return c.json({ success: false, error: 'Photo et mission_id requis' }, 400)
+    }
+    
+    // Utiliser INSERT sans vérification FK (la FK pointe vers table inexistante)
+    const result = await DB.batch([
+      DB.prepare('PRAGMA foreign_keys = OFF'),
+      DB.prepare(`
+        INSERT INTO ordres_mission_item_photos 
+        (ordre_mission_id, item_checklist_id, photo_base64, photo_filename, date_creation)
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+      `).bind(mission_id, itemId, photo_base64, photo_filename || 'photo.jpg'),
+      DB.prepare('PRAGMA foreign_keys = ON')
+    ])
     
     return c.json({ success: true })
   } catch (error) {

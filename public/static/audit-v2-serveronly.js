@@ -246,13 +246,12 @@ async function saveItemPhoto(itemId, photoBase64, filename) {
   try {
     if (!navigator.onLine) throw new Error('offline');
     
-    const response = await fetch(`/api/checklist/item/${itemId}/photo`, {
+    const response = await fetch(`/api/checklist/${missionId}/item/${itemId}/photos`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         photo_base64: photoBase64,
-        photo_filename: filename,
-        mission_id: missionId
+        photo_filename: filename
       })
     });
     
