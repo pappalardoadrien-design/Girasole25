@@ -188,8 +188,8 @@ Systématique pour toutes les missions. Points de contrôle :
 10. Disjoncteurs calibrage correct
 ... *(40 points au total)*
 
-### **🏠 Checklist TOITURE (13 points)**
-Uniquement si `audit_toiture = 'X'` (Missions 2, 6, 8, 12). Points de contrôle :
+### **🏠 Checklist TOITURE (14 points)**
+Uniquement si `audit_toiture = 'X'` (Missions 2, 6, 8, 12, 17, 18, 21, 25, 36, 38, 39, 43, 47). Points de contrôle :
 1. Démontage/remontage ~25 panneaux pertinents
 2. Conformité DTU 40.35
 3. Qualité montage/serrage SI sur support
@@ -203,6 +203,7 @@ Uniquement si `audit_toiture = 'X'` (Missions 2, 6, 8, 12). Points de contrôle 
 11. Respect notices montage / Interdiction marcher sur panneaux
 12. **🆕 Présence de film anticondensation ?**
 13. **🆕 Présence de limaille/rouille/piquage sous modules ?**
+14. **🆕 Mesurer distance Modules > Rives / Modules > Faitage**
 
 ---
 
@@ -237,6 +238,6 @@ Uniquement si `audit_toiture = 'X'` (Missions 2, 6, 8, 12). Points de contrôle 
 ---
 
 **📅 Dernière mise à jour** : 27/11/2024  
-**✅ Version** : 2.0 (Migration 0010 — Ajout 2 items TOITURE)  
+**✅ Version** : 2.1 (Migration 0013 — Ajout mesure distances TOITURE)  
 **🔒 Garantie** : 0% localStorage, 100% Cloudflare D1
 ntie** : 0% localStorage, 100% Cloudflare D1
