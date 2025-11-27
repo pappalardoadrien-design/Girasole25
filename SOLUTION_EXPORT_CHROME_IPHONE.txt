@@ -1,0 +1,99 @@
+🚨 SOLUTION EXPORT CHROME iPHONE
+
+========================================
+PROBLÈME
+========================================
+
+- Audits complets sur iPhone Chrome
+- URL: https://0da64170.girasole-diagpv.pages.dev
+- Données dans localStorage (non synchronisées)
+- Pas de Mac pour Remote Debugging
+- Bookmarklet JavaScript bloqué par Chrome iOS
+
+
+========================================
+SOLUTIONS TENTÉES (échecs)
+========================================
+
+❌ /audit-export sur 0da64170 → 500 error (vieux déploiement)
+❌ Bookmarklet javascript: → Bloqué par Chrome iOS
+❌ chrome://inspect → Nécessite Mac + Safari
+❌ data: URL → Pas d'accès localStorage cross-origin
+
+
+========================================
+SOLUTION ACTUELLE : CAPTURE MANUELLE
+========================================
+
+En attendant solution technique :
+
+1. Ouvrir chaque audit sur Chrome iPhone :
+   - https://0da64170.girasole-diagpv.pages.dev/audit/9
+   - https://0da64170.girasole-diagpv.pages.dev/audit/12
+   - etc.
+
+2. Faire capture d'écran de chaque checklist
+
+3. Adrien recopie manuellement dans nouvelle URL
+
+OU
+
+4. Adrien dicte ses commentaires/statuts par audio
+   → Je les ressaisis dans la DB
+
+
+========================================
+SOLUTION TECHNIQUE EN COURS
+========================================
+
+Option A : Déployer bouton export sur URL production
+- Problème : 0da64170 est ancien déploiement
+- Nécessite redéploiement complet
+
+Option B : Extension Chrome custom
+- Trop complexe pour urgence
+
+Option C : QR Code → Page externe avec postMessage
+- Complexe, risques CORS
+
+Option D : Adrien utilise ordinateur avec Chrome
+- Chrome Desktop a vraie console
+- Peut exécuter script JavaScript
+- Si même compte Chrome = localStorage sync ?
+
+
+========================================
+QUESTION CRITIQUE
+========================================
+
+As-tu un ORDINATEUR (Windows/Linux) avec Chrome ?
+
+Si tu as synchronisé ton compte Chrome entre 
+iPhone et ordinateur, le localStorage POURRAIT 
+être synchronisé aussi.
+
+Test :
+1. Ouvre Chrome sur ordinateur
+2. Connecte-toi avec même compte Google
+3. Va sur https://0da64170.girasole-diagpv.pages.dev/audit/9
+4. Ouvre Console (F12)
+5. Tape: localStorage.getItem('audit_mission_9')
+6. Si ça retourne du JSON → DONNÉES DISPO !
+
+
+========================================
+ALTERNATIVE : EMAIL DES DONNÉES
+========================================
+
+Si Adrien peut :
+1. Copier manuellement ses commentaires dans email
+2. Prendre photos de son écran
+3. M'envoyer tout par email
+
+Je reconstitue manuellement dans la DB.
+
+Long mais garanti 100% de récupération.
+
+
+--
+DiagPV Assistant

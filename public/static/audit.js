@@ -9,6 +9,7 @@ let photosGenerales = [];
 let autoSaveTimer = null;
 let isOnline = navigator.onLine;
 let pendingSyncQueue = [];
+let hasUnsavedChanges = false;
 
 // LocalStorage keys
 const STORAGE_KEY = `audit_mission_${missionId}`;
@@ -16,6 +17,17 @@ const STORAGE_KEY_TOITURE = `audit_mission_toiture_${missionId}`; // NOUVEAU
 const SYNC_QUEUE_KEY = `sync_queue_${missionId}`;
 const COMMENTAIRE_FINAL_KEY = `commentaire_final_${missionId}`;
 const PHOTOS_GENERALES_KEY = `photos_generales_${missionId}`;
+
+// 🚨 PROTECTION CRITIQUE : Empêcher perte données par actualisation
+window.addEventListener('beforeunload', (e) => {
+  const queue = JSON.parse(safeLocalStorageGet(SYNC_QUEUE_KEY) || '[]');
+  if (queue.length > 0 || hasUnsavedChanges) {
+    const message = '⚠️ ATTENTION : Vous avez des modifications non synchronisées ! Quitter maintenant peut entraîner une perte de données.';
+    e.preventDefault();
+    e.returnValue = message;
+    return message;
+  }
+});
 
 // Détecter changements connexion
 window.addEventListener('online', () => {
@@ -86,14 +98,41 @@ async function loadChecklist() {
       const response = await fetch(`/api/checklist/${missionId}`);
       const data = await response.json();
       
+      let serverItems = [];
       if (!data.success || !data.data || data.data.length === 0) {
         // Initialiser checklist si vide
         await fetch(`/api/checklist/${missionId}/init`, { method: 'POST' });
         const retryResponse = await fetch(`/api/checklist/${missionId}`);
         const retryData = await retryResponse.json();
-        checklistItems = retryData.data || [];
+        serverItems = retryData.data || [];
       } else {
-        checklistItems = data.data || [];
+        serverItems = data.data || [];
+      }
+      
+      // 🚨 CRITIQUE : Fusionner avec localStorage au lieu d'écraser
+      if (localData) {
+        const localItems = JSON.parse(localData);
+        // Prioriser données locales si plus récentes ou plus complètes
+        checklistItems = localItems.map(localItem => {
+          const serverItem = serverItems.find(s => s.id === localItem.id);
+          if (!serverItem) return localItem;
+          
+          // Si item local a du contenu (statut != NON_VERIFIE ou commentaire ou photo)
+          const hasLocalContent = localItem.statut !== 'NON_VERIFIE' || localItem.commentaire || localItem.photo_base64;
+          // Si item serveur est vide
+          const serverIsEmpty = serverItem.statut === 'NON_VERIFIE' && !serverItem.commentaire && !serverItem.photo_base64;
+          
+          // Prioriser local si a du contenu et serveur vide
+          if (hasLocalContent && serverIsEmpty) {
+            console.log(`⚠️ Item ${localItem.id}: données locales plus complètes, conservation`);
+            return localItem;
+          }
+          
+          // Sinon prioriser serveur (source de vérité)
+          return serverItem;
+        });
+      } else {
+        checklistItems = serverItems;
       }
       
       // Sauvegarder en local pour backup offline
@@ -1278,11 +1317,28 @@ window.updateProgress = function() {
 };
 
 // Charger au démarrage page
+// 🚨 SYNC AUTOMATIQUE PERMANENTE : toutes les 10 secondes
+setInterval(async () => {
+  if (isOnline) {
+    const queue = JSON.parse(safeLocalStorageGet(SYNC_QUEUE_KEY) || '[]');
+    if (queue.length > 0) {
+      console.log('🔄 Auto-sync périodique...');
+      await syncPendingChanges();
+    }
+  }
+}, 10000); // 10 secondes
+
+// Démarrage application
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', async () => {
     await loadChecklist();
     await loadAllPhotos();
+    // Sync immédiate au démarrage
+    if (isOnline) await syncPendingChanges();
   });
 } else {
-  loadChecklist().then(() => loadAllPhotos());
+  loadChecklist().then(() => {
+    loadAllPhotos();
+    if (isOnline) syncPendingChanges();
+  });
 }
