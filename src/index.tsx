@@ -7659,13 +7659,14 @@ app.get('/api/suivi-missions', async (c) => {
         st.nom_entreprise as sous_traitant,
         t.nom || ' ' || t.prenom as technicien_nom,
         COUNT(DISTINCT ci.id) as nb_points_total,
-        COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME') THEN ci.id END) as nb_points_completes,
-        COUNT(DISTINCT CASE WHEN ci.photo_base64 IS NOT NULL THEN ci.id END) as nb_photos
+        COUNT(DISTINCT CASE WHEN ci.statut IN ('CONFORME', 'NON_CONFORME', 'N/A') THEN ci.id END) as nb_points_completes,
+        COUNT(DISTINCT ph.id) as nb_photos
       FROM ordres_mission om
       JOIN centrales c ON om.centrale_id = c.id
       JOIN sous_traitants st ON om.sous_traitant_id = st.id
       JOIN techniciens t ON om.technicien_id = t.id
       LEFT JOIN checklist_items ci ON om.id = ci.ordre_mission_id
+      LEFT JOIN ordres_mission_item_photos ph ON om.id = ph.ordre_mission_id
       GROUP BY om.id
       ORDER BY om.date_mission, c.nom
     `).all()
