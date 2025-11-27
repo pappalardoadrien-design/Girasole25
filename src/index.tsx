@@ -3086,8 +3086,8 @@ app.get('/audit/:mission_id', async (c) => {
                 <p class="text-xs text-blue-200">${mission.centrale_type === 'SOL' ? '☀️ Sol' : '🏠 Toiture'} • ${mission.puissance_kwc} kWc</p>
               </div>
             </div>
-            <button onclick="finishAudit()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-semibold text-sm">
-              <i class="fas fa-check mr-1"></i>Terminer
+            <button onclick="window.location.href='/'" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-semibold text-sm">
+              <i class="fas fa-arrow-left mr-1"></i>Dashboard
             </button>
           </div>
           <div class="mt-3 flex items-center text-sm" data-technicien-nom="${mission.technicien_prenom} ${mission.technicien_nom}">

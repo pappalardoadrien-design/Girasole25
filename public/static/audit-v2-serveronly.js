@@ -470,8 +470,8 @@ async function loadItemPhotos(itemId) {
     const response = await fetch(`/api/checklist/${missionId}/item/${itemId}/photos`);
     const data = await response.json();
     
-    if (data.success && data.data) {
-      renderItemPhotos(itemId, data.data);
+    if (data.success && data.photos) {
+      renderItemPhotos(itemId, data.photos);
     }
   } catch (error) {
     console.error('Erreur chargement photos item:', error);
@@ -604,16 +604,27 @@ function renderCommentaireFinal() {
       </div>
       
       <!-- BOUTON GÉNÉRATION RAPPORT -->
-      <div class="mt-6 border-t-2 border-blue-300 pt-6">
+      <div class="mt-6 border-t-2 border-blue-300 pt-6 space-y-3">
+        <!-- Bouton TERMINÉ (retour dashboard) -->
+        <button 
+          onclick="terminerAudit()" 
+          class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg flex items-center justify-center gap-3 font-bold text-lg"
+        >
+          <i class="fas fa-check-circle text-2xl"></i>
+          ✅ TERMINÉ - Retour Dashboard
+        </button>
+        
+        <!-- Bouton GÉNÉRER RAPPORT -->
         <button 
           onclick="genererRapportFinal()" 
           class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg flex items-center justify-center gap-3 font-bold text-lg"
         >
           <i class="fas fa-file-pdf text-2xl"></i>
-          📄 GÉNÉRER RAPPORT FINAL (PDF)
+          📄 GÉNÉRER RAPPORT FINAL (JSON)
         </button>
+        
         <p class="text-xs text-gray-500 mt-3 text-center">
-          ✅ Checklist complète + Photos + Commentaires item par item
+          ✅ Toutes les données sont sauvegardées automatiquement
         </p>
       </div>
     </div>
@@ -714,7 +725,6 @@ async function handlePhotosGeneralesUpload(event) {
     reader.readAsDataURL(file);
   }
   
-  hideSyncIndicator();
   event.target.value = '';
 }
 
@@ -912,8 +922,15 @@ document.head.appendChild(style);
 // GÉNÉRATION RAPPORT FINAL
 // ============================================
 
+async function terminerAudit() {
+  // Toutes les modifications sont déjà sauvegardées en temps réel
+  if (confirm('Terminer cet audit et retourner au Dashboard ?\n\n✅ Checklist sauvegardée\n✅ Commentaires sauvegardés\n✅ Photos sauvegardées')) {
+    window.location.href = '/';
+  }
+}
+
 async function genererRapportFinal() {
-  if (!confirm('Générer le rapport final de cet audit ?\n\nCela créera un document PDF complet avec checklist, photos et commentaires.')) {
+  if (!confirm('Générer le rapport final de cet audit ?\n\nCela créera un document JSON complet avec checklist, photos et commentaires.')) {
     return;
   }
   
@@ -928,7 +945,6 @@ async function genererRapportFinal() {
     const data = await response.json();
     
     if (data.success) {
-      hideSyncIndicator();
       alert('✅ RAPPORT GÉNÉRÉ\n\nRapport ID: ' + data.rapport_id + '\n\nLe rapport a été sauvegardé et est accessible via /api/rapports/' + data.rapport_id);
       
       // Optionnel : télécharger le JSON
@@ -936,11 +952,9 @@ async function genererRapportFinal() {
         await telechargerRapportJSON(data.rapport_id);
       }
     } else {
-      hideSyncIndicator();
       alert('❌ ERREUR\n\n' + (data.error || 'Impossible de générer le rapport'));
     }
   } catch (error) {
-    hideSyncIndicator();
     console.error('Erreur génération rapport:', error);
     alert('❌ ERREUR RÉSEAU\n\nImpossible de générer le rapport.\nVérifiez votre connexion.');
   }
