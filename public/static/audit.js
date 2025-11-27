@@ -483,27 +483,79 @@ async function finishAudit() {
     if (!confirm) return;
   }
   
-  if (window.confirm('Marquer la mission comme TERMINÉE ?\n\n💡 Vous pourrez toujours modifier la checklist, ajouter des photos et des commentaires après.')) {
+  if (window.confirm('Synchroniser et marquer mission comme TERMINÉE ?\n\n📤 Vos données seront envoyées au serveur.\n💡 Vous pourrez toujours modifier après.')) {
     try {
+      // 1. SYNCHRONISATION BULK DES DONNÉES
+      showSaveIndicator('📤 Synchronisation des données...', '#3b82f6');
+      
+      // Récupérer photos par item depuis localStorage
+      const photosItems = [];
+      for (const item of checklistItems) {
+        const photosKey = `audit_photos_item_${missionId}_${item.id}`;
+        const photos = JSON.parse(safeLocalStorageGet(photosKey) || '[]');
+        if (photos.length > 0) {
+          photosItems.push({
+            item_numero: item.item_numero,
+            photos: photos
+          });
+        }
+      }
+      
+      // Récupérer commentaire final et photos générales
+      const commentaireFinal = safeLocalStorageGet(`commentaire_final_${missionId}`) || '';
+      const photosGenerales = JSON.parse(safeLocalStorageGet(`photos_generales_${missionId}`) || '[]');
+      
+      // Appeler API sync bulk
+      const syncResponse = await fetch('/api/audit/sync-bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mission_id: missionId,
+          checklist_items: checklistItems,
+          photos_items: photosItems,
+          commentaire_final: commentaireFinal,
+          photos_generales: photosGenerales
+        })
+      });
+      
+      const syncResult = await syncResponse.json();
+      
+      if (!syncResult.success) {
+        throw new Error(syncResult.error || 'Erreur synchronisation');
+      }
+      
+      console.log('✅ Sync bulk réussie:', syncResult.synced);
+      showSaveIndicator('✅ Données synchronisées !', '#10b981');
+      
+      // 2. Mettre à jour statut mission
       await fetch(`/api/ordres-mission/${missionId}/statut`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ statut: 'TERMINE' })
       });
       
-      // Proposer de voir le rapport
-      const voirRapport = window.confirm('✅ Mission terminée !\n\n📄 Voulez-vous consulter le rapport final ?\n\n💡 Vous pourrez revenir sur cette page pour modifier la checklist et ajouter des photos.');
+      // 3. Proposer de voir le rapport
+      const voirRapport = window.confirm('✅ Mission terminée et données sauvegardées !\n\n📊 Voulez-vous générer le rapport ?\n\n💡 Vous pourrez revenir sur cette page pour modifier.');
       
       if (voirRapport) {
-        window.open(`/api/ordres-mission/${missionId}/rapport-final`, '_blank');
+        // Générer rapport
+        const rapportResponse = await fetch(`/api/rapports/generer/${missionId}`, {
+          method: 'POST'
+        });
+        const rapportResult = await rapportResponse.json();
+        
+        if (rapportResult.success) {
+          alert(`✅ Rapport généré (ID ${rapportResult.rapport_id}) !\n\nConsultez-le sur /rapports`);
+        }
+        
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/rapports';
         }, 500);
       } else {
         window.location.href = '/';
       }
     } catch (error) {
-      alert('Erreur mise à jour statut');
+      alert('❌ Erreur synchronisation: ' + error.message);
       console.error(error);
     }
   }

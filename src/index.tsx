@@ -5833,6 +5833,156 @@ app.get('/api/sharepoint/status', async (c) => {
 // ROUTES API - GESTION AUDITS
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// ==============================================
+// API SYNCHRONISATION BULK AUDIT (URGENCE)
+// ==============================================
+
+// POST /api/audit/sync-bulk - Synchroniser toutes les données audit depuis mobile
+app.post('/api/audit/sync-bulk', async (c) => {
+  const { DB } = c.env
+  
+  try {
+    const body = await c.req.json()
+    const { mission_id, checklist_items, photos_items, commentaire_final, photos_generales } = body
+    
+    if (!mission_id) {
+      return c.json({ success: false, error: 'mission_id requis' }, 400)
+    }
+    
+    console.log(`🔄 Sync bulk mission ${mission_id}:`, {
+      items: checklist_items?.length || 0,
+      photos: photos_items?.length || 0
+    })
+    
+    // 1. Sync items checklist SOL
+    if (checklist_items && Array.isArray(checklist_items)) {
+      for (const item of checklist_items) {
+        // Vérifier si item existe
+        const existing = await DB.prepare(`
+          SELECT id FROM checklist_items 
+          WHERE ordre_mission_id = ? AND item_numero = ?
+        `).bind(mission_id, item.item_numero).first()
+        
+        if (existing) {
+          // Update
+          await DB.prepare(`
+            UPDATE checklist_items 
+            SET statut = ?, commentaire = ?, date_modification = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `).bind(item.statut || 'NON_VERIFIE', item.commentaire || null, existing.id).run()
+        } else {
+          // Insert
+          await DB.prepare(`
+            INSERT INTO checklist_items (
+              ordre_mission_id, item_numero, categorie, item_texte, statut, commentaire
+            ) VALUES (?, ?, ?, ?, ?, ?)
+          `).bind(
+            mission_id,
+            item.item_numero,
+            item.categorie || '',
+            item.item_texte || item.libelle || '',
+            item.statut || 'NON_VERIFIE',
+            item.commentaire || null
+          ).run()
+        }
+      }
+    }
+    
+    // 2. Sync photos items
+    if (photos_items && Array.isArray(photos_items)) {
+      for (const photoData of photos_items) {
+        // Récupérer item_id depuis item_numero
+        const item = await DB.prepare(`
+          SELECT id FROM checklist_items 
+          WHERE ordre_mission_id = ? AND item_numero = ?
+        `).bind(mission_id, photoData.item_numero).first()
+        
+        if (item && photoData.photos && Array.isArray(photoData.photos)) {
+          for (let i = 0; i < photoData.photos.length; i++) {
+            const photo = photoData.photos[i]
+            
+            // Vérifier si photo existe déjà
+            const existingPhoto = await DB.prepare(`
+              SELECT id FROM ordres_mission_item_photos
+              WHERE ordre_mission_id = ? AND item_id = ? AND photo_filename = ?
+            `).bind(mission_id, item.id, photo.filename).first()
+            
+            if (!existingPhoto) {
+              await DB.prepare(`
+                INSERT INTO ordres_mission_item_photos (
+                  ordre_mission_id, item_id, photo_base64, photo_filename, commentaire, ordre
+                ) VALUES (?, ?, ?, ?, ?, ?)
+              `).bind(
+                mission_id,
+                item.id,
+                photo.base64,
+                photo.filename,
+                photo.commentaire || null,
+                i
+              ).run()
+            }
+          }
+        }
+      }
+    }
+    
+    // 3. Sync commentaire final
+    if (commentaire_final) {
+      const existing = await DB.prepare(`
+        SELECT id FROM ordres_mission_commentaires_finaux WHERE ordre_mission_id = ?
+      `).bind(mission_id).first()
+      
+      if (existing) {
+        await DB.prepare(`
+          UPDATE ordres_mission_commentaires_finaux 
+          SET commentaire = ?, date_modification = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(commentaire_final, existing.id).run()
+      } else {
+        await DB.prepare(`
+          INSERT INTO ordres_mission_commentaires_finaux (ordre_mission_id, commentaire)
+          VALUES (?, ?)
+        `).bind(mission_id, commentaire_final).run()
+      }
+    }
+    
+    // 4. Sync photos générales
+    if (photos_generales && Array.isArray(photos_generales)) {
+      for (let i = 0; i < photos_generales.length; i++) {
+        const photo = photos_generales[i]
+        
+        const existingPhoto = await DB.prepare(`
+          SELECT id FROM ordres_mission_photos_generales
+          WHERE ordre_mission_id = ? AND photo_filename = ?
+        `).bind(mission_id, photo.filename).first()
+        
+        if (!existingPhoto) {
+          await DB.prepare(`
+            INSERT INTO ordres_mission_photos_generales (
+              ordre_mission_id, photo_base64, photo_filename, legende, ordre
+            ) VALUES (?, ?, ?, ?, ?)
+          `).bind(mission_id, photo.base64, photo.filename, photo.legende || null, i).run()
+        }
+      }
+    }
+    
+    return c.json({
+      success: true,
+      message: 'Données audit synchronisées avec succès',
+      synced: {
+        checklist_items: checklist_items?.length || 0,
+        photos_items: photos_items?.length || 0,
+        commentaire_final: commentaire_final ? 1 : 0,
+        photos_generales: photos_generales?.length || 0
+      }
+    })
+    
+  } catch (error) {
+    console.error('Erreur sync bulk:', error)
+    return c.json({ success: false, error: String(error) }, 500)
+  }
+})
+
 // POST /api/audit/upload-checklist - Upload checklist remplie
 app.post('/api/audit/upload-checklist', async (c) => {
   const { DB } = c.env
