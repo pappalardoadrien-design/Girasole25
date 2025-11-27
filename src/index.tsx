@@ -7699,6 +7699,225 @@ app.post('/api/rapports/:rapport_id/complements', async (c) => {
   }
 })
 
+// Route /export-simple - Export audits localStorage (iPhone)
+app.get('/export-simple', (c) => {
+  return c.html(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Audits iPhone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { font-size: 24px; margin-bottom: 20px; text-align: center; }
+        .mission {
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .mission.found {
+            background: #1a4d2e;
+            border-color: #4ade80;
+        }
+        .mission.empty {
+            background: #3a3a3a;
+            border-color: #666;
+        }
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .mission-name { font-weight: bold; font-size: 18px; }
+        .mission-status { font-size: 32px; }
+        .mission-details { font-size: 14px; color: #aaa; }
+        .btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .btn-primary {
+            background: #4ade80;
+            color: #000;
+        }
+        .btn-primary:active {
+            background: #22c55e;
+        }
+        .summary {
+            background: #1e40af;
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .summary h2 { font-size: 20px; margin-bottom: 10px; }
+        .summary p { font-size: 16px; color: #93c5fd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Export Audits GIRASOLE</h1>
+        
+        <div class="summary" id="summary">
+            <h2>🔍 Analyse en cours...</h2>
+        </div>
+        
+        <div id="missions-container"></div>
+        
+        <button id="btn-export" class="btn btn-primary" style="display:none;">
+            📥 TÉLÉCHARGER JSON
+        </button>
+    </div>
+
+    <script>
+        const MISSIONS = [
+            { id: '7', name: 'Pierre MOURGUES' },
+            { id: '9', name: 'BURGAT' },
+            { id: '12', name: 'Christian MIGNARD' },
+            { id: '20', name: 'VAN ZANTEN' },
+            { id: '24', name: 'Christophe CARRERE 2' },
+            { id: '33', name: 'Mathieu VINCENT' },
+            { id: '44', name: 'GOUNY' },
+            { id: '45', name: 'Maxime BAYLE' },
+            { id: '46', name: 'Commune de POMAS' }
+        ];
+
+        let exportData = {};
+        let foundCount = 0;
+
+        function scanAndDisplay() {
+            const container = document.getElementById('missions-container');
+            const summary = document.getElementById('summary');
+            const btnExport = document.getElementById('btn-export');
+            
+            let html = '';
+            
+            MISSIONS.forEach(mission => {
+                const key = 'audit_mission_' + mission.id;
+                const data = localStorage.getItem(key);
+                
+                if (data) {
+                    try {
+                        const items = JSON.parse(data);
+                        const photosItems = [];
+                        
+                        items.forEach(item => {
+                            const pk = 'audit_photos_item_' + mission.id + '_' + item.id;
+                            const photos = JSON.parse(localStorage.getItem(pk) || '[]');
+                            if (photos.length > 0) {
+                                photosItems.push({
+                                    item_numero: item.item_numero,
+                                    item_id: item.id,
+                                    photos: photos
+                                });
+                            }
+                        });
+                        
+                        exportData[mission.id] = {
+                            items: items,
+                            commentaire: localStorage.getItem('commentaire_final_' + mission.id) || '',
+                            photos_generales: JSON.parse(localStorage.getItem('photos_generales_' + mission.id) || '[]'),
+                            photos_items: photosItems
+                        };
+                        
+                        foundCount++;
+                        
+                        html += \`
+                            <div class="mission found">
+                                <div class="mission-header">
+                                    <div class="mission-name">✅ \${mission.name}</div>
+                                    <div class="mission-status">✓</div>
+                                </div>
+                                <div class="mission-details">
+                                    Mission \${mission.id} • \${items.length} items • \${photosItems.length} photos
+                                </div>
+                            </div>
+                        \`;
+                    } catch (e) {
+                        html += \`
+                            <div class="mission empty">
+                                <div class="mission-header">
+                                    <div class="mission-name">❌ \${mission.name}</div>
+                                    <div class="mission-status">✗</div>
+                                </div>
+                                <div class="mission-details">Erreur lecture</div>
+                            </div>
+                        \`;
+                    }
+                } else {
+                    html += \`
+                        <div class="mission empty">
+                            <div class="mission-header">
+                                <div class="mission-name">⚪ \${mission.name}</div>
+                                <div class="mission-status">○</div>
+                            </div>
+                            <div class="mission-details">Mission \${mission.id} • Pas de données</div>
+                        </div>
+                    \`;
+                }
+            });
+            
+            container.innerHTML = html;
+            
+            if (foundCount > 0) {
+                summary.innerHTML = \`
+                    <h2>✅ \${foundCount} audits trouvés sur 9</h2>
+                    <p>Clique sur le bouton vert ci-dessous</p>
+                \`;
+                summary.style.background = '#15803d';
+                summary.style.borderColor = '#4ade80';
+                btnExport.style.display = 'block';
+            } else {
+                summary.innerHTML = \`
+                    <h2>❌ Aucun audit trouvé</h2>
+                    <p>Es-tu sur le bon téléphone ?</p>
+                \`;
+                summary.style.background = '#991b1b';
+                summary.style.borderColor = '#ef4444';
+            }
+        }
+        
+        document.getElementById('btn-export').addEventListener('click', function() {
+            try {
+                const json = JSON.stringify(exportData, null, 2);
+                const blob = new Blob([json], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'audits_' + foundCount + 'missions_' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('✅ Fichier téléchargé !\\n\\nEnvoie-moi ce fichier JSON.');
+            } catch (e) {
+                alert('❌ Erreur : ' + e.message);
+            }
+        });
+        
+        scanAndDisplay();
+    </script>
+</body>
+</html>`)
+})
+
 // Route /rapports - Liste rapports (HTML simple avec fetch client-side)
 app.get('/rapports', (c) => {
   return c.html(`<!DOCTYPE html>

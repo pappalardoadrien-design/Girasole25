@@ -1,0 +1,77 @@
+📱 INSTRUCTIONS iPHONE - EXPORT AUDITS
+
+========================================
+🔥 ÉTAPE 1 : OUVRE CETTE PAGE
+========================================
+
+https://0da64170.girasole-diagpv.pages.dev/export-complet.html
+
+OU
+
+https://5ea1be1b.girasole-diagpv.pages.dev/export-complet.html
+
+
+========================================
+✅ ÉTAPE 2 : VÉRIFIE LES AUDITS TROUVÉS
+========================================
+
+Tu verras :
+- ✅ VERT = Audit trouvé
+- ⚪ GRIS = Audit manquant
+
+La page cherche automatiquement tes 9 audits :
+1. Pierre MOURGUES
+2. BURGAT
+3. Christian MIGNARD
+4. VAN ZANTEN
+5. Christophe CARRERE 2
+6. Mathieu VINCENT
+7. GOUNY
+8. Maxime BAYLE
+9. Commune de POMAS
+
+
+========================================
+📥 ÉTAPE 3 : CLIQUE SUR "TÉLÉCHARGER JSON"
+========================================
+
+⚠️ NE CLIQUE PAS SUR "SAUVEGARDER SERVEUR" (bug API)
+
+➡️ CLIQUE SUR LE BOUTON VERT :
+   "📥 TÉLÉCHARGER JSON COMPLET"
+
+Un fichier .json va se télécharger.
+
+
+========================================
+📤 ÉTAPE 4 : ENVOIE-MOI LE FICHIER
+========================================
+
+Envoie-moi le fichier JSON téléchargé :
+- Par message
+- Par email
+- Ou upload dans le chat
+
+Le fichier s'appelle :
+audits_complets_9missions_2025-11-27.json
+
+
+========================================
+🎯 RÉSULTAT
+========================================
+
+Je pourrai alors :
+✅ Importer tes 9 audits complets
+✅ Générer les 9 rapports
+✅ Tout sauvegarder sur le serveur
+✅ Fabien aura accès à tout
+
+
+========================================
+⏰ URGENT
+========================================
+
+Fais ça MAINTENANT avant ta réunion BE !
+
+--
+DiagPV Assistant
