@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "token": "u8ejmUtdA2UPx8n06Px1v8Mzu8ziOs5x",
+    "nom": "Adrien PAPPALARDO",
+    "role": "ADMIN",
+    "sous_traitant_id": null,
+    "description": "Accès complet - Toutes centrales - Gestion sous-traitants"
+  },
+  {
+    "id": 2,
+    "token": "W-v8c-SVL7-XzF-xBvwH9BtfPyGoii6x",
+    "nom": "ARTEMIS",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 3,
+    "description": "Accès restreint - Uniquement centrales attribuées à ARTEMIS"
+  },
+  {
+    "id": 3,
+    "token": "FMupE3hHXF_rgVz_jovYZB7vtkcQ3opF",
+    "nom": "CADENET",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 4,
+    "description": "Accès restreint - Uniquement centrales attribuées à CADENET"
+  },
+  {
+    "id": 4,
+    "token": "G379vToAdqZdpqif43M7O8fBYVjYkPOu",
+    "nom": "COURTIADE DISTRIB",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 7,
+    "description": "Accès restreint - Uniquement centrales attribuées à COURTIADE DISTRIB"
+  },
+  {
+    "id": 5,
+    "token": "wtYrujaywSTfOgalNhzQ3Pe3FHNqiVOv",
+    "nom": "DIAGPV - Adrien & Fabien",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 5,
+    "description": "Accès restreint - Uniquement centrales attribuées à DIAGPV - Adrien & Fabien"
+  },
+  {
+    "id": 6,
+    "token": "3W-dQ-9TOBzb92Nk_NoSSVc9dbGNkitj",
+    "nom": "DRONE AVEYRON SERVICE",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 8,
+    "description": "Accès restreint - Uniquement centrales attribuées à DRONE AVEYRON SERVICE"
+  },
+  {
+    "id": 7,
+    "token": "WXBVyrYlC_SSym0omGSOwU5-4S3-VPWD",
+    "nom": "EDOUARD - Martial",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 6,
+    "description": "Accès restreint - Uniquement centrales attribuées à EDOUARD - Martial"
+  },
+  {
+    "id": 8,
+    "token": "BE9zxULmY8HbXalHU4KgKght1MpzPwvk",
+    "nom": "En attente attribution",
+    "role": "SOUS_TRAITANT",
+    "sous_traitant_id": 9,
+    "description": "Accès restreint - Uniquement centrales attribuées à En attente attribution"
+  }
+]

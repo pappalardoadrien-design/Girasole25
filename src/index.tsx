@@ -3,6 +3,18 @@ import { cors } from 'hono/cors'
 // COMMENTED: serveStatic not needed - Cloudflare Pages serves public/ files automatically
 // import { serveStatic } from 'hono/cloudflare-workers'
 
+// Import module auth pour authentification multi-utilisateurs
+import {
+  validateToken,
+  createSession,
+  getSession,
+  destroySession,
+  getCentralesFilter,
+  getOrdresMissionFilter,
+  canModifyCentrale,
+  type UserSession
+} from './auth'
+
 type Bindings = {
   DB: D1Database;
 }
@@ -16,6 +28,99 @@ app.use('/api/*', cors())
 // No need for serveStatic middleware - files are accessible directly
 // app.use('/static/*', serveStatic({ root: './public' }))
 // app.use('/documents/*', serveStatic({ root: './public' }))
+
+// ======================
+// ROUTES D'AUTHENTIFICATION (v2.5.0)
+// ======================
+
+// Route d'authentification par token secret
+// Format: /s/:token (ex: /s/abc123...xyz789)
+app.get('/s/:token', async (c) => {
+  const token = c.req.param('token')
+  
+  // Valider le token
+  const user = await validateToken(c, token)
+  
+  if (!user) {
+    return c.html(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Accès refusé - GIRASOLE</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md text-center">
+          <div class="text-red-500 text-6xl mb-4">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800 mb-4">Accès refusé</h1>
+          <p class="text-gray-600 mb-6">
+            Ce lien d'accès est invalide ou a été révoqué.
+          </p>
+          <p class="text-sm text-gray-500">
+            Si vous pensez qu'il s'agit d'une erreur, contactez l'administrateur.
+          </p>
+        </div>
+      </body>
+      </html>
+    `)
+  }
+  
+  // Créer la session
+  createSession(c, user)
+  
+  // Rediriger vers l'application
+  return c.redirect('/')
+})
+
+// Route de déconnexion
+app.get('/logout', (c) => {
+  destroySession(c)
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Déconnexion - GIRASOLE</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <meta http-equiv="refresh" content="2;url=/">
+    </head>
+    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+      <div class="bg-white p-8 rounded-lg shadow-lg max-w-md text-center">
+        <div class="text-green-500 text-6xl mb-4">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Déconnexion réussie</h1>
+        <p class="text-gray-600">
+          Redirection en cours...
+        </p>
+      </div>
+    </body>
+    </html>
+  `)
+})
+
+// Route API: Informations utilisateur connecté
+app.get('/api/auth/me', (c) => {
+  const session = getSession(c)
+  
+  if (!session) {
+    return c.json({ authenticated: false }, 401)
+  }
+  
+  return c.json({
+    authenticated: true,
+    user: {
+      nom: session.nom,
+      role: session.role,
+      sousTraitantId: session.sousTraitantId
+    }
+  })
+})
 
 // ======================
 // API ROUTES - SOUS-TRAITANTS
@@ -123,21 +228,39 @@ app.put('/api/attributions/:id/email', async (c) => {
 // API ROUTES - CENTRALES
 // ======================
 
-// GET /api/centrales - Liste toutes les centrales
+// GET /api/centrales - Liste toutes les centrales (avec filtre authentification v2.5.0)
 app.get('/api/centrales', async (c) => {
   const { DB } = c.env
+  const session = getSession(c)
   
   try {
-    const result = await DB.prepare(`
+    // Construire la requête avec filtre selon le rôle
+    let query = `
       SELECT 
         c.*,
+        om.sous_traitant_id,
         s.nom_entreprise as sous_traitant_nom,
         0 as nb_retours,
         0 as total_photos
       FROM centrales c
-      LEFT JOIN sous_traitants s ON c.sous_traitant_prevu = s.id
-      ORDER BY c.nom
-    `).all()
+      LEFT JOIN ordres_mission om ON c.id = om.centrale_id
+      LEFT JOIN sous_traitants s ON om.sous_traitant_id = s.id
+      WHERE 1=1
+    `
+    
+    // Appliquer filtre selon session
+    const filter = getCentralesFilter(session)
+    if (filter.sql) {
+      query += ` ${filter.sql}`
+    }
+    
+    query += ` ORDER BY c.nom`
+    
+    // Exécuter avec ou sans paramètres
+    const stmt = DB.prepare(query)
+    const result = filter.params.length > 0 
+      ? await stmt.bind(...filter.params).all()
+      : await stmt.all()
     
     return c.json({ success: true, data: result.results })
   } catch (error) {
@@ -493,9 +616,11 @@ app.put('/api/techniciens/:id', async (c) => {
 // GET /api/ordres-mission - Liste tous les ordres de mission
 app.get('/api/ordres-mission', async (c) => {
   const { DB } = c.env
+  const session = getSession(c)
   
   try {
-    const result = await DB.prepare(`
+    // Construire la requête avec filtre selon le rôle
+    let query = `
       SELECT 
         om.*,
         c.nom as centrale_nom,
@@ -510,8 +635,22 @@ app.get('/api/ordres-mission', async (c) => {
       JOIN centrales c ON om.centrale_id = c.id
       JOIN techniciens t ON om.technicien_id = t.id
       LEFT JOIN sous_traitants st ON om.sous_traitant_id = st.id
-      ORDER BY om.date_mission DESC, om.id DESC
-    `).all()
+      WHERE 1=1
+    `
+    
+    // Appliquer filtre selon session
+    const filter = getOrdresMissionFilter(session)
+    if (filter.sql) {
+      query += ` ${filter.sql}`
+    }
+    
+    query += ` ORDER BY om.date_mission DESC, om.id DESC`
+    
+    // Exécuter avec ou sans paramètres
+    const stmt = DB.prepare(query)
+    const result = filter.params.length > 0 
+      ? await stmt.bind(...filter.params).all()
+      : await stmt.all()
     
     return c.json({ success: true, data: result.results })
   } catch (error) {
@@ -3457,6 +3596,14 @@ app.get('/', (c) => {
                         </div>
                     </div>
                     <div class="flex items-center space-x-6">
+                        <!-- Affichage utilisateur connecté (v2.5.0) -->
+                        <div id="user-info" class="text-right hidden">
+                            <p class="text-sm text-blue-200">Connecté en tant que</p>
+                            <p class="font-semibold flex items-center">
+                                <i id="user-icon" class="fas fa-user mr-2"></i>
+                                <span id="user-name">-</span>
+                            </p>
+                        </div>
                         <div class="text-right">
                             <p class="text-sm text-blue-200">Diagnostic Photovoltaïque</p>
                             <p class="font-semibold">Diagnostic Photovoltaïque</p>
@@ -9239,6 +9386,51 @@ app.get('/migrate-storage', (c) => {
                 }
             }, 1500); // Délai visuel
         });
+
+        // ========================================
+        // AUTHENTIFICATION v2.5.0
+        // Charger informations utilisateur connecté
+        // ========================================
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/auth/me');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    // Afficher nom utilisateur
+                    document.getElementById('user-name').textContent = data.user.nom;
+                    
+                    // Changer icône selon rôle
+                    const icon = document.getElementById('user-icon');
+                    if (data.user.role === 'ADMIN') {
+                        icon.className = 'fas fa-user-shield mr-2 text-yellow-300';
+                    } else {
+                        icon.className = 'fas fa-user mr-2';
+                    }
+                    
+                    // Afficher bloc utilisateur
+                    document.getElementById('user-info').classList.remove('hidden');
+                    
+                    // Masquer onglets non autorisés pour SOUS_TRAITANT
+                    if (data.user.role === 'SOUS_TRAITANT') {
+                        // Planning, Analytics, Docs réservés ADMIN uniquement
+                        const restrictedTabs = ['planning', 'analytics', 'docs'];
+                        restrictedTabs.forEach(tabId => {
+                            const btn = document.querySelector(\`button[onclick="showTab('\${tabId}')"]\`);
+                            if (btn) {
+                                btn.style.display = 'none';
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('[AUTH] Non authentifié ou erreur:', error);
+                // Pas d'authentification = mode normal (accès complet)
+            }
+        }
+        
+        // Charger au chargement de la page
+        document.addEventListener('DOMContentLoaded', loadUserInfo);
     </script>
 </body>
 </html>`)
