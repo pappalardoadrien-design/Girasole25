@@ -4788,7 +4788,7 @@ app.get('/', (c) => {
         <!-- app.js supprimé - Code inline dans Dashboard -->
         <script src="/static/planning.js"></script>
         <script src="/static/attribution.js"></script>
-        <script src="/static/centrales-attribution.js"></script>
+        <script src="/static/centrales-attribution.js?v=2.4.1"></script>
     </body>
     </html>
   `)
