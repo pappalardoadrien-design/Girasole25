@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Récapitulatif Attributions - Campagne Audits GIRASOLE</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 32px 80px;
+        position: relative;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.4;
+        color: #333;
+      }
+      h1 {
+        color: #1a365d;
+        font-size: 18pt;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 8px;
+        border-bottom: 2px solid #1a365d;
+        padding-bottom: 10px;
+      }
+      .subtitle {
+        text-align: center;
+        font-size: 12pt;
+        color: #666;
+        margin-bottom: 30px;
+        font-style: italic;
+      }
+      h2 {
+        color: #1a365d;
+        font-size: 14pt;
+        font-weight: 700;
+        margin-top: 24px;
+        margin-bottom: 12px;
+        border-left: 4px solid #1a365d;
+        padding-left: 10px;
+      }
+      h3 {
+        color: #2c5aa0;
+        font-size: 12pt;
+        font-weight: 600;
+        margin-top: 18px;
+        margin-bottom: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 10pt;
+      }
+      table th {
+        background-color: #e8f4f8;
+        color: #1a365d;
+        font-weight: 600;
+        padding: 8px;
+        border: 1px solid #cbd5e0;
+        text-align: left;
+      }
+      table td {
+        padding: 6px 8px;
+        border: 1px solid #e2e8f0;
+        vertical-align: top;
+      }
+      .overview-box {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-left: 4px solid #1a365d;
+        margin: 20px 0;
+      }
+      .status-externe {
+        background-color: #d4edda;
+      }
+      .status-interne {
+        background-color: #d1ecf1;
+      }
+      .status-attente {
+        background-color: #fff3cd;
+      }
+      .site-list {
+        margin: 10px 0;
+        padding-left: 0;
+        list-style: none;
+      }
+      .site-list li {
+        padding: 4px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .site-number {
+        font-weight: 600;
+        color: #1a365d;
+      }
+      .dept {
+        background-color: #e8f4f8;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 9pt;
+        font-weight: 600;
+      }
+      .audit-type {
+        font-size: 9pt;
+        padding: 2px 4px;
+        border-radius: 2px;
+      }
+      .hors-toiture {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .en-toiture {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .deja-fait {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .actions-list {
+        background-color: #f8f9fa;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .actions-list ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .liens-utiles {
+        background-color: #e8f4f8;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      .liens-utiles a {
+        color: #1a365d;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .liens-utiles a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📋 RÉCAPITULATIF ATTRIBUTIONS - GIRASOLE 2025</h1>
+    <div class="subtitle">Document de travail interne - Adrien & Fabien (DiagPV)</div>
+
+    <h2>1. VUE D'ENSEMBLE DE LA CAMPAGNE</h2>
+    <div class="overview-box">
+      <p><strong>🎯 Total centrales :</strong> 52 installations PV à auditer</p>
+      <p><strong>📍 Couverture géographique :</strong> 17 départements</p>
+      <p><strong>⚡ Puissance totale :</strong> ~13 500 kWc</p>
+      <p><strong>👷 Sous-traitants externes :</strong> 5 entreprises (31 sites)</p>
+      <p><strong>🏠 DiagPV A&F (nous) :</strong> 15 sites en gestion directe</p>
+      <p><strong>⏳ En attente d'attribution :</strong> 6 sites (Creuse 23)</p>
+      <p><strong>🔧 Types d'audits :</strong> 38 hors toiture + 8 EN toiture (démontage ~25 panneaux)</p>
+      <p><strong>📅 Deadline intervention :</strong> <strong style="color: #d9534f">31 DÉCEMBRE 2025</strong></p>
+      <p><strong>📄 Délai rapports :</strong> 5 jours ouvrés post-intervention</p>
+    </div>
+
+    <h2>2. NOS SITES DIAGPV A&F (15 SITES) - PLANNING À ORGANISER</h2>
+    <div class="overview-box" style="background-color: #d1ecf1; border-left-color: #0c5460;">
+      <p><strong>👤 Responsables :</strong> Fabien + Adrien</p>
+      <p><strong>📍 Départements :</strong> 31, 47, 12, 11, 34</p>
+      <p><strong>🔧 Répartition :</strong> 14 audits hors toiture + 1 audit EN toiture (HANGAR Christian MIGNARD - visuel déjà fait)</p>
+      <p><strong>✅ Statut :</strong> 1 site déjà réalisé (Commune De Pomas) → <strong>14 sites restants</strong></p>
+    </div>
+
+    <h3>📋 Liste détaillée de nos interventions</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Centrale</th>
+          <th>Dept</th>
+          <th>Type audit</th>
+          <th>Date prévue</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Hangar Frédéric CASTET (Site 1)</td>
+          <td>31</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Hangar Frédéric CASTET (Site 2)</td>
+          <td>31</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Hangar Yannick CLEMENT</td>
+          <td>31</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>TOURNIER</td>
+          <td>31</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Hangar Pierre MOURGUES</td>
+          <td>46</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Hangar Richard VAN ZANTEN</td>
+          <td>47</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Hangar Christophe CARRERE n°2</td>
+          <td>47</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>EARL GOUNY</td>
+          <td>47</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Burgat Et Fils Tp</td>
+          <td>11</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr style="background-color: #f8d7da;">
+          <td>10</td>
+          <td><strong>HANGAR Christian MIGNARD</strong></td>
+          <td>11</td>
+          <td><strong>EN toiture</strong></td>
+          <td>À définir</td>
+          <td><strong>⚠️ Visuel déjà fait - Reste toiture</strong></td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>MATHIEU Vincent</td>
+          <td>11</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>Hangar Maxime Bayle</td>
+          <td>11</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>GFA LASCOMBES - ANTOINE MICOULEAU</td>
+          <td>11</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+        <tr style="background-color: #d4edda;">
+          <td>14</td>
+          <td><strong>Commune De Pomas</strong></td>
+          <td>11</td>
+          <td>Hors toiture</td>
+          <td>-</td>
+          <td><strong>✅ FAIT</strong></td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>Antunez - SCI ANAUJA</td>
+          <td>34</td>
+          <td>Hors toiture</td>
+          <td>À définir</td>
+          <td>À planifier</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. SOUS-TRAITANTS EXTERNES - SUIVI DEVIS</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Sous-traitant</th>
+          <th>Nb sites</th>
+          <th>Départements</th>
+          <th>Hors toiture</th>
+          <th>EN toiture</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="status-externe">
+          <td><strong>LOIC ARTEMIS</strong></td>
+          <td>15</td>
+          <td>03, 07, 26, 42, 71, 38</td>
+          <td>12</td>
+          <td>3</td>
+          <td>📧 Devis envoyé - Attente réponse semaine prochaine</td>
+        </tr>
+        <tr class="status-externe">
+          <td><strong>CADENET</strong></td>
+          <td>6</td>
+          <td>19, 46, 15</td>
+          <td>4</td>
+          <td>2</td>
+          <td>📧 Devis envoyé - Attente réponse semaine prochaine</td>
+        </tr>
+        <tr class="status-externe">
+          <td><strong>EDOUARD (Baténer)</strong></td>
+          <td>7</td>
+          <td>17, 79, 44, 37</td>
+          <td>5</td>
+          <td>2</td>
+          <td>📧 Devis envoyé - Attente réponse semaine prochaine</td>
+        </tr>
+        <tr class="status-externe">
+          <td><strong>COURTIADE</strong></td>
+          <td>1</td>
+          <td>32</td>
+          <td>1</td>
+          <td>0</td>
+          <td>📧 Devis envoyé - Attente réponse semaine prochaine</td>
+        </tr>
+        <tr class="status-externe">
+          <td><strong>DRONE AVEYRON SERVICE</strong></td>
+          <td>2</td>
+          <td>12</td>
+          <td>2</td>
+          <td>0</td>
+          <td>📧 Devis envoyé - Attente réponse semaine prochaine</td>
+        </tr>
+        <tr class="status-attente">
+          <td><strong>⏳ En attente attribution</strong></td>
+          <td>6</td>
+          <td>23 (Creuse)</td>
+          <td>6</td>
+          <td>0</td>
+          <td>🔍 Recherche sous-traitant en cours</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. SITES EN ATTENTE D'ATTRIBUTION (6 SITES - CREUSE 23)</h2>
+    <div class="overview-box" style="background-color: #fff3cd; border-left-color: #856404;">
+      <p><strong>⚠️ ACTION URGENTE :</strong> Trouver sous-traitant pour ces 6 centrales</p>
+      <p><strong>📍 Localisation :</strong> Toutes en Creuse (23)</p>
+      <p><strong>⚡ Puissance totale :</strong> ~2 672 kWc</p>
+      <p><strong>🔧 Type :</strong> 6 audits hors toiture</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Centrale</th>
+          <th>Puissance</th>
+          <th>Action à mener</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Hangar Frederic Sinaud (Site 1)</td>
+          <td>218,4 kWc</td>
+          <td>Recherche sous-traitant local</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Hangar Frederic Sinaud (Site 2)</td>
+          <td>~220 kWc (estimé)</td>
+          <td>Recherche sous-traitant local</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>MARTEL 183 LOC</td>
+          <td>456,82 kWc</td>
+          <td>Recherche sous-traitant local</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>BOULOIR 206 LOC</td>
+          <td>499,14 kWc</td>
+          <td>Recherche sous-traitant local</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>BOUCHARDY 203 LOC</td>
+          <td>498,68 kWc</td>
+          <td>Recherche sous-traitant local</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>MARTEL 184 Construction</td>
+          <td>499,95 kWc</td>
+          <td>Recherche sous-traitant local</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>5. RÉCAPITULATIF COMPLET PAR SOUS-TRAITANT</h2>
+
+    <h3>LOIC ARTEMIS - 15 sites (Devis envoyé)</h3>
+    <ul class="site-list">
+      <li>
+        <span class="site-number">1.</span> DUMONT GUY <span class="dept">03</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">2.</span> HANGAR Angelina SIMMONET <span class="dept">03</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">3.</span> Hangar Eric LOGNON <span class="dept">03</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">4.</span> Hangar Julien Vaudin <span class="dept">03</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">5.</span> Maymat <span class="dept">03</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">6.</span> HARAS DE LA MAJORIE/MANOHA <span class="dept">07</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">7.</span> SCI KILJOR <span class="dept">07</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">8.</span> Didier - PRIEUR <span class="dept">26</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+      <li>
+        <span class="site-number">9.</span> Hangar Benjamin CHASSON <span class="dept">26</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">10.</span> Hangar Patrick BLANCHET <span class="dept">26</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">11.</span> EARL CADOT <span class="dept">42</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+      <li>
+        <span class="site-number">12.</span> GAYET 42 <span class="dept">42</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">13.</span> Hangar LAMIOT <span class="dept">42</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+      <li>
+        <span class="site-number">14.</span> Serge Maltaverne <span class="dept">71</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">15.</span> Mathieu Montet <span class="dept">38</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+    </ul>
+
+    <h3>CADENET - 6 sites (Devis envoyé)</h3>
+    <ul class="site-list">
+      <li>
+        <span class="site-number">16.</span> Hangar Fabrice COMBY <span class="dept">19</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">17.</span> Hangar Bernard MAGE <span class="dept">46</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">18.</span> Laurent ROUX 1 - Site A <span class="dept">15</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">19.</span> Laurent ROUX 1 - Site B <span class="dept">15</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">20.</span> Laurent ROUX 1 - Site C <span class="dept">15</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+      <li>
+        <span class="site-number">21.</span> Laurent ROUX 2 <span class="dept">15</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+    </ul>
+
+    <h3>EDOUARD (Baténer) - 7 sites (Devis envoyé)</h3>
+    <ul class="site-list">
+      <li>
+        <span class="site-number">22.</span> HANGAR Gérald Guillet <span class="dept">17</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">23.</span> Hangar Karl Biteau <span class="dept">17</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+      <li>
+        <span class="site-number">24.</span> Hangar Renaud Sonnard <span class="dept">79</span>
+        <span class="audit-type en-toiture">EN toiture</span>
+      </li>
+      <li>
+        <span class="site-number">25.</span> Cheraud <span class="dept">44</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">26.</span> VIEL <span class="dept">44</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">27.</span> Bourgeois <span class="dept">44</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">28.</span> Concept-TY Chambray 2 <span class="dept">37</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+    </ul>
+
+    <h3>COURTIADE - 1 site (Devis envoyé)</h3>
+    <ul class="site-list">
+      <li>
+        <span class="site-number">29.</span> Hangar Joris SAINT MARTIN <span class="dept">32</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+    </ul>
+
+    <h3>DRONE AVEYRON SERVICE - 2 sites (Devis envoyé)</h3>
+    <ul class="site-list">
+      <li>
+        <span class="site-number">44.</span> Hangar Sebastien RUDELLE <span class="dept">12</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+      <li>
+        <span class="site-number">45.</span> Azemar <span class="dept">12</span>
+        <span class="audit-type hors-toiture">Hors toiture</span>
+      </li>
+    </ul>
+
+    <h2>6. ACTIONS PRIORITAIRES - TO-DO LIST</h2>
+    <div class="actions-list">
+      <p><strong>🔴 URGENT (Semaine prochaine)</strong></p>
+      <ul>
+        <li>☐ <strong>Récupérer réponses devis</strong> des 5 sous-traitants (deadline : semaine prochaine)</li>
+        <li>☐ <strong>Trouver sous-traitant pour Creuse 23</strong> (6 sites en attente)</li>
+        <li>☐ <strong>Planifier nos 14 interventions DiagPV</strong> (+ 1 toiture Christian MIGNARD)</li>
+      </ul>
+
+      <p><strong>🟠 IMPORTANT (Avant 15 décembre)</strong></p>
+      <ul>
+        <li>☐ Récupérer planning d'intervention définitif de chaque sous-traitant</li>
+        <li>☐ Prévenir les exploitants 48h avant chaque visite</li>
+        <li>☐ Préparer plans de prévention sécurité (audits EN toiture)</li>
+        <li>☐ Vérifier habilitations électriques + autorisations travail en hauteur</li>
+        <li>☐ Préparer ordres de mission pour chaque intervenant</li>
+      </ul>
+
+      <p><strong>🟢 SUIVI CONTINU</strong></p>
+      <ul>
+        <li>☐ Centraliser les rapports au fur et à mesure (délai 5 jours/intervention)</li>
+        <li>☐ Relancer sous-traitants si retard de livrable</li>
+        <li>☐ Tenir à jour le tableau récap avec dates réelles d'intervention</li>
+        <li>☐ Assurer reporting GIRASOLE (avancement campagne)</li>
+      </ul>
+    </div>
+
+    <h2>7. DOCUMENTS DE DEVIS ENVOYÉS AUX SOUS-TRAITANTS</h2>
+    <div class="liens-utiles">
+      <p><strong>LOIC ARTEMIS (15 sites) :</strong><br />
+      <a href="https://www.genspark.ai/api/files/s/cQp2QEyr" target="_blank">📄 Télécharger le devis ARTEMIS</a></p>
+
+      <p><strong>CADENET (6 sites) :</strong><br />
+      <a href="https://www.genspark.ai/api/files/s/00UWxLQd" target="_blank">📄 Télécharger le devis CADENET</a></p>
+
+      <p><strong>EDOUARD / Baténer (7 sites) :</strong><br />
+      <a href="https://www.genspark.ai/api/files/s/OUFUV8oP" target="_blank">📄 Télécharger le devis BATÉNER</a></p>
+
+      <p><strong>COURTIADE (1 site) :</strong><br />
+      <a href="https://www.genspark.ai/api/files/s/ILo5YrsR" target="_blank">📄 Télécharger le devis COURTIADE</a></p>
+
+      <p><strong>DRONE AVEYRON SERVICE (2 sites) :</strong><br />
+      <a href="https://www.genspark.ai/api/files/s/7ojf81Fs" target="_blank">📄 Télécharger le devis DRONE AVEYRON</a></p>
+    </div>
+
+    <h2>8. OUTILS & RESSOURCES</h2>
+    <div class="liens-utiles">
+      <p>
+        <strong>Plateforme audits GIRASOLE :</strong><br />
+        <a href="https://girasole-diagpv.pages.dev/" target="_blank">https://girasole-diagpv.pages.dev/</a>
+      </p>
+
+      <p>
+        <strong>Carte interactive des centrales :</strong><br />
+        <a
+          href="https://www.google.com/maps/d/u/1/edit?mid=1MJgj6n27VgccguGJ0rM27GAJcXvhSb4&usp=sharing"
+          target="_blank"
+          >Google Maps - Centrales GIRASOLE</a
+        >
+      </p>
+
+      <p>
+        <strong>Tableau récapitulatif général :</strong><br />
+        <a href="https://www.genspark.ai/api/files/s/xMHj9jjC" target="_blank">Tableau complet 52 centrales</a>
+      </p>
+    </div>
+
+    <h2>9. RÉPARTITION FINANCIÈRE ESTIMÉE</h2>
+    <div class="overview-box">
+      <p><strong>⚠️ À COMPLÉTER après réception des devis :</strong></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Sous-traitant</th>
+            <th>Nb sites</th>
+            <th>Montant devis (HT)</th>
+            <th>Statut paiement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LOIC ARTEMIS</td>
+            <td>15</td>
+            <td>À compléter</td>
+            <td>En attente devis</td>
+          </tr>
+          <tr>
+            <td>CADENET</td>
+            <td>6</td>
+            <td>À compléter</td>
+            <td>En attente devis</td>
+          </tr>
+          <tr>
+            <td>EDOUARD (Baténer)</td>
+            <td>7</td>
+            <td>À compléter</td>
+            <td>En attente devis</td>
+          </tr>
+          <tr>
+            <td>COURTIADE</td>
+            <td>1</td>
+            <td>À compléter</td>
+            <td>En attente devis</td>
+          </tr>
+          <tr>
+            <td>DRONE AVEYRON SERVICE</td>
+            <td>2</td>
+            <td>À compléter</td>
+            <td>En attente devis</td>
+          </tr>
+          <tr style="background-color: #d1ecf1;">
+            <td><strong>DIAGPV A&F (Fabien + Adrien)</strong></td>
+            <td>15</td>
+            <td><strong>Gestion interne (coûts = temps + déplacements)</strong></td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td>Creuse 23 (à attribuer)</td>
+            <td>6</td>
+            <td>À compléter</td>
+            <td>À attribuer</td>
+          </tr>
+          <tr style="font-weight: bold;">
+            <td><strong>TOTAL</strong></td>
+            <td><strong>52</strong></td>
+            <td><strong>À calculer</strong></td>
+            <td>-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; font-style: italic; color: #666">
+      📅 Document généré le : Décembre 2025<br />
+      👤 <strong>DiagPV A&F</strong> - Fabien & Adrien<br />
+      📧 Contact : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="84e5aaf4e5f4f4e5e8e5f6e0ebc4e0ede5e3eaebf7f0ede7f4ecebf0ebf2ebe8f0e5edf5f1e1aae2f6">[email&#160;protected]</a><br />
+      🎯 Campagne Audits Qualité GIRASOLE - 52 centrales PV
+    </p>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

@@ -3476,21 +3476,15 @@ app.get('/', (c) => {
                     <button onclick="showTab('centrales')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-list mr-2"></i>Centrales
                     </button>
-                    <button onclick="showTab('missions')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
-                        <i class="fas fa-tasks mr-2"></i>Missions
-                    </button>
-                    <button onclick="showTab('carte')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
-                        <i class="fas fa-map-marked-alt mr-2"></i>Carte
-                    </button>
-                    <button onclick="showTab('upload')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
-                        <i class="fas fa-upload mr-2"></i>Upload JSON
-                    </button>
+                    <!-- Missions archivé - masqué par simplification -->
+                    <a href="https://www.google.com/maps/d/u/1/edit?mid=1MJgj6n27VgccguGJ0rM27GAJcXvhSb4&usp=sharing" target="_blank" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Carte <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                    </a>
+                    <!-- Upload JSON supprimé par simplification -->
                     <button onclick="showTab('planning')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-calendar-alt mr-2"></i>Planning
                     </button>
-                    <button onclick="showTab('attribution')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
-                        <i class="fas fa-handshake mr-2"></i>Attribution
-                    </button>
+                    <!-- Attribution avec génération mail supprimé (géré par GenSpark) -->
                     <button onclick="showTab('analytics')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-chart-pie mr-2"></i>Analytics
                     </button>
@@ -4720,9 +4714,60 @@ app.get('/', (c) => {
                         </div>
 
                         <div class="border-l-4 border-red-500 pl-6">
-                            <h4 class="font-bold text-lg mb-2">📅 Planning</h4>
-                            <p class="text-gray-600"><strong>52 centrales</strong> réparties sur 3-4 semaines</p>
-                            <p class="text-gray-600"><strong>5 sous-traitants</strong> mobilisés pour la mission</p>
+                            <h4 class="font-bold text-lg mb-2">📅 Planning & Attributions</h4>
+                            <p class="text-gray-600 mb-3"><strong>52 centrales</strong> réparties sur <strong>7 sous-traitants</strong></p>
+                            <table class="min-w-full mt-4 border text-sm">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-2 border text-left">Sous-traitant</th>
+                                        <th class="px-3 py-2 border">Missions</th>
+                                        <th class="px-3 py-2 border">Départements</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-600">
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">ARTEMIS</td>
+                                        <td class="px-3 py-2 border text-center">20</td>
+                                        <td class="px-3 py-2 border">03, 07, 26, 42, 71, 38, 89</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">DIAGPV - Adrien & Fabien</td>
+                                        <td class="px-3 py-2 border text-center">13</td>
+                                        <td class="px-3 py-2 border">11, 31, 34, 47</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">EDOUARD - Martial</td>
+                                        <td class="px-3 py-2 border text-center">7</td>
+                                        <td class="px-3 py-2 border">17, 79, 44, 37</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">En attente attribution</td>
+                                        <td class="px-3 py-2 border text-center">5</td>
+                                        <td class="px-3 py-2 border">23 (Creuse)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">CADENET</td>
+                                        <td class="px-3 py-2 border text-center">4</td>
+                                        <td class="px-3 py-2 border">19, 46, 15</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">DRONE AVEYRON SERVICE</td>
+                                        <td class="px-3 py-2 border text-center">2</td>
+                                        <td class="px-3 py-2 border">12</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-3 py-2 border font-semibold">COURTIADE DISTRIB</td>
+                                        <td class="px-3 py-2 border text-center">1</td>
+                                        <td class="px-3 py-2 border">32</td>
+                                    </tr>
+                                    <tr class="bg-blue-50 font-bold">
+                                        <td class="px-3 py-2 border">TOTAL</td>
+                                        <td class="px-3 py-2 border text-center">52</td>
+                                        <td class="px-3 py-2 border">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-gray-500 text-xs mt-2">🔄 Dernière mise à jour: 27/11/2024</p>
                         </div>
                     </div>
                 </div>
