@@ -3476,7 +3476,9 @@ app.get('/', (c) => {
                     <button onclick="showTab('centrales')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-list mr-2"></i>Centrales
                     </button>
-                    <!-- Missions archivé - masqué par simplification -->
+                    <button onclick="showTab('missions')" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
+                        <i class="fas fa-tasks mr-2"></i>Missions
+                    </button>
                     <a href="https://www.google.com/maps/d/u/1/edit?mid=1MJgj6n27VgccguGJ0rM27GAJcXvhSb4&usp=sharing" target="_blank" class="tab-btn py-4 px-4 border-b-2 border-transparent hover:border-gray-300 text-gray-600">
                         <i class="fas fa-map-marked-alt mr-2"></i>Carte <i class="fas fa-external-link-alt ml-1 text-xs"></i>
                     </a>
