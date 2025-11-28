@@ -23,8 +23,9 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 - **Note**: Cette URL est **stable** et ne change jamais, idéale pour les sous-traitants
 
 ### **Dernière mise à jour**
-- **Date**: 27/11/2024 17:00 CET
-- **Version: 2.4 (27/11/2024)
+- **Date**: 28/11/2024 13:05 CET
+- **Version**: 2.4.4 (28/11/2024)
+- **Sous-traitants**: 7 sous-traitants réels (suppression DiagPV Solutions + SolarTech Audits fictifs)
 - **Migrations**: 0014_ajout_statut_na.sql, 0015_fix_statut_na_toiture.sql
 - **Bug fix**: Bouton "N/A" fonctionne maintenant (CHECK constraint corrigée)
 - **URL STABLE**: https://girasole-diagpv.pages.dev (ne change plus)
@@ -148,6 +149,26 @@ L'Excel ANNEXE 1 v4 contient **52 centrales uniques** :
 - ✅ 5 centrales sans GPS (affichées en fin de liste)
 - ✅ 3 types supportés : SOL, TOITURE, OMBRIERE
 - ✅ Toutes centrales affichées dans Planning Manager avec checklist auto
+
+## 👥 Sous-traitants Mission GIRASOLE (7 réels)
+
+| ID | Nom Entreprise | Contact | Nb Missions | Départements | Statut |
+|----|----------------|---------|-------------|--------------|--------|
+| 3 | **ARTEMIS** | LOIC | 20 | Multi | ✅ ACTIF |
+| 5 | **DIAGPV - Adrien & Fabien** | Adrien | 13 | 11, 31, 34, 47 | ✅ ACTIF |
+| 6 | **EDOUARD - Martial** | Martial Edouard | 7 | 17, 79, 44, 37 | ✅ ACTIF |
+| 9 | **En attente attribution** | N/A | 5 | 23 (Creuse) | ⏳ RECHERCHE |
+| 4 | **CADENET** | Contact CADENET | 4 | 26, 7, 3, 71 | ✅ ACTIF |
+| 8 | **DRONE AVEYRON SERVICE** | À compléter | 2 | 12 | ⏳ DEVIS ENVOYÉ |
+| 7 | **COURTIADE DISTRIB** | Courtiade | 1 | - | ✅ ACTIF |
+
+**Total : 52 missions attribuées**
+
+### Notes importantes
+- ~~DiagPV Solutions (id: 1)~~ ❌ SUPPRIMÉ (fictif)
+- ~~SolarTech Audits (id: 2)~~ ❌ SUPPRIMÉ (fictif)
+- 5 missions "En attente attribution" (Dept 23 Creuse) : recherche sous-traitant local en cours
+- API : `GET /api/sous-traitants` retourne uniquement les 7 sous-traitants réels
 
 ## 📦 Volumétrie Mission 52 Centrales
 
