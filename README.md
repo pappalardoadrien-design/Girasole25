@@ -24,7 +24,7 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 
 ### **Dernière mise à jour**
 - **Date**: 27/11/2024 17:00 CET
-- **Version**: 2.2 (Fix statut NA + URL fixe)
+- **Version: 2.4 (27/11/2024)
 - **Migrations**: 0014_ajout_statut_na.sql, 0015_fix_statut_na_toiture.sql
 - **Bug fix**: Bouton "N/A" fonctionne maintenant (CHECK constraint corrigée)
 - **URL STABLE**: https://girasole-diagpv.pages.dev (ne change plus)
