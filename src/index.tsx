@@ -3589,22 +3589,22 @@ app.get('/', (c) => {
                                 type="text" 
                                 id="search-centrales" 
                                 placeholder="🔍 Rechercher par nom ou localisation..." 
-                                onkeyup="loadCentrales()"
+                                onkeyup="loadCentralesAvecAttributions()"
                                 class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
-                            <select id="filter-type" onchange="loadCentrales()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                            <select id="filter-type" onchange="loadCentralesAvecAttributions()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
                                 <option value="">📂 Tous types</option>
                                 <option value="SOL">☀️ SOL (39)</option>
                                 <option value="TOITURE">🏠 TOITURE (13)</option>
                             </select>
-                            <select id="filter-statut" onchange="loadCentrales()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                            <select id="filter-statut" onchange="loadCentralesAvecAttributions()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
                                 <option value="">📊 Tous statuts</option>
                                 <option value="A_AUDITER">⏳ À auditer</option>
                                 <option value="EN_COURS">🔄 En cours</option>
                                 <option value="TERMINE">✅ Terminé</option>
                                 <option value="VALIDE">⭐ Validé</option>
                             </select>
-                            <select id="sort-by" onchange="loadCentrales()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
+                            <select id="sort-by" onchange="loadCentralesAvecAttributions()" class="px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500">
                                 <option value="nom">📝 Trier par nom</option>
                                 <option value="date_audit">📅 Trier par date</option>
                                 <option value="nb_retours">📊 Trier par retours</option>
@@ -3789,8 +3789,8 @@ app.get('/', (c) => {
                     // Charger le contenu de l'onglet
                     if (tabName === 'dashboard' && typeof loadDashboard === 'function') {
                         loadDashboard();
-                    } else if (tabName === 'centrales' && typeof loadCentrales === 'function') {
-                        loadCentrales();
+                    } else if (tabName === 'centrales' && typeof loadCentralesAvecAttributions === 'function') {
+                        loadCentralesAvecAttributions();
                     } else if (tabName === 'missions') {
                         console.log('🔄 showTab(missions) - Appel loadMissionsGlobal()');
                         window.loadMissionsGlobal();
