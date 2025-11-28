@@ -638,10 +638,10 @@ app.get('/api/ordres-mission', async (c) => {
       WHERE 1=1
     `
     
-    // Appliquer filtre selon session
+    // Appliquer filtre selon session (préfixe om. pour éviter ambiguïté)
     const filter = getOrdresMissionFilter(session)
     if (filter.sql) {
-      query += ` ${filter.sql}`
+      query += ` ${filter.sql.replace('sous_traitant_id', 'om.sous_traitant_id')}`
     }
     
     query += ` ORDER BY om.date_mission DESC, om.id DESC`
