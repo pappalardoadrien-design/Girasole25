@@ -23,9 +23,10 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 - **Note**: Cette URL est **stable** et ne change jamais, idéale pour les sous-traitants
 
 ### **Dernière mise à jour**
-- **Date**: 28/11/2024 13:05 CET
-- **Version**: 2.4.4 (28/11/2024)
-- **Sous-traitants**: 7 sous-traitants réels (suppression DiagPV Solutions + SolarTech Audits fictifs)
+- **Date**: 28/11/2024 13:15 CET
+- **Version**: 2.4.5 (28/11/2024)
+- **Synchronisation**: ✅ Base de données 100% conforme document Excel final
+- **Sous-traitants**: 7 sous-traitants réels (distribution finale validée)
 - **Migrations**: 0014_ajout_statut_na.sql, 0015_fix_statut_na_toiture.sql
 - **Bug fix**: Bouton "N/A" fonctionne maintenant (CHECK constraint corrigée)
 - **URL STABLE**: https://girasole-diagpv.pages.dev (ne change plus)
