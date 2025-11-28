@@ -4785,7 +4785,9 @@ app.get('/', (c) => {
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <!-- app.js supprimé - Code inline dans Dashboard -->
+        <script src="/static/dashboard.js?v=2.4.5"></script>
         <script src="/static/planning.js"></script>
         <script src="/static/attribution.js"></script>
         <script src="/static/centrales-attribution.js?v=2.4.1"></script>
