@@ -7,8 +7,9 @@
 async function loadSousTraitants() {
   try {
     const response = await fetch('/api/sous-traitants');
-    const data = await response.json();
-    return data;
+    const result = await response.json();
+    // L'API retourne {success: true, data: [...]}
+    return result.data || result || [];
   } catch (error) {
     console.error('❌ Erreur chargement sous-traitants:', error);
     return [];
