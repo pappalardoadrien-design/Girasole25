@@ -23,8 +23,9 @@ Interface web professionnelle pour la gestion de la mission GIRASOLE 2025 : audi
 - **Note**: Cette URL est **stable** et ne change jamais, idéale pour les sous-traitants
 
 ### **Dernière mise à jour**
-- **Date**: 28/11/2024 13:15 CET
-- **Version**: 2.4.5 (28/11/2024)
+- **Date**: 28/11/2024 13:30 CET
+- **Version**: 2.4.6 (28/11/2024)
+- **Nouveau**: ✅ Dashboard 100% dynamique avec données temps réel + graphiques Chart.js
 - **Synchronisation**: ✅ Base de données 100% conforme document Excel final
 - **Sous-traitants**: 7 sous-traitants réels (distribution finale validée)
 - **Migrations**: 0014_ajout_statut_na.sql, 0015_fix_statut_na_toiture.sql
