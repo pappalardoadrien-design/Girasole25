@@ -39,7 +39,7 @@ Référence : `PLANNING_TOULOUSE_ADRIEN_FABIEN.md`
 
 - Sélectionner centrale
 - Sous-Traitant : DiagPV Solutions
-- Technicien : Adrien Pappalardon / Fabien
+- Technicien : Coordinateur Mission GIRASOLEn / Fabien
 - Date : 27/01 → 21/02/2025
 - Auto-save → Badge vert ✓ 54/54
 

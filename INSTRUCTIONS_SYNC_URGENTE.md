@@ -1,7 +1,7 @@
 # 🚨 INSTRUCTIONS SYNCHRONISATION URGENTE AUDITS
 
 **Date:** 26 novembre 2025  
-**Pour:** Adrien Pappalardo  
+**Pour:** Coordinateur Mission GIRASOLE  
 **Problème:** Données audits uniquement en localStorage mobile, pas en DB serveur
 
 ---

@@ -2,7 +2,7 @@
 
 **Date:** 26 novembre 2025  
 **Pour:** Fabien (Diagnostic Photovoltaïque)  
-**De:** Adrien Pappalardo
+**De:** Coordinateur Mission GIRASOLE
 
 ---
 
@@ -241,7 +241,7 @@ RAPPORT AUDIT QUALITÉ - [Nom Centrale]
 
 ## 📞 SUPPORT
 
-**Contact:** Adrien Pappalardo  
+**Contact:** Coordinateur Mission GIRASOLE  
 **Email:** a.pappalardo@diagnosticphotovoltaique.fr  
 **Documentation complète:** `/home/user/webapp/GUIDE_RAPPORTS_AUDITS.md`  
 **Date création:** 26 novembre 2025  

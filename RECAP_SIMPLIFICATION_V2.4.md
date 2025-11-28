@@ -132,7 +132,7 @@ webapp/
 
 - **URL stable**: https://girasole-diagpv.pages.dev
 - **Version**: 2.4
-- **Contact**: Adrien Pappalardo (Diagnostic Photovoltaïque)
+- **Contact**: Coordinateur Mission GIRASOLE (Diagnostic Photovoltaïque)
 - **Agent GenSpark**: Gestion attributions mails automatique
 
 ---

@@ -1,7 +1,7 @@
 # 📊 GUIDE SYSTÈME RAPPORTS AUDITS - GIRASOLE 2025
 
 **Date:** 26 novembre 2025  
-**Accès:** Adrien Pappalardo + Fabien  
+**Accès:** Coordinateur Mission GIRASOLE + Fabien  
 **Objectif:** Générer rapports factuels courts et précis item par item (40 pts SOL + 11 pts TOITURE si applicable)
 
 ---
@@ -380,7 +380,7 @@ Photos/commentaires post-audit (Adrien/Fabien)
 
 ## 🆘 SUPPORT
 
-**Contact :** Adrien Pappalardo  
+**Contact :** Coordinateur Mission GIRASOLE  
 **Email :** a.pappalardo@diagnosticphotovoltaique.fr  
 **Webapp :** https://0da64170.girasole-diagpv.pages.dev  
 **Date création guide :** 26 novembre 2025  

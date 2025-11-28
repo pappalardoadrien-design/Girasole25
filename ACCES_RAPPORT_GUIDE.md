@@ -53,7 +53,7 @@ Le rapport final HTML inclut :
 - ✅ Nom centrale + Type (SOL/TOITURE)
 - ✅ Puissance kWc
 - ✅ Date audit
-- ✅ Technicien (Adrien Pappalardo)
+- ✅ Technicien (Coordinateur Mission GIRASOLE)
 - ✅ Sous-traitant (ARTEMIS)
 
 ### **Statistiques conformité**

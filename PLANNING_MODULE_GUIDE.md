@@ -271,7 +271,7 @@ Ordre n°0001 - Créé le 20/01/2025
 
 #### Footer
 - Branding Diagnostic Photovoltaïque
-- Adrien Pappalardo
+- Coordinateur Mission GIRASOLE
 - Date génération
 
 ### **Format & Style**
@@ -543,7 +543,7 @@ Nouvelle mission d'audit photovoltaïque :
 Veuillez trouver en pièce jointe l'ordre de mission complet avec checklist V4.
 
 Cordialement,
-Adrien Pappalardo
+Coordinateur Mission GIRASOLE
 Diagnostic Photovoltaïque
   `
 }
@@ -687,7 +687,7 @@ GET /api/export/planning.ics
 ## 📞 Support & Contact
 
 **Projet** : GIRASOLE 2025 - Mission 52 Centrales Photovoltaïques  
-**Responsable** : Adrien Pappalardo  
+**Responsable** : Coordinateur Mission GIRASOLE  
 **Entreprise** : Diagnostic Photovoltaïque  
 **GitHub** : https://github.com/pappalardoadrien-design/Girasole25  
 

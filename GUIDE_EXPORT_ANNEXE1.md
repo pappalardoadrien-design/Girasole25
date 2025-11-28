@@ -230,7 +230,7 @@ Le fichier préserve toutes les colonnes originales de l'ANNEXE 1 (ID, localisat
 Les audits débuteront selon le planning établi.
 
 Cordialement,
-Adrien Pappalardon
+Coordinateur Mission GIRASOLEn
 Diagnostic Photovoltaïque
 ```
 

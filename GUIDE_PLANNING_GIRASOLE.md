@@ -211,7 +211,7 @@ https://3000-ifb38209wujb1luk88o0l-6532622b.e2b.dev/audit/[MISSION_ID]
 Merci de compléter la checklist sur site avec photos.
 
 Cordialement,
-Adrien Pappalardon
+Coordinateur Mission GIRASOLEn
 Diagnostic Photovoltaïque
 ```
 

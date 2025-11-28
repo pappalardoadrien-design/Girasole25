@@ -466,7 +466,7 @@ npm run deploy:prod
 ## 👨‍💼 Contact et Support
 
 **Projet** : GIRASOLE 2025 - Mission 52 Centrales Photovoltaïques  
-**Responsable** : Adrien Pappalardo - Diagnostic Photovoltaïque  
+**Responsable** : Coordinateur Mission GIRASOLE - Diagnostic Photovoltaïque  
 **GitHub** : https://github.com/pappalardoadrien-design/Girasole25  
 **Documentation** : Voir dossier `/home/user/` pour guides complets
 
@@ -474,5 +474,5 @@ npm run deploy:prod
 
 ## 📄 Licence
 
-© 2025 Diagnostic Photovoltaïque - Adrien Pappalardo  
+© 2025 Diagnostic Photovoltaïque - Coordinateur Mission GIRASOLE  
 Tous droits réservés - Usage interne mission GIRASOLE 2025

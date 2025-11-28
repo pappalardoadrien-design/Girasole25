@@ -1231,7 +1231,7 @@ app.get('/api/ordres-mission/:id/document', async (c) => {
         </div>
 
         <div class="footer">
-          <p><strong>Diagnostic Photovoltaïque - Adrien Pappalardo</strong></p>
+          <p><strong>Diagnostic Photovoltaïque Professionnel</strong></p>
           <p>Mission GIRASOLE 2025 - Audit 52 Centrales Photovoltaïques</p>
           <p>Document généré le ${new Date().toLocaleString('fr-FR')}</p>
         </div>
@@ -2641,7 +2641,7 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
           <h1>📋 RAPPORT FINAL AUDIT</h1>
           <div class="subtitle">Mission GIRASOLE 2025 - Diagnostic Photovoltaïque Premium</div>
           <div style="margin-top: 15px; font-size: 14px; opacity: 0.85;">
-            Rapport généré le ${new Date().toLocaleString('fr-FR')} | Diagnostic Photovoltaïque - Adrien Pappalardo
+            Rapport généré le ${new Date().toLocaleString('fr-FR')} | Diagnostic Photovoltaïque Professionnel
           </div>
         </div>
 
@@ -2796,7 +2796,7 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
 
         <!-- Footer -->
         <div style="margin-top: 40px; padding: 20px; background: #1f2937; color: white; border-radius: 10px; text-align: center;">
-          <p style="margin: 0; font-size: 14px;">© 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+          <p style="margin: 0; font-size: 14px;">© 2025 Diagnostic Photovoltaïque Professionnel - Mission GIRASOLE</p>
           <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7;">
             Mission GIRASOLE 2025 - Audit Conforme IEC 62446-1, IEC 61215/61730, NF C 15-100
           </p>
@@ -3459,7 +3459,7 @@ app.get('/', (c) => {
                     <div class="flex items-center space-x-6">
                         <div class="text-right">
                             <p class="text-sm text-blue-200">Diagnostic Photovoltaïque</p>
-                            <p class="font-semibold">Adrien Pappalardo</p>
+                            <p class="font-semibold">Diagnostic Photovoltaïque</p>
                         </div>
                     </div>
                 </div>
@@ -4779,7 +4779,7 @@ app.get('/', (c) => {
         <!-- Footer -->
         <footer class="bg-gray-800 text-white mt-12 py-6">
             <div class="container mx-auto px-6 text-center">
-                <p>&copy; 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+                <p>&copy; 2025 Diagnostic Photovoltaïque Professionnel</p>
                 <p class="text-gray-400 text-sm mt-2">Mission GIRASOLE 2025 - Interface Web Professionnelle</p>
             </div>
         </footer>
@@ -5117,7 +5117,7 @@ app.get('/planning-girasole', (c) => {
         <!-- Footer -->
         <footer class="bg-gray-800 text-white mt-12 py-6">
             <div class="container mx-auto px-6 text-center">
-                <p>&copy; 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+                <p>&copy; 2025 Diagnostic Photovoltaïque Professionnel</p>
                 <p class="text-gray-400 text-sm mt-2">Planning GIRASOLE 2025 - Interface Web Professionnelle</p>
             </div>
         </footer>
@@ -5468,7 +5468,7 @@ app.get('/planning-manager', (c) => {
         <!-- Footer -->
         <footer class="bg-gray-800 text-white mt-12 py-6">
             <div class="container mx-auto px-6 text-center">
-                <p>&copy; 2025 Diagnostic Photovoltaïque - Adrien Pappalardo</p>
+                <p>&copy; 2025 Diagnostic Photovoltaïque Professionnel</p>
                 <p class="text-gray-400 text-sm mt-2">Gestion Planning GIRASOLE 2025 - 52 Centrales</p>
             </div>
         </footer>

@@ -432,7 +432,7 @@ PRIORITÉ 3 - RECOMMANDATIONS (1 an)
 SIGNATURES
 
 Technicien Terrain          Expert DiagPV
-Pierre Martin               Adrien Pappalardo
+Pierre Martin               Coordinateur Mission GIRASOLE
 EcoPV Solutions             Business Developer
 Date : 15/01/2025           Date : 16/01/2025
 

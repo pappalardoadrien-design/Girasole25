@@ -10,7 +10,7 @@
 ### **Sous-Traitant** : DiagPV Solutions (ID 1)
 
 **Techniciens** :
-- 🔵 **Adrien Pappalardon** (ID 1) - Business Developer + Audits terrain
+- 🔵 **Coordinateur Mission GIRASOLEn** (ID 1) - Business Developer + Audits terrain
 - 🔵 **Fabien COLLABORATEUR** (ID 2) - Technicien terrain
 
 ---
@@ -72,7 +72,7 @@
 ### **1. Mettre à jour les techniciens (FAIT)** ✅
 
 Les techniciens ont été préparés :
-- ID 1 : Adrien Pappalardon
+- ID 1 : Coordinateur Mission GIRASOLEn
 - ID 2 : Fabien COLLABORATEUR
 
 ### **2. Attribuer dans Planning Manager**

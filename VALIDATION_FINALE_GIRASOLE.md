@@ -84,7 +84,7 @@ Référence : `PLANNING_TOULOUSE_ADRIEN_FABIEN.md`
 
 **Pour Adrien (13 centrales TOITURE complexes) :**
 - Sous-Traitant : `DiagPV Solutions`
-- Technicien : `Adrien Pappalardon` (à créer dans interface)
+- Technicien : `Coordinateur Mission GIRASOLEn` (à créer dans interface)
 - Dates : 27/01 → 21/02/2025 (lun-ven)
 
 **Pour Fabien (13 centrales SOL standard) :**
@@ -108,7 +108,7 @@ Ouvrir CSV dans Excel et vérifier :
 - ✅ 24 colonnes
 - ✅ Dates visibles : `2025-01-27`, `2025-01-28`...
 - ✅ Sous-traitants : `DiagPV Solutions`
-- ✅ Techniciens : `Adrien Pappalardon`, `Fabien COLLABORATEUR`
+- ✅ Techniciens : `Coordinateur Mission GIRASOLEn`, `Fabien COLLABORATEUR`
 - ✅ Checklist : `PRÊT (54/54)` pour centrales planifiées
 
 #### Étape 5: Envoi GIRASOLE
