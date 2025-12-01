@@ -111,18 +111,48 @@ app.use('/', async (c, next) => {
         </div>
         
         <script>
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
+            console.log('🔐 Script login chargé');
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('📄 DOM chargé');
                 
-                const password = document.getElementById('password').value;
-                const errorDiv = document.getElementById('error');
-                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const loginForm = document.getElementById('loginForm');
+                console.log('📋 Formulaire trouvé:', loginForm);
                 
-                // Créer cookie
-                document.cookie = 'girasole_auth=' + password + '; Path=/; Max-Age=86400; SameSite=Strict';
+                if (!loginForm) {
+                    console.error('❌ Formulaire loginForm introuvable');
+                    return;
+                }
                 
-                // Recharger page (middleware vérifiera mot de passe)
-                window.location.reload();
+                loginForm.addEventListener('submit', function(e) {
+                    console.log('🚀 Soumission formulaire détectée');
+                    e.preventDefault();
+                    
+                    const password = document.getElementById('password').value;
+                    console.log('🔑 Mot de passe saisi:', password.length, 'caractères');
+                    
+                    const errorDiv = document.getElementById('error');
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    
+                    // Désactiver bouton pendant traitement
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connexion...';
+                    }
+                    
+                    // Créer cookie
+                    const cookieValue = 'girasole_auth=' + password + '; Path=/; Max-Age=86400; SameSite=Strict';
+                    document.cookie = cookieValue;
+                    console.log('🍪 Cookie créé:', cookieValue.substring(0, 30) + '...');
+                    
+                    // Recharger page (middleware vérifiera mot de passe)
+                    console.log('🔄 Rechargement page...');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 500);
+                });
+                
+                console.log('✅ Event listener ajouté sur formulaire');
             });
         </script>
     </body>
