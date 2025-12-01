@@ -234,14 +234,20 @@ app.get('/api/centrales', async (c) => {
   const session = getSession(c)
   
   try {
-    // Construire la requête avec filtre selon le rôle
+    // Construire la requête OPTIMISÉE avec colonnes sélectionnées uniquement
     let query = `
       SELECT 
-        c.*,
+        c.id,
+        c.nom,
+        c.type,
+        c.puissance_kwc,
+        c.localisation,
+        c.statut,
+        c.date_audit,
+        c.dept,
+        c.audit_toiture,
         om.sous_traitant_id,
-        s.nom_entreprise as sous_traitant_nom,
-        0 as nb_retours,
-        0 as total_photos
+        s.nom_entreprise as sous_traitant_nom
       FROM centrales c
       LEFT JOIN ordres_mission om ON c.id = om.centrale_id
       LEFT JOIN sous_traitants s ON om.sous_traitant_id = s.id
@@ -261,6 +267,9 @@ app.get('/api/centrales', async (c) => {
     const result = filter.params.length > 0 
       ? await stmt.bind(...filter.params).all()
       : await stmt.all()
+    
+    // Cache HTTP 60 secondes
+    c.header('Cache-Control', 'public, max-age=60')
     
     return c.json({ success: true, data: result.results })
   } catch (error) {
@@ -619,17 +628,21 @@ app.get('/api/ordres-mission', async (c) => {
   const session = getSession(c)
   
   try {
-    // Construire la requête avec filtre selon le rôle
+    // Construire la requête OPTIMISÉE avec colonnes sélectionnées uniquement
     let query = `
       SELECT 
-        om.*,
+        om.id,
+        om.centrale_id,
+        om.technicien_id,
+        om.sous_traitant_id,
+        om.date_mission,
+        om.statut,
+        om.checklist_generee,
         c.nom as centrale_nom,
         c.type as centrale_type,
         c.puissance_kwc,
-        c.localisation,
         t.prenom as technicien_prenom,
         t.nom as technicien_nom,
-        t.email as technicien_email,
         st.nom_entreprise as sous_traitant_nom
       FROM ordres_mission om
       JOIN centrales c ON om.centrale_id = c.id
@@ -651,6 +664,9 @@ app.get('/api/ordres-mission', async (c) => {
     const result = filter.params.length > 0 
       ? await stmt.bind(...filter.params).all()
       : await stmt.all()
+    
+    // Cache HTTP 60 secondes
+    c.header('Cache-Control', 'public, max-age=60')
     
     return c.json({ success: true, data: result.results })
   } catch (error) {
