@@ -3257,7 +3257,7 @@ app.get('/audit/:mission_id', async (c) => {
             <i class="fas fa-user-hard-hat mr-2"></i>
             <span>${mission.technicien_prenom} ${mission.technicien_nom}</span>
             <span class="mx-2">•</span>
-            <span id="progressText">0/54 vérifications</span>
+            <span id="progressText"><i class="fas fa-spinner fa-spin"></i> Chargement...</span>
           </div>
         </header>
 

@@ -466,6 +466,8 @@ function updateProgress() {
   const completed = checklistItems.filter(i => i.statut !== 'NON_VERIFIE').length;
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
   
+  console.log('🔄 updateProgress:', { total, completed, percent });
+  
   const progressBar = document.getElementById('progressBar');
   if (progressBar) {
     progressBar.style.width = percent + '%';
@@ -474,8 +476,12 @@ function updateProgress() {
   
   // ✅ CORRECTIF: Mettre à jour le texte "X/Y vérifications" dans le header
   const progressText = document.getElementById('progressText');
+  console.log('📊 progressText element:', progressText);
   if (progressText) {
     progressText.textContent = `${completed}/${total} vérifications`;
+    console.log('✅ Updated progressText to:', progressText.textContent);
+  } else {
+    console.warn('⚠️ Element #progressText not found');
   }
 }
 
