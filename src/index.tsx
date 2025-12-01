@@ -24,6 +24,112 @@ const app = new Hono<{ Bindings: Bindings }>()
 // Enable CORS for API routes
 app.use('/api/*', cors())
 
+// 🔒 MIDDLEWARE PROTECTION MOT DE PASSE (v2.5.6)
+// Mot de passe maître pour accès page d'accueil
+const MASTER_PASSWORD = 'girasole2025'
+
+// Middleware: Vérifie authentification pour route /
+app.use('/', async (c, next) => {
+  // Ignorer si route API ou route avec token
+  if (c.req.path.startsWith('/api') || c.req.path.startsWith('/s/') || c.req.path !== '/') {
+    return next()
+  }
+  
+  // Vérifier session active (via token)
+  const session = getSession(c)
+  if (session) {
+    // ✅ Session via token active
+    return next()
+  }
+  
+  // Vérifier cookie mot de passe
+  const cookies = c.req.header('Cookie') || ''
+  const authCookie = cookies.split(';').find(c => c.trim().startsWith('girasole_auth='))
+  
+  if (authCookie) {
+    const authValue = authCookie.split('=')[1]?.trim()
+    if (authValue === MASTER_PASSWORD) {
+      // ✅ Mot de passe correct
+      return next()
+    }
+  }
+  
+  // ❌ Pas d'authentification, afficher formulaire login
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Connexion - GIRASOLE 2025</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gradient-to-br from-blue-600 to-blue-800 min-h-screen flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full">
+            <div class="text-center mb-8">
+                <div class="inline-block bg-blue-100 rounded-full p-4 mb-4">
+                    <i class="fas fa-solar-panel text-blue-600 text-5xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">GIRASOLE 2025</h1>
+                <p class="text-gray-600">Dashboard Mission 52 Centrales PV</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2"></i>Mot de passe
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Entrez le mot de passe"
+                        required
+                        autocomplete="current-password"
+                    />
+                </div>
+                
+                <div id="error" class="hidden text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg p-3">
+                    <i class="fas fa-exclamation-circle mr-2"></i>Mot de passe incorrect
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+                </button>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t text-center text-sm text-gray-600">
+                <p>
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Accès réservé aux utilisateurs autorisés
+                </p>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('password').value;
+                const errorDiv = document.getElementById('error');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                
+                // Créer cookie
+                document.cookie = 'girasole_auth=' + password + '; Path=/; Max-Age=86400; SameSite=Strict';
+                
+                // Recharger page (middleware vérifiera mot de passe)
+                window.location.reload();
+            });
+        </script>
+    </body>
+    </html>
+  `)
+})
+
 // COMMENTED: Cloudflare Pages automatically serves files from public/ directory
 // No need for serveStatic middleware - files are accessible directly
 // app.use('/static/*', serveStatic({ root: './public' }))
