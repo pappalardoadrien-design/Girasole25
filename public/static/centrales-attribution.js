@@ -29,15 +29,19 @@ async function loadCentralesAvecAttributions() {
     const centralesData = await centralesResponse.json();
     const missionsData = await missionsResponse.json();
     const centrales = centralesData.data || centralesData.centrales || [];
-    const missions = missionsData.missions || missionsData || [];
+    const missions = missionsData.data || missionsData.missions || [];
     
     // Créer un index missions par centrale_id pour lookup O(1)
     const missionsMap = {};
-    missions.forEach(m => {
-      if (m.centrale_id) {
-        missionsMap[m.centrale_id] = m;
-      }
-    });
+    if (Array.isArray(missions)) {
+      missions.forEach(m => {
+        if (m.centrale_id) {
+          missionsMap[m.centrale_id] = m;
+        }
+      });
+    } else {
+      console.warn('⚠️ Missions n\'est pas un tableau:', missions);
+    }
     
     const container = document.getElementById('centrales-list');
     if (!container) {
