@@ -19,13 +19,25 @@ async function loadSousTraitants() {
 // Charger les centrales avec leurs missions et sous-traitants
 async function loadCentralesAvecAttributions() {
   try {
-    const [centralesResponse, sousTraitants] = await Promise.all([
+    // ⚡ OPTIMISATION : Charger TOUT en parallèle (1 seul appel missions)
+    const [centralesResponse, missionsResponse, sousTraitants] = await Promise.all([
       fetch('/api/centrales'),
+      fetch('/api/ordres-mission'),
       loadSousTraitants()
     ]);
     
     const centralesData = await centralesResponse.json();
+    const missionsData = await missionsResponse.json();
     const centrales = centralesData.data || centralesData.centrales || [];
+    const missions = missionsData.missions || missionsData || [];
+    
+    // Créer un index missions par centrale_id pour lookup O(1)
+    const missionsMap = {};
+    missions.forEach(m => {
+      if (m.centrale_id) {
+        missionsMap[m.centrale_id] = m;
+      }
+    });
     
     const container = document.getElementById('centrales-list');
     if (!container) {
@@ -56,14 +68,13 @@ async function loadCentralesAvecAttributions() {
           <tbody class="bg-white divide-y divide-gray-200">
     `;
     
+    // ⚡ BOUCLE SYNCHRONE (pas de await dans la boucle)
     for (const centrale of centrales) {
       const statutBadge = getStatutBadge(centrale.statut);
       const typeBadge = centrale.type === 'TOITURE' ? '🏠 TOITURE' : '☀️ SOL';
       
-      // Récupérer la mission associée
-      const missionResponse = await fetch(`/api/ordres-mission?centrale_id=${centrale.id}`);
-      const missionData = await missionResponse.json();
-      const mission = missionData.missions && missionData.missions.length > 0 ? missionData.missions[0] : null;
+      // Lookup O(1) au lieu de fetch() séquentiel
+      const mission = missionsMap[centrale.id] || null;
       
       // Dropdown des sous-traitants
       const dropdownOptions = sousTraitants.map(st => {
