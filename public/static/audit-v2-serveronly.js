@@ -471,6 +471,12 @@ function updateProgress() {
     progressBar.style.width = percent + '%';
     progressBar.textContent = `${completed}/${total} (${percent}%)`;
   }
+  
+  // ✅ CORRECTIF: Mettre à jour le texte "X/Y vérifications" dans le header
+  const progressText = document.getElementById('progressText');
+  if (progressText) {
+    progressText.textContent = `${completed}/${total} vérifications`;
+  }
 }
 
 async function loadItemPhotos(itemId) {
