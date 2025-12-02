@@ -176,6 +176,7 @@ async function saveItemStatus(itemId, statut, conformite = null) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`❌ PUT /api/checklist/item/${itemId} ${response.status}:`, errorText);
+      alert(`❌ ERREUR ${response.status}\n\n${errorText.substring(0, 200)}`);
       throw new Error(`Server error ${response.status}`);
     }
     
