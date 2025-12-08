@@ -1254,7 +1254,7 @@ app.get('/api/ordres-mission/:id/document', async (c) => {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Nom Complet</div>
-              <div class="info-value">${mission.technicien_prenom} ${mission.technicien_nom}</div>
+              <div class="info-value">Technicien DiagPV</div>
             </div>
             <div class="info-item">
               <div class="info-label">Entreprise</div>
@@ -1262,11 +1262,11 @@ app.get('/api/ordres-mission/:id/document', async (c) => {
             </div>
             <div class="info-item">
               <div class="info-label">Email</div>
-              <div class="info-value">${mission.technicien_email || 'N/A'}</div>
+              <div class="info-value">contact@diagnosticphotovoltaique.fr</div>
             </div>
             <div class="info-item">
               <div class="info-label">Téléphone</div>
-              <div class="info-value">${mission.technicien_telephone || 'N/A'}</div>
+              <div class="info-value">Voir contact général</div>
             </div>
           </div>
         </div>
@@ -2837,7 +2837,7 @@ app.get('/api/ordres-mission/:id/rapport-final', async (c) => {
             </div>
             <div class="info-item">
               <div class="info-label">Technicien</div>
-              <div class="info-value">${mission.technicien_prenom} ${mission.technicien_nom}</div>
+              <div class="info-value">Technicien DiagPV</div>
             </div>
             <div class="info-item">
               <div class="info-label">Sous-Traitant</div>
@@ -3151,9 +3151,9 @@ app.get('/audit/:mission_id', async (c) => {
               <i class="fas fa-arrow-left mr-1"></i>Dashboard
             </button>
           </div>
-          <div class="mt-3 flex items-center text-sm" data-technicien-nom="${mission.technicien_prenom} ${mission.technicien_nom}">
+          <div class="mt-3 flex items-center text-sm" data-technicien-nom="Technicien DiagPV">
             <i class="fas fa-user-hard-hat mr-2"></i>
-            <span>${mission.technicien_prenom} ${mission.technicien_nom}</span>
+            <span>Technicien DiagPV</span>
             <span class="mx-2">•</span>
             <span id="progressText"><i class="fas fa-spinner fa-spin"></i> Chargement...</span>
           </div>
@@ -8189,7 +8189,7 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
         localisation: mission.localisation,
         adresse: mission.adresse,
         date_audit: mission.date_audit || new Date().toISOString().split('T')[0],
-        auditeur: `${mission.technicien_prenom} ${mission.technicien_nom}`
+        auditeur: `Technicien DiagPV`
       },
       checklist_sol: {
         items: itemsSol.results.map(item => ({
@@ -8240,7 +8240,7 @@ app.post('/api/rapports/generer/:mission_id', async (c) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       mission.centrale_id, missionId, `Rapport Audit ${mission.nom}`, typeRapport, 'TERMINE',
-      `${mission.technicien_prenom} ${mission.technicien_nom}`,
+      `Technicien DiagPV`,
       mission.date_audit || new Date().toISOString().split('T')[0],
       nbConformesSol + nbConformesToiture, nbNonConformesSol + nbNonConformesToiture,
       nbNaSol + nbNaToiture, JSON.stringify(rapportData), 'Système'
