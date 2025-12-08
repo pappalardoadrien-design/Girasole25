@@ -3556,7 +3556,7 @@ app.get('/documents-export', (c) => {
                         </div>
                         <div class="p-6">
                             <p class="text-gray-700 mb-1">
-                                <strong class="text-2xl text-purple-600">24 centrales</strong>
+                                <strong class="text-2xl text-purple-600">25 centrales</strong>
                             </p>
                             <p class="text-sm text-gray-500 mb-4">
                                 Depts: 03, 07, 19, 23, 26, 38, 42, 71, 89
@@ -3628,10 +3628,10 @@ app.get('/documents-export', (c) => {
                         </div>
                         <div class="p-6">
                             <p class="text-gray-700 mb-1">
-                                <strong class="text-2xl text-orange-600">4 centrales</strong>
+                                <strong class="text-2xl text-orange-600">3 centrales</strong>
                             </p>
                             <p class="text-sm text-gray-500 mb-4">
-                                Depts: 03, 15, 46
+                                Depts: 15, 46
                             </p>
                             <a href="/documents/csv/ATTRIBUTION_CADENET.csv" 
                                download
