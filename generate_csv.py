@@ -40,8 +40,7 @@ headers = [
     'Date prév audit',
     'Mission ID',
     'Statut mission',
-    'Date mission',
-    'Technicien'
+    'Date mission'
 ]
 
 # Créer CSV complet
@@ -78,8 +77,7 @@ with open('/home/user/webapp/public/documents/csv/ANNEXE1_COMPLETE_ATTRIBUTIONS.
             c.get('date_prev_audit', ''),
             c.get('mission_id', ''),
             c.get('mission_statut', ''),
-            c.get('date_mission', ''),
-            c.get('technicien', '')
+            c.get('date_mission', '')
         ]
         writer.writerow(row)
 
@@ -131,8 +129,7 @@ for st_nom, st_centrales in sous_traitants.items():
                 c.get('date_prev_audit', ''),
                 c.get('mission_id', ''),
                 c.get('mission_statut', ''),
-                c.get('date_mission', ''),
-                c.get('technicien', '')
+                c.get('date_mission', '')
             ]
             writer.writerow(row)
     
