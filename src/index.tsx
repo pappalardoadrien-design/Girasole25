@@ -3476,6 +3476,245 @@ app.get('/photos-audit/:mission_id', async (c) => {
 })
 
 // ======================
+// PAGE TÉLÉCHARGEMENT DOCUMENTS CSV
+// ======================
+
+app.get('/documents-export', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Export Documents - GIRASOLE 2025</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+        <div class="container mx-auto px-4 py-12">
+            <!-- En-tête -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-file-csv text-green-600 mr-3"></i>
+                    Export Documents CSV - GIRASOLE 2025
+                </h1>
+                <p class="text-gray-600 text-lg">
+                    Téléchargez les fichiers d'attribution des centrales photovoltaïques
+                </p>
+                <p class="text-sm text-gray-500 mt-2">
+                    Mis à jour le : <strong>8 décembre 2025</strong> | 52 centrales attribuées
+                </p>
+            </div>
+
+            <!-- Fichier complet -->
+            <div class="max-w-4xl mx-auto mb-8">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-blue-500">
+                    <div class="bg-blue-500 text-white px-6 py-4">
+                        <h2 class="text-2xl font-bold">
+                            <i class="fas fa-database mr-2"></i>
+                            Fichier Complet - Toutes les centrales
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-xl text-gray-800 mb-2">ANNEXE1_COMPLETE_ATTRIBUTIONS.csv</h3>
+                                <p class="text-gray-600 mb-1">
+                                    <i class="fas fa-solar-panel text-yellow-500 mr-2"></i>
+                                    <strong>52 centrales</strong> - Toutes les attributions
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    Fichier complet avec tous les détails techniques et attributions par sous-traitant
+                                </p>
+                            </div>
+                            <a href="/documents/csv/ANNEXE1_COMPLETE_ATTRIBUTIONS.csv" 
+                               download
+                               class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fichiers par sous-traitant -->
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                    <i class="fas fa-users mr-2"></i>
+                    Fichiers par Sous-traitant
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- ARTEMIS -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4">
+                            <h3 class="text-xl font-bold">
+                                <i class="fas fa-building mr-2"></i>
+                                ARTEMIS
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-1">
+                                <strong class="text-2xl text-purple-600">24 centrales</strong>
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Depts: 03, 07, 19, 23, 26, 38, 42, 71, 89
+                            </p>
+                            <a href="/documents/csv/ATTRIBUTION_ARTEMIS.csv" 
+                               download
+                               class="block bg-purple-500 hover:bg-purple-600 text-white text-center px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- DIAGPV -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-4">
+                            <h3 class="text-xl font-bold">
+                                <i class="fas fa-building mr-2"></i>
+                                DIAGPV - Adrien & Fabien
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-1">
+                                <strong class="text-2xl text-blue-600">14 centrales</strong>
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Depts: 11, 31, 34, 47
+                            </p>
+                            <a href="/documents/csv/ATTRIBUTION_DIAGPV___Adrien_&_Fabien.csv" 
+                               download
+                               class="block bg-blue-500 hover:bg-blue-600 text-white text-center px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- EDOUARD -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+                        <div class="bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-4">
+                            <h3 class="text-xl font-bold">
+                                <i class="fas fa-building mr-2"></i>
+                                EDOUARD - Martial
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-1">
+                                <strong class="text-2xl text-green-600">7 centrales</strong>
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Depts: 17, 37, 44, 79
+                            </p>
+                            <a href="/documents/csv/ATTRIBUTION_EDOUARD___Martial.csv" 
+                               download
+                               class="block bg-green-500 hover:bg-green-600 text-white text-center px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- CADENET -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+                        <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-4">
+                            <h3 class="text-xl font-bold">
+                                <i class="fas fa-building mr-2"></i>
+                                CADENET
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-1">
+                                <strong class="text-2xl text-orange-600">4 centrales</strong>
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Depts: 03, 15, 46
+                            </p>
+                            <a href="/documents/csv/ATTRIBUTION_CADENET.csv" 
+                               download
+                               class="block bg-orange-500 hover:bg-orange-600 text-white text-center px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- DRONE AVEYRON -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+                        <div class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-4">
+                            <h3 class="text-xl font-bold">
+                                <i class="fas fa-building mr-2"></i>
+                                DRONE AVEYRON SERVICE
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-1">
+                                <strong class="text-2xl text-indigo-600">2 centrales</strong>
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Dept: 12 (Aveyron)
+                            </p>
+                            <a href="/documents/csv/ATTRIBUTION_DRONE_AVEYRON_SERVICE.csv" 
+                               download
+                               class="block bg-indigo-500 hover:bg-indigo-600 text-white text-center px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- COURTIADE -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+                        <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-6 py-4">
+                            <h3 class="text-xl font-bold">
+                                <i class="fas fa-building mr-2"></i>
+                                COURTIADE DISTRIB
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-700 mb-1">
+                                <strong class="text-2xl text-yellow-600">1 centrale</strong>
+                            </p>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Dept: 32 (Gers)
+                            </p>
+                            <a href="/documents/csv/ATTRIBUTION_COURTIADE_DISTRIB.csv" 
+                               download
+                               class="block bg-yellow-500 hover:bg-yellow-600 text-white text-center px-6 py-3 rounded-lg font-bold transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Télécharger
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton retour -->
+            <div class="text-center mt-12">
+                <a href="/" class="inline-block bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-bold transition-all">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Retour au Dashboard
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-12 text-gray-500 text-sm">
+                <p>© 2025 Diagnostic Photovoltaïque - GIRASOLE</p>
+                <p class="mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Fichiers CSV encodés en UTF-8 avec BOM, séparateur point-virgule (;)
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `)
+})
+
+// ======================
 // PAGE PRINCIPALE
 // ======================
 
