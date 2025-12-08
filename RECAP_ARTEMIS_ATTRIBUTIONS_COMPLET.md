@@ -182,11 +182,6 @@ Pour : EARL CADOT, Hangar Fabrice COMBY, HANGAR Benoit BERTELOOT, Didier - PRIEU
 - ✅ Commentaire final de mission
 - ✅ Rapport PDF auto-généré par la plateforme
 
-### **Accès plateforme** :
-- **URL** : https://girasole-diagpv.pages.dev
-- **Login** : artemis@diagnosticphotovoltaique.fr
-- **Mot de passe** : [À communiquer]
-
 ---
 
 ## 📅 PLANNING
@@ -194,8 +189,8 @@ Pour : EARL CADOT, Hangar Fabrice COMBY, HANGAR Benoit BERTELOOT, Didier - PRIEU
 | Étape | Date |
 |-------|------|
 | **Démarrage audits** | Semaine 9 décembre 2025 |
-| **Deadline checklists** | 31 janvier 2026 |
-| **Rapport client** | 15 février 2026 |
+| **Deadline checklists** | 31 décembre 2025 |
+| **Rapport client** | 15 janvier 2026 |
 
 ---
 
@@ -204,8 +199,8 @@ Pour : EARL CADOT, Hangar Fabrice COMBY, HANGAR Benoit BERTELOOT, Didier - PRIEU
 **Adrien PAPPALARDO**  
 Bras droit fondateur - Développement commercial  
 Diagnostic Photovoltaïque  
-Email : adrien@diagnosticphotovoltaique.fr  
-Tel : [À compléter]
+Email : a.pappalardo@diagnosticphotovoltaique.fr  
+Tel : 06 07 29 22 12
 
 ---
 
