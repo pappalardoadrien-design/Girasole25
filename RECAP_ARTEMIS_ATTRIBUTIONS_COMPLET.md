@@ -12,9 +12,9 @@
 |----------|--------|
 | **Missions totales** | 25 |
 | **Puissance totale** | 8.261 kWc |
-| **Départements couverts** | 9 (03, 07, 19, 23, 26, 38, 42, 71, 89) |
-| **Missions avec toiture** | 4 |
-| **Missions sans toiture** | 21 |
+| **Départements couverts** | 10 (03, 07, 15, 19, 23, 26, 38, 42, 71, 89) |
+| **Missions avec toiture** | 5 |
+| **Missions sans toiture** | 20 |
 
 ---
 
@@ -24,14 +24,14 @@
 |-------------|-------------|-----------------|-----------|
 | **03 (Allier)** | 5 | 1.426 kWc | DUMONT GUY, HANGAR Angelina SIMMONET, Hangar Eric LOGNON, Hangar Julien Vaudin, Maymat |
 | **07 (Ardèche)** | 2 | 609 kWc | HARAS DE LA MAJORIE/MANOHA, SCI KILJOR |
+| **15 (Cantal)** | 1 | 314 kWc | Hangar Laurent ROUX (2) |
 | **19 (Corrèze)** | 1 | 500 kWc | Hangar Fabrice COMBY |
-| **23 (Creuse)** | 5 | 1.892 kWc | BOUCHARDY 203 LOC, BOULOIR 206 LOC, Hangar Frederic Sinaud, MARTEL 183 LOC, MARTEL 184 Construction |
+| **23 (Creuse)** | 6 | 2.329 kWc | BOUCHARDY 203 LOC, BOULOIR 206 LOC, Hangar Frederic Sinaud, Hangar Frederic Sinaud (2), MARTEL 183 LOC, MARTEL 184 Construction |
 | **26 (Drôme)** | 3 | 1.047 kWc | Didier - PRIEUR, Hangar Benjamin CHASSON, Hangar Patrick BLANCHET |
 | **38 (Isère)** | 1 | 256 kWc | Mathieu Montet |
 | **42 (Loire)** | 3 | 962 kWc | EARL CADOT, GAYET 42, Hangar LAMIOT |
-| **71 (Saône-et-Loire)** | 2 | 479 kWc | Serge Maltaverne, Serge Maltaverne (2) |
+| **71 (Saône-et-Loire)** | 3 | 739 kWc | Serge Maltaverne, Serge Maltaverne (2) |
 | **89 (Yonne)** | 1 | 279 kWc | HANGAR Benoit BERTELOOT |
-| **Sans département** | 2 | 532 kWc | Hangar Frederic Sinaud (2), Hangar Laurent ROUX (2) |
 
 ---
 
@@ -134,14 +134,29 @@
 
 ---
 
-#### **Sans département - 3 missions**
+#### **Département 15 (Cantal) - 1 mission**
 
 | # | Centrale | Puissance | Mission ID | URL Checklist |
 |---|----------|-----------|------------|---------------|
-| 24 | Hangar Frederic Sinaud (2) | 218.40 kWc | 28 | https://girasole-diagpv.pages.dev/audit/28 |
-| 25 | Hangar Laurent ROUX (2) | 313.95 kWc | 22 | https://girasole-diagpv.pages.dev/audit/22 |
+| 24 | Hangar Laurent ROUX (2) | 313.95 kWc | 22 | https://girasole-diagpv.pages.dev/audit/22 |
 
-**Sous-total sans dept** : 2 missions - 532,35 kWc
+**Sous-total dept 15** : 1 mission - 313,95 kWc
+
+---
+
+#### **Département 23 (Creuse) - Mission supplémentaire**
+
+| # | Centrale | Puissance | Mission ID | URL Checklist |
+|---|----------|-----------|------------|---------------|
+| 25 | Hangar Frederic Sinaud (2) | 218.40 kWc | 28 | https://girasole-diagpv.pages.dev/audit/28 |
+
+**Sous-total dept 23** : 6 missions - 2.391,39 kWc (incluant missions 14, 15, 16, 26, 27, 28)
+
+---
+
+#### **Département 71 (Saône-et-Loire) - Mission supplémentaire**
+
+**Sous-total dept 71** : 3 missions - 739,12 kWc (incluant mission 40)
 
 ---
 
@@ -218,4 +233,4 @@ https://girasole-diagpv.pages.dev/documents/csv/ATTRIBUTION_ARTEMIS.csv
 
 **Rapport créé** : 2025-12-08  
 **Source** : Base D1 production `girasole-db-production`  
-**Validation** : ✅ 25 missions ARTEMIS, 8.261 kWc, 9 départements
+**Validation** : ✅ 25 missions ARTEMIS, 8.261 kWc, 10 départements (03, 07, 15, 19, 23, 26, 38, 42, 71, 89)
