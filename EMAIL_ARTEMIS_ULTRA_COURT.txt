@@ -1,0 +1,40 @@
+Objet : Attribution +7 nouvelles centrales PV - ARTEMIS
+
+Bonjour,
+
+Mise à jour de votre périmètre GIRASOLE 2025 :
+
+🔢 NOUVEAU TOTAL : 25 centrales (+7)
+📊 PUISSANCE : 8,261 kWc
+📍 COUVERTURE : 9 départements
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7 NOUVELLES CENTRALES AJOUTÉES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ID 13  │ DUMONT GUY                    │ 232 kWc  │ 03
+ID 18  │ Hangar Fabrice COMBY          │ 500 kWc  │ 19
+ID 36  │ Didier - PRIEUR               │ 500 kWc  │ 26
+ID 42  │ Hangar Benjamin CHASSON       │ 388 kWc  │ 26
+ID 32  │ Hangar Patrick BLANCHET       │ 159 kWc  │ 26
+ID 22  │ Hangar Laurent ROUX (2)       │ 314 kWc  │ 15
+ID 28  │ Hangar Frederic Sinaud (2)    │ 218 kWc  │ 23
+
+TOTAL : +2,311 kWc
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 TÉLÉCHARGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fichier CSV complet (25 centrales) :
+https://girasole-diagpv.pages.dev/documents/csv/ATTRIBUTION_ARTEMIS.csv
+
+Tous les fichiers :
+https://girasole-diagpv.pages.dev/documents-export
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions : contact@diagnosticphotovoltaique.fr
+
+Cordialement,
+Diagnostic Photovoltaïque - GIRASOLE 2025
