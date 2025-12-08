@@ -325,6 +325,78 @@ function setupCommentListener(itemId) {
   });
 }
 
+// ✅ NOUVEAU: Setup Drag & Drop zone pour photos
+function setupDragDropZone(itemId) {
+  const dropzone = document.getElementById(`dropzone-${itemId}`);
+  const fileInput = document.getElementById(`fileinput-${itemId}`);
+  
+  if (!dropzone || !fileInput) return;
+  
+  dropzone.addEventListener('click', () => fileInput.click());
+  
+  fileInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    await handlePhotoFiles(itemId, files);
+    fileInput.value = '';
+  });
+  
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#2563eb';
+    dropzone.style.background = '#dbeafe';
+    dropzone.style.transform = 'scale(1.02)';
+  });
+  
+  dropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#3b82f6';
+    dropzone.style.background = '#eff6ff';
+    dropzone.style.transform = 'scale(1)';
+  });
+  
+  dropzone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#3b82f6';
+    dropzone.style.background = '#eff6ff';
+    dropzone.style.transform = 'scale(1)';
+    
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    
+    if (files.length === 0) {
+      alert('⚠️ Aucune image détectée.\n\nVeuillez glisser uniquement des fichiers images (JPG, PNG, HEIC).');
+      return;
+    }
+    
+    await handlePhotoFiles(itemId, files);
+  });
+}
+
+// ✅ NOUVEAU: Gérer upload multiple de photos
+async function handlePhotoFiles(itemId, files) {
+  if (files.length === 0) return;
+  
+  const existingPhotos = document.querySelectorAll(`#photos-${itemId} img`).length;
+  const remaining = 5 - existingPhotos;
+  
+  if (remaining <= 0) {
+    alert('⚠️ LIMITE ATTEINTE\n\nVous avez déjà 5 photos pour cet item.\nSupprimez-en une avant d\'en ajouter.');
+    return;
+  }
+  
+  if (files.length > remaining) {
+    alert(`⚠️ TROP DE PHOTOS\n\nVous pouvez ajouter seulement ${remaining} photo(s) de plus.\nLimite: 5 photos par item.`);
+    files = files.slice(0, remaining);
+  }
+  
+  for (const file of files) {
+    const compressed = await compressImage(file);
+    await saveItemPhoto(itemId, compressed.base64, compressed.filename);
+  }
+}
+
 async function handlePhotoCapture(itemId) {
   const input = document.createElement('input');
   input.type = 'file';
@@ -442,10 +514,18 @@ function renderChecklist() {
             <textarea id="comment-${item.id}" 
                       placeholder="Commentaire (optionnel)..." 
                       style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; min-height: 60px; margin-bottom: 10px;">${item.commentaire || ''}</textarea>
-            <button onclick="handlePhotoCapture(${item.id})" 
-                    style="width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
-              <i class="fas fa-camera mr-2"></i> Ajouter Photo
-            </button>
+            
+            <!-- Zone Drag & Drop -->
+            <div id="dropzone-${item.id}" 
+                 class="dropzone"
+                 style="width: 100%; padding: 30px; border: 2px dashed #3b82f6; border-radius: 6px; background: #eff6ff; text-align: center; margin-bottom: 10px; cursor: pointer; transition: all 0.3s ease;">
+              <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: #3b82f6; margin-bottom: 10px;"></i>
+              <p style="color: #3b82f6; font-weight: 600; margin: 0;">📸 Glissez vos photos ici</p>
+              <p style="color: #6b7280; font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner (max 5 photos)</p>
+            </div>
+            
+            <input type="file" id="fileinput-${item.id}" accept="image/*" multiple style="display: none;">
+            
             <div id="photos-${item.id}" style="margin-top: 10px;"></div>
           </div>
         `).join('')}
@@ -458,6 +538,7 @@ function renderChecklist() {
   // Setup listeners
   checklistItems.forEach(item => {
     setupCommentListener(item.id);
+    setupDragDropZone(item.id); // ✅ NOUVEAU: Setup drag & drop
     loadItemPhotos(item.id); // Charger photos pour chaque item
   });
 }
@@ -646,22 +727,23 @@ function renderCommentaireFinal() {
           <span id="photosGeneralesCount" class="text-xs text-gray-500">0 photo(s)</span>
         </div>
         
+        <!-- Zone Drag & Drop Photos Générales -->
+        <div id="dropzonePhotosGenerales" 
+             style="width: 100%; padding: 40px; border: 3px dashed #3b82f6; border-radius: 12px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); text-align: center; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">
+          <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #3b82f6; margin-bottom: 15px; display: block;"></i>
+          <p style="color: #1e40af; font-weight: 700; margin: 0; font-size: 18px;">📸 Glissez vos photos générales ici</p>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 8px;">Vue d'ensemble, contexte, accès chantier...</p>
+          <p style="color: #9ca3af; font-size: 12px; margin-top: 5px;">ou cliquez pour sélectionner (JPG, PNG, HEIC)</p>
+        </div>
+        
         <input 
           type="file" 
           id="photosGeneralesInput" 
           accept="image/*" 
           multiple 
           capture="environment"
-          class="hidden"
+          style="display: none;"
         >
-        
-        <button 
-          onclick="document.getElementById('photosGeneralesInput').click()" 
-          class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition-all mb-4 flex items-center justify-center gap-2"
-        >
-          <i class="fas fa-camera"></i>
-          📸 Ajouter photos générales
-        </button>
         
         <div id="photosGeneralesGallery" class="grid grid-cols-3 gap-3 mt-3">
           <!-- Photos générales ici -->
@@ -702,11 +784,56 @@ function renderCommentaireFinal() {
     await saveCommentaireFinal();
   });
   
-  // Event listener upload photos
-  const input = document.getElementById('photosGeneralesInput');
-  input?.addEventListener('change', handlePhotosGeneralesUpload);
+  // ✅ Setup Drag & Drop pour photos générales
+  setupDragDropPhotosGenerales();
   
   loadPhotosGenerales();
+}
+
+// ✅ NOUVEAU: Setup Drag & Drop pour photos générales
+function setupDragDropPhotosGenerales() {
+  const dropzone = document.getElementById('dropzonePhotosGenerales');
+  const fileInput = document.getElementById('photosGeneralesInput');
+  
+  if (!dropzone || !fileInput) return;
+  
+  dropzone.addEventListener('click', () => fileInput.click());
+  
+  fileInput.addEventListener('change', handlePhotosGeneralesUpload);
+  
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#1e40af';
+    dropzone.style.background = 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)';
+    dropzone.style.transform = 'scale(1.02)';
+  });
+  
+  dropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#3b82f6';
+    dropzone.style.background = 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)';
+    dropzone.style.transform = 'scale(1)';
+  });
+  
+  dropzone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#3b82f6';
+    dropzone.style.background = 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)';
+    dropzone.style.transform = 'scale(1)';
+    
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    
+    if (files.length === 0) {
+      alert('⚠️ Aucune image détectée.\n\nVeuillez glisser uniquement des fichiers images (JPG, PNG, HEIC).');
+      return;
+    }
+    
+    const event = { target: { files } };
+    await handlePhotosGeneralesUpload(event);
+  });
 }
 
 async function saveCommentaireFinal() {
@@ -856,6 +983,82 @@ function renderChecklistToiture() {
   `;
   
   container.innerHTML = html;
+  
+  // ✅ Setup drag & drop pour chaque item toiture
+  checklistItemsToiture.forEach(item => {
+    setupDragDropZoneToiture(item.id);
+  });
+}
+
+// ✅ NOUVEAU: Setup Drag & Drop zone pour photos TOITURE
+function setupDragDropZoneToiture(itemId) {
+  const dropzone = document.getElementById(`dropzone-toiture-${itemId}`);
+  const fileInput = document.getElementById(`photo-input-toiture-${itemId}`);
+  
+  if (!dropzone || !fileInput) return;
+  
+  dropzone.addEventListener('click', () => fileInput.click());
+  
+  fileInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    await handlePhotoFilesToiture(itemId, files);
+    fileInput.value = '';
+  });
+  
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#ea580c';
+    dropzone.style.background = '#ffedd5';
+    dropzone.style.transform = 'scale(1.02)';
+  });
+  
+  dropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#f97316';
+    dropzone.style.background = '#fff7ed';
+    dropzone.style.transform = 'scale(1)';
+  });
+  
+  dropzone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.borderColor = '#f97316';
+    dropzone.style.background = '#fff7ed';
+    dropzone.style.transform = 'scale(1)';
+    
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    
+    if (files.length === 0) {
+      alert('⚠️ Aucune image détectée.\n\nVeuillez glisser uniquement des fichiers images (JPG, PNG, HEIC).');
+      return;
+    }
+    
+    await handlePhotoFilesToiture(itemId, files);
+  });
+}
+
+// ✅ NOUVEAU: Gérer upload multiple de photos TOITURE
+async function handlePhotoFilesToiture(itemId, files) {
+  if (files.length === 0) return;
+  
+  const existingPhotos = document.querySelectorAll(`#photos-gallery-${itemId} img`).length;
+  const remaining = 5 - existingPhotos;
+  
+  if (remaining <= 0) {
+    alert('⚠️ LIMITE ATTEINTE\n\nVous avez déjà 5 photos pour cet item.\nSupprimez-en une avant d\'en ajouter.');
+    return;
+  }
+  
+  if (files.length > remaining) {
+    alert(`⚠️ TROP DE PHOTOS\n\nVous pouvez ajouter seulement ${remaining} photo(s) de plus.\nLimite: 5 photos par item.`);
+    files = files.slice(0, remaining);
+  }
+  
+  for (const file of files) {
+    await handleMultiPhotoUpload(itemId, { target: { files: [file] } });
+  }
 }
 
 function renderChecklistItemToiture(item) {
@@ -906,18 +1109,25 @@ function renderChecklistItemToiture(item) {
         onchange="saveCommentToiture(${item.id})"
       >${item.commentaire || ''}</textarea>
       
-      <!-- Photos -->
+      <!-- Photos avec Drag & Drop -->
       <div class="mt-3">
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-medium text-gray-700">
             <i class="fas fa-images mr-1"></i>Photos (<span id="photo-count-toiture-${item.id}">0</span>)
           </span>
-          <button class="photo-btn inline-flex items-center" onclick="openPhotoUploader(${item.id})">
-            <i class="fas fa-camera mr-2"></i>Ajouter photos
-          </button>
         </div>
-        <input type="file" id="photo-input-${item.id}" accept="image/*" capture="environment" 
-               multiple onchange="handleMultiPhotoUpload(${item.id}, event)" style="display:none">
+        
+        <!-- Zone Drag & Drop -->
+        <div id="dropzone-toiture-${item.id}" 
+             class="dropzone-toiture"
+             style="width: 100%; padding: 20px; border: 2px dashed #f97316; border-radius: 6px; background: #fff7ed; text-align: center; margin-bottom: 10px; cursor: pointer; transition: all 0.3s ease;">
+          <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: #f97316; margin-bottom: 8px;"></i>
+          <p style="color: #f97316; font-weight: 600; margin: 0; font-size: 14px;">📸 Glissez vos photos ici</p>
+          <p style="color: #6b7280; font-size: 11px; margin-top: 3px;">ou cliquez pour sélectionner (max 5 photos)</p>
+        </div>
+        
+        <input type="file" id="photo-input-toiture-${item.id}" accept="image/*" multiple style="display:none">
+        
         <div id="photos-gallery-${item.id}" class="grid grid-cols-3 gap-2">
           <!-- Photos chargées dynamiquement -->
         </div>
